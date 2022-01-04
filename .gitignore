@@ -1,0 +1,5 @@
+*~
+*.png
+swarm.egg-info/
+container_id
+__pycache__/
