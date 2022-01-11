@@ -5,7 +5,7 @@ import networkx as nx
 import logging
 from .. agent import AgentInterface
 
-from .color import FREE, AGENT
+from .color import FREE, AGENT, OBSTACLE
 
 
 class Map(object):
@@ -52,7 +52,6 @@ class Map(object):
             f"Trying to place an agent at a none free location {agent.position}"
         self._graph.nodes[agent.position]["agent"] = agent
 
-
     def size(self) -> int:
         """ Get the size of the world """
         return nx.number_of_nodes(self._graph)
@@ -90,19 +89,35 @@ class Map(object):
 
         """
         node = int(node)
-        assert 0 <= node <= nx.number_of_nodes(self._graph), "Updating value on a non existing node"
+        assert 0 <= node <= nx.number_of_nodes(self._graph), "Updating value on a non-existing node"
         self._graph.nodes[node][key] = value
 
     def view(self, block=True):
         """ Show the world
 
         """
-        color = self._graph.nodes(data="agent", default=None)
-        color = [FREE if c is None else AGENT for _, c in color]
+        color = []
+
+        for _, data in list(self._graph.nodes.data()):
+            if "agent" in data:
+                if data["agent"] is None:
+                    c = FREE
+                else:
+                    c = AGENT
+            else:
+                if "obstacle" in data:
+                    c = OBSTACLE
+                else:
+                    assert False, "This should never happen"
+
+            color.append(c)
+
+#        color = self._graph.nodes(data="agent", default=None)
+#        color = [FREE if c is None else AGENT for _, c in color]
 
         pos = {n: (n[0] * 10, n[1] * 10) for n in nx.nodes(self._graph)}
 
         nodes_graph = nx.draw_networkx_nodes(self._graph, pos=pos, node_color=color,
-                                             node_size=300, node_shape="s", linewidths=1.0)
+                                             node_size=160, node_shape="s", linewidths=1.0)
 
         nodes_graph.set_edgecolor('black')

@@ -19,7 +19,7 @@ class Swarm(object):
 
         for number, gen in agent_generators:
             for i in range(number):
-                agent = gen((1, 1))
+                agent = gen((1, i))
                 my_map.add_agent_to_map(agent)
                 self._agents.append(agent)
 

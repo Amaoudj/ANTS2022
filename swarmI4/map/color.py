@@ -2,3 +2,4 @@
 
 FREE = "green"
 AGENT = "red"
+OBSTACLE = "blue"

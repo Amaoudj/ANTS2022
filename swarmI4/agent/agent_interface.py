@@ -24,7 +24,6 @@ class AgentInterface:
         if self._conf.get("history", False):
             self._history = []
 
-
     def move(self, world, updated_pos) -> int:
         """ Move the agent
 

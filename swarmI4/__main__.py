@@ -3,12 +3,12 @@ import argparse
 from random import seed
 import logging
 
-from .map import Map, MapGenerator
-import matplotlib.pyplot as plt
+from .map import Map, MapGenerator, WarehouseMapGenerator
 
 from . agent import random_agent_generator
 from . swarm import Swarm
 from . simulator import Simulator
+from . renderer import MatplotlibRenderer
 
 # from . import VideoRecorder, DummyRecorder
 
@@ -65,23 +65,17 @@ def main(args):
     logging.root.setLevel(getattr(logging, args.loglevel.upper(), None))
     logging.info(f"Runtime arguments f{args}")
 
-    map_generator = MapGenerator(args.nodes, 2,
-                                 (2, 3), args.seed)
+    # map_generator = MapGenerator(args.nodes, args.seed)
+    map_generator = WarehouseMapGenerator((29, 29), (5, 5), (3, 3), args.seed)
+
 
     my_map: Map = map_generator.generate()
-    my_swarm: Swarm = Swarm([[1, random_agent_generator()]], my_map)
-    my_sim: Simulator = Simulator(my_map, True)
+    my_swarm: Swarm = Swarm([[10, random_agent_generator()]], my_map, )
+    my_renderer: MatplotlibRenderer = MatplotlibRenderer(my_map, my_swarm)
+    my_sim: Simulator = Simulator(my_map, my_renderer)
     my_sim.start(my_swarm)
     my_sim.main_loop(my_swarm)
 
-
-"""    
-    plt.title("Testing")
-    my_map.view()
-    plt.draw()
-    plt.savefig("test.png")
-    plt.show()
-"""
 
 if __name__ == "__main__":
     arg = parse_args()

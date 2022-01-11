@@ -1,7 +1,7 @@
 """ Run the simulation """
 import logging
-import matplotlib.pyplot as plt
 from ..swarm import Swarm
+from ..renderer import RendererInterface
 # from typing import List
 
 from ..map import Map
@@ -11,7 +11,7 @@ from ..map import Map
 class Simulator(object):
     """ The Simulator"""
 
-    def __init__(self, my_map: Map, display: bool):
+    def __init__(self, my_map: Map, renderer: RendererInterface):
         """ Create the simulator
 
         :my_map: The map generated for the simulation
@@ -19,10 +19,9 @@ class Simulator(object):
 
         """
         self._my_map = my_map
-        self._display = display
         self._display_initialized = False
         self._step = 0
-        self._speed = 0.001
+        self._renderer = renderer
 
     def start(self, swarm: Swarm) -> None:
         """ Start the simulating
@@ -41,41 +40,20 @@ class Simulator(object):
         """
         return self._step > 100
 
-    def display(self):
-        """ Show the world """
-        if self._display:
-            plt.clf()
-            if not self._display_initialized:
-                f = plt.gcf()
-                f.set_size_inches(self._my_map.get_number_of_nodes()[0] / 4, self._my_map.get_number_of_nodes()[1] / 4,
-                                  forward=True)
-                f.set_dpi(100)
-                self._display_initialized = True
-
-            plt.title(f"Turn: {self._step}")
-            self._my_map.view(False)
-            plt.draw()
-            plt.show(block=False)
-
-    def sleep(self):
-        """ Sleep for a time step """
-        if self._speed > -1:
-            plt.pause(self._speed)
-
     def main_loop(self, swarm: Swarm) -> None:
         """ The main loop of the simulator
 
         :swarm: The swarm
 
         """
+        self._renderer.setup()
+
         while not self.stop():
             logging.debug(f"Turn {self._step} is now running")
-            self.display()
+            self._renderer.display_frame(self._step)
             swarm.move_all(self._my_map)
-            self.sleep()
             self._step += 1
 
+        self._renderer.display_frame(self._step)
         logging.info("Simulation is done")
-        if self._display:
-            self.display()
-            plt.show()
+        self._renderer.tear_down()
