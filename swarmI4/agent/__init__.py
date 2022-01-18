@@ -2,3 +2,4 @@
 from . agent_interface import AgentInterface
 from . random_agent import RandomAgent, random_agent_generator
 from .  agent_placement import random_placement
+from .  agent_placement import horizontal_placement

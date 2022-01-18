@@ -2,7 +2,6 @@
 import logging
 from ..swarm import Swarm
 from ..renderer import RendererInterface
-# from typing import List
 
 from ..map import Map
 # from .recording import DummyRecorder
