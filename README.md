@@ -11,8 +11,14 @@ git clone https://github.com/anderslyhne/swarm4I40sim.git
 
 cd swarm4I40sim
 ```
+To run an example from the terminal:
 
-Now build the docker image (install docker.io if not already installed `sudo apt install docker.io`):
+```sh
+python -m swarmI4 -c configfiles/example.conf
+```
+
+# Using pycharm in docker
+Build the docker image (install docker.io if not already installed `sudo apt install docker.io`):
 
 ```sh
 make build
@@ -25,13 +31,6 @@ make start
 ```
 
 You should now be in a shell in the directory called `~/package` in the container.
-
-To run an example from the terminal:
-
-```sh
-python -m swarmI4 run -n 10 40
-```
-
 
 To use PyCharm as an IDE, do the following:
 ```

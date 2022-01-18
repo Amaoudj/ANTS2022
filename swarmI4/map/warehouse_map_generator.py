@@ -4,28 +4,46 @@ import networkx as nx
 import random as rnd
 import logging
 import math
-
+import configargparse
 
 from .map import Map
 
+parser = configargparse.get_arg_parser()
+parser.add_argument("-n", "--nodes",
+                    help="The number of nodes (x, y) in the map",
+                    nargs=2, metavar="nodes", type=int, default=(10, 10))
+
+parser.add_argument("-o", "--obstacles",
+                    help="The number of obstacles (x, y) in the map",
+                    nargs=2, metavar="obstacles", type=int, default=(2, 2))
+
+parser.add_argument("-z", "--obstacle_size",
+                    help="Obstacle size (x, y)",
+                    nargs=2, metavar="obstacle_size", type=int, default=(2, 2))
+
 
 class WarehouseMapGenerator(object):
-
     """ Auto generating warehouse maps. Warehouse maps are regular grids with regular obstacles. E.g.:
 
-    #######################
-    #                     #
-    #  XXXX  XXXXX  XXXX  #
-    #  XXXX  XXXXX  XXXX  #
-    #                     #
-    #  XXXX  XXXXX  XXXX  #
-    #  XXXX  XXXXX  XXXX  #
-    #                     #
-    #######################
+    ######################
+    #                    #
+    #  XXXX  XXXX  XXXX  #
+    #  XXXX  XXXX  XXXX  #
+    #                    #
+    #  XXXX  XXXX  XXXX  #
+    #  XXXX  XXXX  XXXX  #
+    #                    #
+    ######################
 
     The example above has 3x2 regularly obstacles
 
     """
+
+    @staticmethod
+    def create_from_args(args):
+        """ Static method for creating a warehouse map from args.
+        """
+        return WarehouseMapGenerator(args.nodes, args.obstacles, args.obstacle_size, args.seed)
 
     def __init__(self, number_of_nodes: Tuple[int, int],
                  number_of_obstacles: Tuple[int, int],

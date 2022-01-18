@@ -1,7 +1,5 @@
 """ The interface for a renderer """
 
-#from map import Map
-#from swarm import Swarm
 
 class RendererInterface:
     """ Interface class for a renderr """

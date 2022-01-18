@@ -3,14 +3,25 @@ from typing import Tuple
 import networkx as nx
 import random as rnd
 import logging
+import configargparse
 
 from .map import Map
 
+parser = configargparse.get_arg_parser()
+parser.add_argument("-n", "--nodes",
+                    help="The number of nodes (x, y) in the map",
+                    nargs=2, metavar="nodes", type=int, default=(10, 10))
 
-class MapGenerator(object):
 
-    """ Auto generating worlds"""
+class SimpleMapGenerator(object):
 
+    @staticmethod
+    def create_from_args(args):
+        """ Static method for creating a simple map from args.
+        """
+        return SimpleMapGenerator(args.nodes, args.seed)
+
+    """ Auto generate simple maps (no obstacles or similar) """
     def __init__(self, number_of_nodes: Tuple[int, int],
                  seed=rnd.seed()):
         """ Create a generator

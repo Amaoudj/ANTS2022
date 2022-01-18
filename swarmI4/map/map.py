@@ -18,8 +18,17 @@ class Map(object):
         self._graph = graph
         self._number_of_nodes = number_of_nodes
 
-    def get_number_of_nodes(self) -> Tuple[int, int]:
+    @property
+    def size_xy(self) -> Tuple[int, int]:
         return self._number_of_nodes
+
+    @property
+    def size_x(self) -> int:
+        return self._number_of_nodes[0]
+
+    @property
+    def size_y(self) -> int:
+        return self._number_of_nodes[1]
 
     def connected(self, node: int) -> list:
         """ Get the corrected nodes to node
@@ -35,7 +44,7 @@ class Map(object):
         Check if a node is occupied
         :position: node position
         """
-        return self._graph.nodes[position]["agent"] is not None
+        return "agent" not in self._graph.nodes[position] or self._graph.nodes[position]["agent"] is not None
 
     def move_agent(self, agent: AgentInterface, new_position: Tuple[int, int]):
         assert self._graph.nodes[agent.position]["agent"] == agent, \
@@ -52,7 +61,7 @@ class Map(object):
             f"Trying to place an agent at a none free location {agent.position}"
         self._graph.nodes[agent.position]["agent"] = agent
 
-    def size(self) -> int:
+    def number_of_nodes(self) -> int:
         """ Get the size of the world """
         return nx.number_of_nodes(self._graph)
 

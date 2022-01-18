@@ -1,55 +1,47 @@
 """ Main function """
-import argparse
+import configargparse
 from random import seed
 import logging
 
-from .map import Map, MapGenerator, WarehouseMapGenerator
+from .map import *
 
 from . agent import random_agent_generator
 from . swarm import Swarm
 from . simulator import Simulator
-from . renderer import MatplotlibRenderer
+
+from . renderer import *
 
 # from . import VideoRecorder, DummyRecorder
+
+parser = configargparse.get_arg_parser() # ArgumentParser(description="Swarm robotics for I4.0 abstract simulator.")
 
 
 def parse_args():
     """ Handles the arguments """
-    parser = argparse.ArgumentParser(description="Swarm robotics for I4.0 abstract simulator.")
+    parser = configargparse.get_arg_parser() # configargparse.ArgumentParser(description="Swarm robotics for I4.0 abstract simulator.")
 
-    subparsers = parser.add_subparsers(help="Commands")
-    subparse_run = subparsers.add_parser("run", help="Run a experiment")
+    parser.add('-c', '--config', is_config_file=True, help='Config file')
 
-    subparse_run.add_argument("-n", "--nodes",
-                              help="The number of nodes (x, y) in the map",
-                              nargs=2, metavar="nodes", type=int, default=(10, 10))
+    parser.add_argument("-r", "--renderer", help="Renderer to use", nargs=1, metavar="renderer", type=str,
+                        default="MatPlotLibRenderer", choices=["MatPlotLibRenderer", "NullRenderer"])
 
-    subparse_run.add_argument("--no-display",
-                              help="Run in headless mode without display",
-                              action="store_const",
-                              const=True)
+    parser.add_argument("-m", "--map", help="Map/map generator to use", nargs=1, metavar="map", type=str,
+                        default="WarehouseMapGenerator", choices=["WarehouseMapGenerator", "SimpleMapGenerator"])
 
-    subparse_run.add_argument("--seed",
-                              help="Random seed",
-                              nargs=1, metavar="seed", type=int,
-                              default=seed())
-    # subparse_run.add_argument("--delay",
-    #                           help="The delay between each turn in the simulation (used together with display)",
-    #                           nargs=1, metavar="delay", type=float, default=-1)
-    # subparse_run.add_argument("-r", "--record",
-    #                           help="Record a video of the simulation",
-    #                           nargs=1, metavar="filename", type=str)
-    #
+    parser.add_argument("--seed",
+                        help="Random seed",
+                        nargs=1, metavar="seed", type=int,
+                        default=seed())
+
+    parser.add_argument("-l", "--loglevel",
+                        help="Logging level",
+                        nargs=1, metavar="level", choices=["INFO", "DEBUG", "WARNING", "ERROR"], type=str,
+                        default="INFO")
+
     # subparse_run.add_argument("-s", "--swarm",
     #                           help="The size of the swarm",
     #                           nargs=1, metavar="size", type=int, required=True)
     #
-    subparse_run.add_argument("-l", "--loglevel",
-                              help="Logging level",
-                              nargs=1, metavar="level", choices=["INFO", "DEBUG", "WARNING", "ERROR"], type=str,
-                              default="INFO")
-
-    subparse_run.set_defaults(func=main)
 
     return parser.parse_args()
 
@@ -58,6 +50,12 @@ def main(args):
     if type(args.loglevel) == list:
         args.loglevel = args.loglevel[0]
 
+    if type(args.map) == list:
+        args.map = args.map[0]
+
+    if type(args.renderer) == list:
+        args.renderer = args.renderer[0]
+
     if type(args.seed) == list:
         args.seed = args.seed[0]
 
@@ -65,13 +63,13 @@ def main(args):
     logging.root.setLevel(getattr(logging, args.loglevel.upper(), None))
     logging.info(f"Runtime arguments f{args}")
 
-    # map_generator = MapGenerator(args.nodes, args.seed)
-    map_generator = WarehouseMapGenerator((29, 29), (5, 5), (3, 3), args.seed)
-
+    map_generator = globals()[args.map].create_from_args(args)
 
     my_map: Map = map_generator.generate()
     my_swarm: Swarm = Swarm([[10, random_agent_generator()]], my_map, )
-    my_renderer: MatplotlibRenderer = MatplotlibRenderer(my_map, my_swarm)
+
+    my_renderer: RendererInterface = globals()[args.renderer](my_map, my_swarm)
+
     my_sim: Simulator = Simulator(my_map, my_renderer)
     my_sim.start(my_swarm)
     my_sim.main_loop(my_swarm)
@@ -79,4 +77,4 @@ def main(args):
 
 if __name__ == "__main__":
     arg = parse_args()
-    arg.func(arg)
+    main(arg)

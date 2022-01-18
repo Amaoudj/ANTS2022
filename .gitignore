@@ -3,3 +3,4 @@
 swarm.egg-info/
 container_id
 __pycache__/
+venv/

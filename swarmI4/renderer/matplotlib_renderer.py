@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from ..map import Map
 
 
-class MatplotlibRenderer (RendererInterface):
+class MatPlotLibRenderer (RendererInterface):
     """
     A simple matplotlib renderer
     """
@@ -36,7 +36,7 @@ class MatplotlibRenderer (RendererInterface):
         plt.clf()
         if not self._display_initialized:
             f = plt.gcf()
-            f.set_size_inches(self._my_map.get_number_of_nodes()[0] / 4, self._my_map.get_number_of_nodes()[1] / 4,
+            f.set_size_inches(self._my_map.size_x / 4, self._my_map.size_y / 4,
                               forward=True)
             f.set_dpi(100)
             self._display_initialized = True

@@ -51,7 +51,7 @@ class Simulator(object):
         while not self.stop():
             logging.debug(f"Turn {self._step} is now running")
             self._renderer.display_frame(self._step)
-            swarm.move_all(self._my_map)
+            swarm.move_all()
             self._step += 1
 
         self._renderer.display_frame(self._step)
