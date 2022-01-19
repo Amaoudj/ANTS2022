@@ -3,17 +3,7 @@ import configargparse
 from random import seed
 import logging
 
-from .map import *
-
-# from . agent import random_agent_generator
-from . agent import *
-
-from . swarm import Swarm
-from . simulator import Simulator
-
-from . renderer import *
-
-# from . import VideoRecorder, DummyRecorder
+from . experiment import *
 
 # Since some arguments are local to individual components (see for instance map generators), we ise the singleton
 # argument parser from the configargparse lib.
@@ -22,7 +12,7 @@ parser = configargparse.get_arg_parser() # ArgumentParser(description="Swarm rob
 
 def parse_args():
     """ Handles the arguments """
-    parser = configargparse.get_arg_parser()
+    # parser = configargparse.get_arg_parser()
 
     parser.add('-c', '--config', is_config_file=True, help='Config file')
 
@@ -55,6 +45,12 @@ def parse_args():
                         type=str,
                         default="random_placement")
 
+    parser.add_argument("-e", "--experiment",
+                        help="Experiment to run",
+                        nargs=1, metavar="experiment", choices=["BaseExperiment", "AndersTestExperiment"],
+                        type=str,
+                        default="BaseExperiment")
+
     return parser.parse_args()
 
 
@@ -77,22 +73,18 @@ def main(args):
     if type(args.agent_placement) == list:
         args.agent_placement = args.agent_placement[0]
 
+    if type(args.experiment) == list:
+        args.experiment = args.experiment[0]
+
     logging.basicConfig(format='%(asctime)s %(message)s')
     logging.root.setLevel(getattr(logging, args.loglevel.upper(), None))
     logging.info(f"Runtime arguments f{args}")
 
-    map_generator = globals()[args.map].create_from_args(args)
+    my_experiment = globals()[args.experiment]()
+    my_sim = my_experiment.create_simulator(args)
 
-    my_map: Map = map_generator.generate()
-    my_swarm: Swarm = Swarm([[args.swarm_size, random_agent_generator()]], globals()[args.agent_placement], my_map)
-
-    my_renderer: RendererInterface = globals()[args.renderer](my_map, my_swarm)
-
-    # my_renderer = MatPlotLibRenderer(my_map, my_swarm)
-
-    my_sim: Simulator = Simulator(my_map, my_renderer)
-    my_sim.start(my_swarm)
-    my_sim.main_loop(my_swarm)
+    my_sim.start()
+    my_sim.main_loop()
 
 
 if __name__ == "__main__":

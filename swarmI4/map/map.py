@@ -44,6 +44,9 @@ class Map(object):
         Check if a node is occupied
         :position: node position
         """
+        if position[0] < 0 or position[0] >= self.size_x or position[1] < 0 or position[1] >= self.size_y:
+            return True
+
         return "agent" not in self._graph.nodes[position] or self._graph.nodes[position]["agent"] is not None
 
     def move_agent(self, agent: AgentInterface, new_position: Tuple[int, int]):

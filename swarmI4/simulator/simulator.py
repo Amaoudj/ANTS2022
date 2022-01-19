@@ -10,7 +10,7 @@ from ..map import Map
 class Simulator(object):
     """ The Simulator"""
 
-    def __init__(self, my_map: Map, renderer: RendererInterface):
+    def __init__(self, my_map: Map, my_swarm: Swarm, renderer: RendererInterface):
         """ Create the simulator
 
         :my_map: The map generated for the simulation
@@ -21,8 +21,9 @@ class Simulator(object):
         self._display_initialized = False
         self._step = 0
         self._renderer = renderer
+        self._my_swarm = my_swarm
 
-    def start(self, swarm: Swarm) -> None:
+    def start(self) -> None:
         """ Start the simulating
 
         :swarm: The swarm to use
@@ -39,7 +40,7 @@ class Simulator(object):
         """
         return self._step > 100
 
-    def main_loop(self, swarm: Swarm) -> None:
+    def main_loop(self) -> None:
         """ The main loop of the simulator
 
         :swarm: The swarm
@@ -50,7 +51,7 @@ class Simulator(object):
         while not self.stop():
             logging.debug(f"Turn {self._step} is now running")
             self._renderer.display_frame(self._step)
-            swarm.move_all()
+            self._my_swarm.move_all()
             self._step += 1
 
         self._renderer.display_frame(self._step)
