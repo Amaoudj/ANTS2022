@@ -1,6 +1,4 @@
 networkx
 numpy
 matplotlib
-bokeh
-pygraphviz
 configargparse

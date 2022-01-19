@@ -22,10 +22,13 @@ class Swarm(object):
         """
 
         self._agents.clear()
+        total_number_of_agents = sum([agent_type[0] for agent_type in agent_generators])
 
         for number, gen in agent_generators:
             for i in range(number):
-                agent = gen(placement_func(i, my_map))
+                position = placement_func(i, total_number_of_agents, my_map)
+                print(position)
+                agent = gen(position)
                 my_map.add_agent_to_map(agent)
                 self._agents.append(agent)
 

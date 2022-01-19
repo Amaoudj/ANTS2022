@@ -1,15 +1,29 @@
+import math
 import random
-
-from .. agent import AgentInterface
 from typing import Tuple
-from random import seed
+
+MAX_PLACEMENT_TRIES = 1000
+
+"""
+Initial agent placement functions. When agents are created and initially placed, a placement function is called
+iteratively for each agent to determine its initial coordinates.
+"""
 
 
-def random_placement(agent_number: int, my_map) -> Tuple[int, int]:
+def random_placement(agent_number: int, total_number_of_agents: int, my_map) -> Tuple[int, int]:
+    """ Randomly place agents across the whole maps. x and y are sampled from a uniform distribution until a free
+    spot is found. If a free spot has not been found after MAX_PLACEMENT_TRIES tries, we give up and an assertion
+    fails.
+
+    :agent_number: the number of the agent currently being placed (0...total number of agents - 1)
+    :total_number_of_agents: the total number of agents that will be placed
+    :my_map: the map
+    """
+
     tries = 0
     placed = False
 
-    while not placed and tries < 1000:
+    while not placed and tries < MAX_PLACEMENT_TRIES:
         x, y = random.randint(0, my_map.size_x - 1), random.randint(0, my_map.size_y - 1)
         if not my_map.occupied((x, y)):
             placed = True
@@ -22,8 +36,49 @@ def random_placement(agent_number: int, my_map) -> Tuple[int, int]:
     return x, y
 
 
-def horizontal_placement(agent_number: int, my_map) -> Tuple[int, int]:
-    return agent_number, 0
+def horizontal_placement(agent_number: int, total_number_of_agents: int, my_map) -> Tuple[int, int]:
+    """ Place agents horizontally centered in row 0 in the environment
+
+    :agent_number: the number of the agent currently being placed (0...total number of agents - 1)
+    :total_number_of_agents: the total number of agents that will be placed
+    :my_map: the map
+    """
+
+    if agent_number % 2 == 0:
+        return int(my_map.size_x / 2 + agent_number / 2 + 1), 0
+    else:
+        return int(my_map.size_x / 2 - agent_number / 2), 0
+
+
+def vertical_placement(agent_number: int, total_number_of_agents: int, my_map) -> Tuple[int, int]:
+    """ Place agents vertically centered in column 0 in the environment
+
+    :agent_number: the number of the agent currently being placed (0...total number of agents - 1)
+    :total_number_of_agents: the total number of agents that will be placed
+    :my_map: the map
+    """
+
+    if agent_number % 2 == 0:
+        return 0, int(my_map.size_y / 2 + agent_number / 2 + 1)
+    else:
+        return 0, int(my_map.size_y / 2 - agent_number / 2)
+
+
+def center_placement(agent_number: int, total_number_of_agents: int, my_map) -> Tuple[int, int]:
+    """ Place agents vertically centered in column 0 in the environment
+
+    :agent_number: the number of the agent currently being placed (0...total number of agents - 1)
+    :total_number_of_agents: the total number of agents that will be placed
+    :my_map: the map
+    """
+
+    square_side_length = int(math.sqrt(total_number_of_agents))
+    column = agent_number % square_side_length
+    row = int(agent_number / square_side_length)
+    x = int(my_map.size_x / 2 - square_side_length / 2) + column
+    y = int(my_map.size_y / 2 - square_side_length / 2) + row
+    return x, y
+
 
 
 

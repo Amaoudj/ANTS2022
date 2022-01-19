@@ -13,11 +13,12 @@ from . simulator import Simulator
 
 from . renderer import *
 
-
 # from . import VideoRecorder, DummyRecorder
 
-parser = configargparse.get_arg_parser() # ArgumentParser(description="Swarm robotics for I4.0 abstract simulator.")
+# Since some arguments are local to individual components (see for instance map generators), we ise the singleton
+# argument parser from the configargparse lib.
 
+parser = configargparse.get_arg_parser() # ArgumentParser(description="Swarm robotics for I4.0 abstract simulator.")
 
 def parse_args():
     """ Handles the arguments """
@@ -49,15 +50,10 @@ def parse_args():
     parser.add_argument("-p", "--agent_placement",
                         help="Agent placement function",
                         nargs=1, metavar="agent_placement", choices=["random_placement", "horizontal_placement",
-                                                                     "vertical_placement (not implemented)",
-                                                                     "center_placement (not implemented)"],
+                                                                     "vertical_placement",
+                                                                     "center_placement"],
                         type=str,
                         default="random_placement")
-
-    # subparse_run.add_argument("-s", "--swarm",
-    #                           help="The size of the swarm",
-    #                           nargs=1, metavar="size", type=int, required=True)
-    #
 
     return parser.parse_args()
 
