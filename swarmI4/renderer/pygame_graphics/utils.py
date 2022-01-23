@@ -92,7 +92,7 @@ class EventHandler:
             self.selected_agent.position = selected_node
 
     def _set_target(self,map):
-        # select target for the selected agent and add it to it's target list
+        # select target for the selected agent and add it to its target list
         if self.selected_agent is not None:
             selected_node = self._get_selected_node(map)
             self._map.nodes[selected_node]["state"] = 'target'

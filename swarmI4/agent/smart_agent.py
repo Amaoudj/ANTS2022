@@ -2,7 +2,7 @@
 import logging
 
 from . agent_interface import AgentInterface
-from . random_agent import RandomAgent
+
 from swarmI4.calculation.path_planning import PathFinder
 
 from typing import Callable, Tuple
@@ -64,6 +64,7 @@ class SmartAgent(AgentInterface):
 
 
     def wait(self,wait_time):
+        # used later
         self.wait_time += wait_time
 
     def step(self,map, target_pos=None, waypoint=None):

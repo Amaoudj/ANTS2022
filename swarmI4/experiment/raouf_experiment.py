@@ -15,6 +15,7 @@ class RaoufExperiment(BaseExperiment):
     All we need to do is just to override the
     _create_swarm method to ensure that the correct agents are created.
     """
+
     def _create_swarm(self, args, my_map: Map):
         print(f"Creating a swarm of {args.swarm_size} agents\n")
         return Swarm([(args.swarm_size, smart_agent_generator(args,my_map))], globals()[args.agent_placement], my_map)

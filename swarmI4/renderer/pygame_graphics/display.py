@@ -31,7 +31,7 @@ class Display:
         self.nodes_states = {'free_space':BLACK,
                              'obstacle':GREEN,
                              'start': None,
-                             'target':WHITE,#BLUE_LIGHT
+                             'target':WHITE,
                              'path':BLACK,#BLUE_LIGHT,
                              'agent':WHITE}
 

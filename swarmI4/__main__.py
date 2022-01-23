@@ -5,6 +5,7 @@ import logging
 
 from swarmI4.experiment  import *
 
+
 # Since some arguments are local to individual components (see for instance map generators), we ise the singleton
 # argument parser from the configargparse lib.
 
@@ -14,10 +15,12 @@ def parse_args():
     """ Handles the arguments """
     # parser = configargparse.get_arg_parser()
 
+
     parser.add('-c', '--config', is_config_file=True, help='Config file')
 
     parser.add_argument("-r", "--renderer", help="Renderer to use", nargs=1, metavar="renderer", type=str,
                         default="PygameRenderer", choices=["MatPlotLibRenderer", "NullRenderer","PygameRenderer"])
+
 
     parser.add_argument("-res", "--resolution",
                         help="width of the grid cell in px",

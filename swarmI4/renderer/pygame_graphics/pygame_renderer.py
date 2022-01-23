@@ -3,14 +3,13 @@ from swarmI4.renderer.pygame_graphics.display import Display
 import pygame
 from swarmI4.renderer.pygame_graphics.write_info import Info
 
-
 class PygameRenderer (RendererInterface):
     """
     A simple pygame renderer
     """
     def __init__(self,args,my_map, swarm):
         super().__init__(my_map, swarm)
-        self._display_initialized = False# used later
+        self._display_initialized = False # used later
         self._display = Display(args.display_size,args.resolution)
         self._sim_info = []
         self._graph = self._my_map
