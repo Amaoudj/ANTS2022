@@ -11,15 +11,15 @@ from .map import Map
 parser = configargparse.get_arg_parser()
 parser.add_argument("-n", "--nodes",
                     help="The number of nodes (x, y) in the map",
-                    nargs=2, metavar="nodes", type=int, default=(10, 10))
+                    nargs=2, metavar="nodes", type=int, default=(30, 30))
 
 parser.add_argument("-o", "--obstacles",
                     help="The number of obstacles (x, y) in the map",
-                    nargs=2, metavar="obstacles", type=int, default=(2, 2))
+                    nargs=2, metavar="obstacles", type=int, default=(5, 5))
 
 parser.add_argument("-z", "--obstacle_size",
                     help="Obstacle size (x, y)",
-                    nargs=2, metavar="obstacle_size", type=int, default=(2, 2))
+                    nargs=2, metavar="obstacle_size", type=int, default=(3, 2))
 
 
 class WarehouseMapGenerator(object):
@@ -87,7 +87,9 @@ class WarehouseMapGenerator(object):
             for y in range(0, self._number_of_nodes[1]):
                 my_map.add_node((x, y))
                 my_map.nodes[(x, y)]["agent"] = None
-#                logging.info(f"Adding {x} and {y}")
+                my_map.nodes[(x, y)]["state"] = 'free_space'
+
+                #                logging.info(f"Adding {x} and {y}")
                 if x > 0:
                     my_map.add_edge((x - 1, y), (x, y))
                 if y > 0:
@@ -111,12 +113,11 @@ class WarehouseMapGenerator(object):
                         wy = math.ceil(spacing_y * (oy + 1) + self._obstacle_size[1] * oy + y)
 
                         logging.info(f"world {wx}, {wy}")
-
-
                         my_map.remove_node((wx, wy))
                         my_map.add_node((wx, wy))
                         my_map.nodes[(wx, wy)]["obstacle"] = True
+                        my_map.nodes[(wx, wy)]["state"] = 'obstacle'
 
         logging.info("World generated")
-
+        print(my_map.nodes)
         return Map(my_map, self._number_of_nodes)

@@ -3,7 +3,7 @@ import configargparse
 from random import seed
 import logging
 
-from . experiment import *
+from swarmI4.experiment  import *
 
 # Since some arguments are local to individual components (see for instance map generators), we ise the singleton
 # argument parser from the configargparse lib.
@@ -17,7 +17,17 @@ def parse_args():
     parser.add('-c', '--config', is_config_file=True, help='Config file')
 
     parser.add_argument("-r", "--renderer", help="Renderer to use", nargs=1, metavar="renderer", type=str,
-                        default="MatPlotLibRenderer", choices=["MatPlotLibRenderer", "NullRenderer"])
+                        default="PygameRenderer", choices=["MatPlotLibRenderer", "NullRenderer","PygameRenderer"])
+
+    parser.add_argument("-res", "--resolution",
+                        help="width of the grid cell in px",
+                        nargs=1, metavar="resolution", type=int,
+                        default=20)
+
+    parser.add_argument("-disp", "--display_size",
+                        help="screen size",
+                        nargs=2, metavar="display_size", type=int,
+                        default=(600,1200))
 
     parser.add_argument("-m", "--map", help="Map/map generator to use", nargs=1, metavar="map", type=str,
                         default="WarehouseMapGenerator", choices=["WarehouseMapGenerator", "SimpleMapGenerator"])
@@ -30,7 +40,13 @@ def parse_args():
     parser.add_argument("-s", "--swarm_size",
                         help="Swarm size (number of agents)",
                         nargs=1, metavar="swarm_size", type=int,
-                        default="10")
+                        default=3)
+
+    parser.add_argument("-ta", "--num_targets",
+                        help="number of targets each agent have initially",
+                        nargs=1, metavar="swarm_size", type=int,
+                        default=2)
+
 
     parser.add_argument("-l", "--loglevel",
                         help="Logging level",
@@ -47,10 +63,9 @@ def parse_args():
 
     parser.add_argument("-e", "--experiment",
                         help="Experiment to run",
-                        nargs=1, metavar="experiment", choices=["BaseExperiment", "AndersTestExperiment"],
+                        nargs=1, metavar="experiment", choices=["BaseExperiment", "AndersTestExperiment","RaoufExperiment"],
                         type=str,
-                        default="BaseExperiment")
-
+                        default="RaoufExperiment")
     return parser.parse_args()
 
 
@@ -76,15 +91,23 @@ def main(args):
     if type(args.experiment) == list:
         args.experiment = args.experiment[0]
 
+    if type(args.resolution) == list:
+        args.resolution = args.resolution[0]
+
+    if type(args.num_targets) == list:
+        args.num_targets = args.num_targets[0]
+
+
     logging.basicConfig(format='%(asctime)s %(message)s')
     logging.root.setLevel(getattr(logging, args.loglevel.upper(), None))
     logging.info(f"Runtime arguments f{args}")
 
+
     my_experiment = globals()[args.experiment]()
     my_sim = my_experiment.create_simulator(args)
 
-    my_sim.start()
-    my_sim.main_loop()
+    my_sim.start(args)
+    my_sim.main_loop(args)
 
 
 if __name__ == "__main__":

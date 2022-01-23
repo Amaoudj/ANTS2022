@@ -3,3 +3,5 @@
 FREE = "green"
 AGENT = "red"
 OBSTACLE = "blue"
+TARGET = "white"
+PATH = "blue_light"

@@ -1,8 +1,8 @@
-""" Install the package swarmI4 """
+""" Install the package swarmI40 """
 from setuptools import setup
 
 setup(
-    name='swarmI4',
+    name='swarmI40',
     version='0.1.0',
     author='Anders Lyhne Christensen',
     author_email='anderslyhne@gmail.com',

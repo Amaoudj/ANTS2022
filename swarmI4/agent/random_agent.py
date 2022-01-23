@@ -11,7 +11,7 @@ class RandomAgent(AgentInterface):
 
     """ A random walk agent """
 
-    def move(self, my_map: map):
+    def move(self, my_map: map, time_lapsed:float=0):
         """ Move the agent
 
         :world: The world
@@ -27,17 +27,13 @@ class RandomAgent(AgentInterface):
 
         logging.info(f"New position {new_position}")
 
-
         return self._position
 
 
 def random_agent_generator() -> Callable:
     """ Create a random agent generator
-
     :returns: A generator function
-
     """
-
     def generator(position: Tuple[int, int]):
         return RandomAgent(None, position)
 

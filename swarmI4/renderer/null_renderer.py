@@ -18,7 +18,7 @@ class NullRenderer(RendererInterface):
     def __init__(self, my_map, swarm):
         pass
 
-    def setup(self):
+    def setup(self,args:None):
         pass
 
     def tear_down(self):

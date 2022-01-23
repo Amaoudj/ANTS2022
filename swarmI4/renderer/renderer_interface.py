@@ -13,7 +13,7 @@ class RendererInterface:
         self._my_map = my_map
         self._swarm  = swarm
 
-    def setup(self):
+    def setup(self,args:None):
         """
         Set up the rendering. Called before every new simulation.
         """
@@ -25,7 +25,7 @@ class RendererInterface:
         """
         return NotImplementedError("Swarm agents should contains this method")
 
-    def display_frame(self, step: int):
+    def display_frame(self, args=None, step: int = 0, lapsed_time: float = 0):
         """
         Display a frame
         """

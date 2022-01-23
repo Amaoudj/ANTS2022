@@ -28,7 +28,7 @@ class AndersTestAgent(AgentInterface):
         """
         return random.choice(["UP", "DOWN", "LEFT", "RIGHT", "RANDOM"])
 
-    def move(self, my_map: map):
+    def move(self, my_map: map,time_lapsed:float=0):
         x, y = self._position
         if self._direction == "UP":
             y += 1
@@ -51,12 +51,12 @@ class AndersTestAgent(AgentInterface):
 def anders_test_agent_generator() -> Callable:
     """
     Factory function to create agents if the right type
-
     @return: a generator for AndersTestAgent
     """
-
     def generator(position: Tuple[int, int]):
         return AndersTestAgent(position)
+
+
 
     return generator
 
@@ -69,6 +69,7 @@ class AndersTestExperiment(BaseExperiment):
 
     def _create_swarm(self, args, my_map: Map):
         return Swarm([[args.swarm_size, anders_test_agent_generator()]], globals()[args.agent_placement], my_map)
+
 
 
 

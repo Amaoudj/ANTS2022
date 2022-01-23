@@ -15,11 +15,11 @@ class MatPlotLibRenderer (RendererInterface):
     A simple matplotlib renderer
     """
 
-    def __init__(self, my_map, swarm):
+    def __init__(self,args, my_map, swarm):
         super().__init__(my_map, swarm)
         self._display_initialized = False
 
-    def setup(self):
+    def setup(self,args:None):
         """
         Set up the rendering. Called before every new simulation.
         """
@@ -29,7 +29,7 @@ class MatPlotLibRenderer (RendererInterface):
         Tear down the rendering. Called after every simulation.
         """
 
-    def display_frame(self, step: int):
+    def display_frame(self,args=None, step: int=0,lapsed_time: float = 0):
         """
         Display a frame
         """

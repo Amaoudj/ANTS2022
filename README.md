@@ -14,7 +14,7 @@ cd swarm4I40sim
 To run an example from the terminal:
 
 ```sh
-python -m swarmI4 -c configfiles/example.conf
+python -m swarmI40 -c configfiles/example.conf
 ```
 
 # Using pycharm in docker
