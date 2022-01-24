@@ -1,4 +1,4 @@
-""" An Agent capable of path planning"""
+""" A smart Agent"""
 import logging
 
 from . agent_interface import AgentInterface
@@ -10,7 +10,6 @@ from typing import Callable, Tuple
 
 class SmartAgent(AgentInterface):
 
-    """ A random walk agent """
     def __init__(self,conf,my_map,position,num_targets):
         super().__init__(conf,position)
 

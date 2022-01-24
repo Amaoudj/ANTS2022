@@ -91,6 +91,7 @@ class EventHandler:
         if graph.nodes[selected_node]["state"] == 'free_space':
             self.selected_agent.position = selected_node
 
+
     def _set_target(self,map):
         # select target for the selected agent and add it to its target list
         if self.selected_agent is not None:

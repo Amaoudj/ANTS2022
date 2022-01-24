@@ -5,7 +5,7 @@ from swarmI4.renderer.pygame_graphics.write_info import Info
 
 class PygameRenderer (RendererInterface):
     """
-    A simple pygame renderer
+    A simple pygame-renderer
     """
     def __init__(self,args,my_map, swarm):
         super().__init__(my_map, swarm)
@@ -46,9 +46,9 @@ class PygameRenderer (RendererInterface):
     def sim_info_display(self, step, lapsed_time: float = 0, sim_arguments=None):
         self._sim_info = []
         self._sim_info.append(Info(f'Simulation Info', is_title=True))
-        self._sim_info.append(Info(f'NUMBER OF AGENTS: {sim_arguments.swarm_size}'))
         self._sim_info.append(Info(f'GRAPH SIZE: {sim_arguments.nodes}'))
-        self._sim_info.append(Info(f'NUMBER OF TARGETS: {sim_arguments.num_targets}'))
+        self._sim_info.append(Info(f'NUMBER OF AGVs: {sim_arguments.swarm_size}'))
+        self._sim_info.append(Info(f'NUMBER OF TARGETS OF EACH AGV: {sim_arguments.num_targets}'))
         self._sim_info.append(Info(f'Simulation Statistics', is_title=True))
         self._sim_info.append(Info(f'Step: {step}'))
         self._sim_info.append(Info(f'Lapsed Time: {round(lapsed_time, 1)}  sec'))

@@ -76,12 +76,13 @@ class Display:
 
     def to_grid_coords(self, canvas_coords):
         """
-        convert canvas coords (x_px, y_px) to grid coords (row,col)
-        :param canvas_coords: canvas coordinates (x_px, y_px)
+        convert canvas-coords (x_px, y_px) to grid coords (row,col)
+        :param canvas-coords: canvas coordinates (x_px, y_px)
         :return: grid coordinates (row,col)
         """
         col = canvas_coords[0]//self.resolution
         row = canvas_coords[1]//self.resolution
+
         return row, col
 
 
@@ -112,7 +113,7 @@ class Display:
 
     def draw_targets(self,agents:list)->None:
         """
-        draw all the targets of the agents
+        draw all targets of the agents
         :param agents: a list of all the agents
         :return:
         """
@@ -123,7 +124,10 @@ class Display:
                     row,col = target
                     x_px, y_px = col * self.resolution, row * self.resolution
                     pygame.draw.rect(self.canvas, BLUE_LIGHT, [x_px, y_px, self.resolution, self.resolution])#WHITE
-                    pygame.draw.circle(self.canvas,WHITE, (x_px + self.resolution / 2, y_px + self.resolution / 2),radius=self.resolution/2,width=0)
+                    pygame.draw.circle(self.canvas,WHITE,
+                                       (x_px + self.resolution / 2, y_px + self.resolution / 2),
+                                       radius=self.resolution/2,
+                                       width=0)
 
 
     def draw_selections(self, agents:list)->None:
