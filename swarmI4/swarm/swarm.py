@@ -37,13 +37,12 @@ class Swarm(object):
         :returns: None
         """
 
-        # TODO:check for conflicting neighbors of each agent
-        # TODO:send data of agent to other agent using what we call msg box
-        # TODO:make message box in map where each agent is able to leave messages to others
+        # TODO:get conflicting neighbors of each agent
+        # TODO:each agent should send data to other agents using a msg-box
+        # TODO:make msg-box in map.py where each agent can leave messages to others
         # TODO: agents solve conflict and then move
         # TODO: Add a func to reset and run the simulation again
 
-        # TODO: check paths when we use big AGV num
 
         for agent in self._agents:
             pos = agent.move(self._my_map,time_lapsed=dt)
