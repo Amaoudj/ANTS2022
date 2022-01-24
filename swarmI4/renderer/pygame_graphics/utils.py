@@ -133,10 +133,7 @@ class EventHandler:
                     if e.type == pygame.QUIT:
                         quit()
                     else:
-                        self.handle_events(e,
-                                            renderer.display,
-                                            map,
-                                            swarm.agents)
+                        self.handle_events(e, renderer.display, map, swarm.agents)
         else:
             pass
 

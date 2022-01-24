@@ -37,15 +37,22 @@ class Swarm(object):
         :returns: None
         """
 
-        # TODO:get conflicting neighbors of each agent
-        # TODO:each agent should send data to other agents using a msg-box
-        # TODO:make msg-box in map.py where each agent can leave messages to others
-        # TODO: agents solve conflict and then move
-        # TODO: Add a func to reset and run the simulation again
+        # TODO: get conflicting neighbors of each agent
+        # TODO: each agent should send data to other agents using a msg-box
+        # TODO: msg-box in map.py where each agent can leave messages to others
+        # TODO: agents solve conflict and then move (should be implemented in the function move)
+        # TODO: I need to add a func to reset and run the simulation again
 
+        # for agent in self._agents:
+           #agent.get_neighbors(self._my_map)
+
+        #for agent in self._agents:
+            #agent.send_my_data(self._my_map)
 
         for agent in self._agents:
+            # sole the conflicts was implemented in the function agent.Move(...)
             pos = agent.move(self._my_map,time_lapsed=dt)
+
 
 
     def set_positions(self, position: int) -> None:

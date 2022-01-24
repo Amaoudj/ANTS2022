@@ -20,12 +20,31 @@ class SmartAgent(AgentInterface):
 
         for n in range(0, self.num_targets):
             target = my_map.get_free_node()
-            self.target_list.append(target)
+            if num_targets > 0: # if num_targets == 0, then you should add targets manually
+                self.target_list.append(target)  #make it a comment if you want to set the target pos manually
 
         # initial path info
         self.path = None
         self._current_target_id = 0
         self._current_waypoint_id = 0
+
+    # TODO: this function will returns the neighbors of this agent
+    def get_neighbors(self,map):
+        pass
+
+    #TODO: this func will update the list of msg_box in MAP.py for this agent
+    def send_my_data(self,map):
+        if self.path is None:
+            self.plan(map)
+        target = self.target_list[self._current_target_id]
+        waypoint = self.path[self._current_waypoint_id]
+        #data={'AgentID': self.id, 'pos':(self.row, self.col),'remaining_nodes': len(self.path), 'next_node':self.path[self._current_waypoint_id+1]}
+        #map._msg_box.append(data)
+
+
+    # TODO: solve conflict and return agents with priority to move and their next node
+    def Solve_conflict(self):
+        pass
 
     def move(self,map, time_lapsed:float=0):
 
@@ -35,17 +54,22 @@ class SmartAgent(AgentInterface):
         :returns: The new node it would move to
         """
 
-        if self.path is None:
-             self.plan(map)
-        target   = self.target_list[self._current_target_id]
-        waypoint = self.path[self._current_waypoint_id]
+        #TODO: I need to make an update of this func: the agent should run self.Solve_conflict() and check if it has the priority to move
+        #agents_id[], next_node[] = self.Solve_conflict()
+        if len(self.target_list) > 0:
+          if self.path is None :
+              self.plan(map)
 
-        # required for MatPlotLibRender
-        map._graph.nodes[(self.row, self.col)]["agent"] = None
-        map._graph.nodes[waypoint]["agent"] = self
 
-        self.face_to(waypoint)
-        self.step(map,target_pos=target,waypoint=waypoint)
+          target   = self.target_list[self._current_target_id]
+          waypoint = self.path[self._current_waypoint_id]
+
+          # required for MatPlotLibRender
+          map._graph.nodes[(self.row, self.col)]["agent"] = None
+          map._graph.nodes[waypoint]["agent"] = self
+
+          self.face_to(waypoint)
+          self.step(map,target_pos=target,waypoint=waypoint)
 
 
     def plan(self,map)->list:

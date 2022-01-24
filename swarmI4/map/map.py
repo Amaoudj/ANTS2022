@@ -14,11 +14,14 @@ class Map(object):
     """ The world representation """
 
     def __init__(self, graph, number_of_nodes: Tuple[int, int]):
-        """TODO: to be defined. """
+
         logging.debug("Initializing the world")
         self._graph = graph
         self._swarm = None
         self._number_of_nodes = number_of_nodes
+
+        # Defining a list of dictionaries as message box for agents to leave data
+        self._msg_box= []
 
     @property
     def size_xy(self) -> Tuple[int, int]:
@@ -98,9 +101,10 @@ class Map(object):
         """
         random_node = None
         node_state = ''
-        while node_state is not 'free_space':
+        while node_state is not 'free_space' :
             random_node_id = np.random.choice(range(0,len(self._graph.nodes)-1))
             random_node = list(self._graph.nodes)[random_node_id]
+
             node_state = self._graph.nodes[random_node]["state"]
 
         return random_node
