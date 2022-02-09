@@ -29,7 +29,6 @@ class Simulator(object):
         self._simulation_time = 0
 
 
-
     def start(self,args) -> None:
         """ Start the simulating
         :swarm: The swarm to use

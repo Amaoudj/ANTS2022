@@ -130,4 +130,5 @@ class CustomMapGenerator(object):
 
         logging.info("World generated")
         print('start_goal_list',(start_list,goal_list))
+
         return Map(my_map, self._number_of_nodes,(start_list,goal_list))
