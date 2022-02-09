@@ -4,7 +4,7 @@ from ..agent import agent_placement
 from swarmI4.agent.smart_agent import SmartAgent
 from swarmI4.agent.agent_placement import custom_placement
 import pandas as pd
-import os
+import os,sys
 from swarmI4.renderer.pygame_graphics.info import Info
 import csv
 import ctypes
@@ -60,37 +60,42 @@ class Swarm(object):
         :world: The world
         :returns: None
         """
-        logging.info(f'------------< iteration started >-----------------------------')
-        logging.info(f'Phase 01 : planning the next step ')
+
         for agent in self._agents:
             if type(agent) is SmartAgent:
+                print(f'------------< iteration started >-----------------------------')
+                #logging.info(f'Phase 01 : planning the next step ')
                 agent.next_step(self._my_map)
 
-        logging.info(f'Phase 02 : Handling rising conflicts ')
+
         for agent in self._agents:
             if type(agent) is SmartAgent:
+                #logging.info(f'Phase 02 : Handling rising conflicts ')
                 num_pos_requests, _ = agent.pos_requests(agent.position)
-                logging.info(f'agent: {agent.id}, requests : {num_pos_requests}')
+                #logging.info(f'agent: {agent.id}, requests : {num_pos_requests}')
                 agent.handle_conflicts(self._my_map)
 
-        logging.info(f'Phase 03 : AGVs are moving ...')
+
         for agent in self._agents:
           if type(agent) is SmartAgent:
+            #logging.info(f'Phase 03 : AGVs are moving ...')
             if agent.remaining_nodes >0 :
                agent.move(self._my_map,simulation_time, time_lapsed=dt)
                self.store_data(agent.storage_container,self.data_storage_dir,f'agent_{agent.id}.csv')
 
           else:
               agent.move(self._my_map, simulation_time, time_lapsed=dt)
-        logging.info('------------<iteration ended>-----------------------------')
 
-        # TODO: I need to add a func to reset and run the simulation again
+        print('------------<iteration ended>-----------------------------')
+
+        #TODO: I need to add a func to reset and run the simulation again
         for agent1 in self._agents:
             for agent2 in self._agents:
                 if agent1.id != agent2.id and agent1.position == agent2.position :
                     ctypes.windll.user32.MessageBoxW(0,
                                                      f"Collision in node {agent1.position} between : {agent1.id} and {agent2.id}",
                                                      "Conflict", 1)
+                    sys.exit()
 
 
     def set_positions(self, position: int) -> None:

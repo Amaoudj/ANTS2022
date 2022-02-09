@@ -13,7 +13,6 @@ class PathFinder:
         :param target: the row,col position of the target in the grid
         :return:
         """
-
         agent_row,agent_col = agent_pos
         target_row,target_col = target_pos
         path = nx.astar_path(map, (agent_row, agent_col), (target_row, target_col))
