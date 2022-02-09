@@ -13,15 +13,18 @@ class Map(object):
 
     """ The world representation """
 
-    def __init__(self, graph, number_of_nodes: Tuple[int, int]):
+    def __init__(self, graph, number_of_nodes: Tuple[int, int], start_goal:tuple=(None,None)):
 
         logging.debug("Initializing the world")
         self._graph = graph
         self._swarm = None
         self._number_of_nodes = number_of_nodes
+        self.custom_start_list,self.custom_goal_list = start_goal
 
-        # Defining a list of dictionaries as message box for agents to leave data
-        self._msg_box= []
+
+        #Defining a list of dictionaries as message box for agents to leave data
+        self.msg_box= {}
+        self.new_paths_node = []
 
     @property
     def size_xy(self) -> Tuple[int, int]:
@@ -45,16 +48,24 @@ class Map(object):
 
         return list(nx.neighbors(self._graph, node))
 
-    def set_as_obstacle(self, node_pos:tuple):
+    def set_as_obstacle(self, node_pos:tuple or list):
         """
         set a note to be in obstacle space
         which means it will be isolated from
         it's neighbors
         """
-        self._graph.remove_node(node_pos)
-        self._graph.add_node(node_pos)
-        self._graph.nodes[node_pos]["obstacle"] = True
-        self._graph.nodes[node_pos]["state"] = 'obstacle'
+        if type(node_pos) is list:
+            for n in node_pos:
+                self._graph.remove_node(n)
+                self._graph.add_node(n)
+                self._graph.nodes[n]["obstacle"] = True
+                self._graph.nodes[n]["state"] = 'obstacle'
+        else:
+            self._graph.remove_node(node_pos)
+            self._graph.add_node(node_pos)
+            self._graph.nodes[node_pos]["obstacle"] = True
+            self._graph.nodes[node_pos]["state"] = 'obstacle'
+
 
     def set_as_free(self,node_pos:tuple or list):
         """
@@ -64,7 +75,10 @@ class Map(object):
         """
         if type(node_pos) is list:
             for node_pos_i in node_pos:
+                self._graph.remove_node(node_pos_i)
+                self._graph.add_node(node_pos_i)
                 self._graph.nodes[node_pos_i]["obstacle"] = False
+                self._graph.nodes[node_pos_i]["agent"] = None
                 # for agent in swarm.agents:
                 #     if node_pos_i in agent.targets_list:
                 #         continue
@@ -73,9 +87,9 @@ class Map(object):
                     if neighbor in self._graph.nodes:
                         self._graph.add_edge(node_pos_i, neighbor, weight=1)
         else:
-            self._graph.remove_node(node_pos)
-            self._graph.add_node(node_pos)
+
             self._graph.nodes[node_pos]["obstacle"] = False
+            self._graph.nodes[node_pos]["agent"] = None
             self._graph.nodes[node_pos]["state"] = 'free_space'
             for neighbor in self.get_neighbors(node_pos,diagonal=False):
                 if neighbor in self._graph.nodes:
@@ -114,10 +128,27 @@ class Map(object):
         Check if a node is occupied
         :position: node position
         """
+        #if position in self._graph:
         if position[0] < 0 or position[0] >= self.size_x or position[1] < 0 or position[1] >= self.size_y:
             return True
 
         return "agent" not in self._graph.nodes[position] or self._graph.nodes[position]["agent"] is not None
+
+    def free_neighboring_node(self,pos,prohibited_nodes):
+        """
+        find a free node in the neighborhood
+        """
+
+        neighborhood = self.get_neighbors(pos,diagonal=False)
+        for node in neighborhood:
+            if node in prohibited_nodes:
+                continue
+            else:
+                if node in self._graph.nodes and self._graph.nodes[node]["state"] == 'free_space':
+                    if self._graph.nodes[node]["agent"] is not None:
+                        return None
+                    else:
+                        return node
 
     def move_agent(self, agent: AgentInterface, new_position: Tuple[int, int]):
         assert self._graph.nodes[agent.position]["agent"] == agent, \
@@ -128,6 +159,7 @@ class Map(object):
         self._graph.nodes[agent.position]["agent"] = None
         self._graph.nodes[new_position]["agent"] = agent
         agent.position = new_position
+
 
 
 
@@ -150,11 +182,10 @@ class Map(object):
         return self._graph[node_1][node_2]["weight"]
 
     def get_agents_numbers(self, node):
-        """ Get the number of agents and a given node
 
+        """ Get the number of agents and a given node
         :node: The node id
         :returns: The number of agents
-
         """
         assert 0 <= node <= nx.number_of_nodes(self._graph), "Get number of agents from a non existing node"
         ret = self._graph.nodes[node].get("agents")
@@ -182,6 +213,7 @@ class Map(object):
         """
         for node in path:
             self._graph.nodes[node]["state"] = 'path'
+
 
     def view(self, block=True):
         """ Show the world

@@ -6,8 +6,8 @@ class AgentInterface:
     """ Interface class for a swarm agent """
 
     def __init__(self,conf: dict, position: Tuple[int, int],size:tuple=(1,1)):
-        """ Create the agent
 
+        """ Create the agent
         :conf: The configuration of agent
         :position: The starting position of the agent
 
@@ -41,6 +41,7 @@ class AgentInterface:
         """
         return NotImplementedError("Swarm agents should contains this method")
 
+
     @property
     def position(self) -> Tuple[int, int]:
         """ The position of the agent """
@@ -59,6 +60,7 @@ class AgentInterface:
         return the column of the current position
         """
         return self._position[1]
+
 
 
     @position.setter

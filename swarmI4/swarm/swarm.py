@@ -2,57 +2,95 @@ from typing import Callable as Func, List, Tuple
 from ..map import Map
 from ..agent import agent_placement
 from swarmI4.agent.smart_agent import SmartAgent
-
+from swarmI4.agent.agent_placement import custom_placement
+import pandas as pd
+import os
+from swarmI4.renderer.pygame_graphics.info import Info
+import csv
+import ctypes
 
 class Swarm(object):
     """ This a wrapper for the all agents """
 
-    def __init__(self, agent_generators: List[Tuple[int, Func]], placement_func: Func, my_map: Map):
+    def __init__(self,args, agent_generators: List[Tuple[int, Func]], placement_func: Func, my_map: Map):
         """ Create the swarm """
+        # create an empty storage folder
+        self.data_storage_dir = 'results'
+        if not os.path.exists(self.data_storage_dir):
+            os.mkdir(self.data_storage_dir)
+        else:
+            for f in os.listdir(self.data_storage_dir):
+                os.remove(os.path.join(self.data_storage_dir, f))
+
         self._agents = []
         self._positions = {}
 
-        self.create_swarm(agent_generators, my_map, agent_placement.random_placement)
+        self.create_swarm(args,agent_generators, my_map, placement_func)
         self._my_map = my_map
 
-    def create_swarm(self, agent_generators: List[Tuple[int, Func]], my_map: Map, placement_func: Func) -> None:
+
+
+    def create_swarm(self,args, agent_generators: List[Tuple[int, Func]], my_map: Map, placement_func: Func) -> None:
         """ Create the swarm according to the generators """
 
         self._agents.clear()
-        total_number_of_agents = sum([agent_type[0] for agent_type in agent_generators])
+        if args.agent_placement == "custom_placement":
+            total_number_of_agents = len(my_map.custom_start_list)
+        else:
+            total_number_of_agents = sum([agent_type[0] for agent_type in agent_generators])
 
         for number, gen in agent_generators:
-            for i in range(number):
-                position = placement_func(i, total_number_of_agents, my_map)
+            for i in range(total_number_of_agents):
+                position,targets= placement_func(i, total_number_of_agents, my_map)
+                print('position',position,targets)
                 agent = gen(position)
-
+                if targets is not None:
+                    agent.target_list = [targets]
+                agent.id = i
+                # set targets as they come in the custom map
                 my_map.add_agent_to_map(agent)
                 self._agents.append(agent)
 
 
-    def move_all(self,dt) -> None:
+
+    def move_all(self,simulation_time,dt=0) -> None:
+
         """
         Move all agents in the swarm
         :world: The world
         :returns: None
         """
-
-        # TODO: get conflicting neighbors of each agent
-        # TODO: each agent should send data to other agents using a msg-box
-        # TODO: msg-box in map.py where each agent can leave messages to others
-        # TODO: agents solve conflict and then move (should be implemented in the function move)
-        # TODO: I need to add a func to reset and run the simulation again
-
-        # for agent in self._agents:
-           #agent.get_neighbors(self._my_map)
-
-        #for agent in self._agents:
-            #agent.send_my_data(self._my_map)
+        print(f'------------< iteration started >-----------------------------')
+        print(f'Phase 01 : planning the next step ')
 
         for agent in self._agents:
-            # sole the conflicts was implemented in the function agent.Move(...)
-            pos = agent.move(self._my_map,time_lapsed=dt)
+            if type(agent) is SmartAgent:
+                agent.next_step(self._my_map)
 
+        print(f'Phase 02 : Handling rising conflicts ')
+        for agent in self._agents:
+            if type(agent) is SmartAgent:
+                num_pos_requests, _ = agent.pos_requests(agent.position)
+                print(f'agent: {agent.id}, requests : {num_pos_requests}')
+                agent.handle_conflicts(self._my_map)
+
+        #print(len(self._my_map.msg_box), self._my_map.msg_box)
+        print(f'Phase 03 : AGVs are moving ...')
+        for agent in self._agents:
+
+            agent.move(self._my_map,simulation_time, time_lapsed=dt)
+
+            if type(agent) is SmartAgent:
+                self.store_data(agent.storage_container,self.data_storage_dir,f'agent_{agent.id}.csv')
+        print('------------<iteration ended>-----------------------------')
+
+        # TODO: I need to add a func to reset and run the simulation again
+        for agent1 in self._agents:
+            for agent2 in self._agents:
+                if agent1.position == agent2.position and agent1.id != agent2.id:
+                    ctypes.windll.user32.MessageBoxW(0,
+                                                     f"Collision in node {agent1.position} between : {agent1.id} and {agent2.id}",
+                                                     "Conflict", 1)
 
 
     def set_positions(self, position: int) -> None:
@@ -64,6 +102,14 @@ class Swarm(object):
 
         self._positions.clear()
         self._positions[str(position)] = len(self._agents)
+
+    @staticmethod
+    def store_data(data,folder,file_name):
+        # all files of the folder if the folder exists
+        df = pd.DataFrame(data)
+        fullname = os.path.join(folder, file_name)
+        df.to_csv(fullname)
+
 
     @property
     def agents(self):

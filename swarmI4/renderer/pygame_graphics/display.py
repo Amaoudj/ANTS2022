@@ -1,4 +1,5 @@
 import numpy as np
+import pandas
 import pygame
 import matplotlib
 from   matplotlib import pyplot as plt
@@ -15,6 +16,7 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 150, 255)
+ORANGE= (255, 165, 0)
 
 
 
@@ -33,7 +35,8 @@ class Display:
                              'start': None,
                              'target':WHITE,
                              'path':BLACK,#BLUE_LIGHT,
-                             'agent':WHITE}
+                             'agent':WHITE,
+                             'critic':RED}
 
         pygame.init()
         self.name = 'Multi-AGV Simulator'
@@ -57,7 +60,7 @@ class Display:
             pygame.draw.line(self.canvas, GREEN, (0, i * self.resolution ), (width_px, i * self.resolution))
         for j in range(cols + 1):
             pygame.draw.line(self.canvas, GREEN, (j * self.resolution, 0), (j * self.resolution, height_px))
-        pygame.draw.rect(self.canvas, GREEN, [0, 0, height_px, height_px], 3)
+        pygame.draw.rect(self.canvas, BLUE, [0, 0, width_px, height_px], 5)
 
     def draw_node(self, node_pos:tuple, graph:nx)->None:
         """
@@ -98,16 +101,24 @@ class Display:
             width, height = agent.size[0]*self.resolution,agent.size[1]*self.resolution
             x_px, y_px = col * self.resolution, row * self.resolution
             if agent.orientation == 0:
-                pygame.draw.rect(self.canvas, RED,[x_px, y_px,self.resolution,self.resolution])
+                #pygame.draw.rect(self.canvas, RED,[x_px, y_px,self.resolution,self.resolution])
+                pygame.draw.circle(self.canvas, RED, (x_px + self.resolution / 2, y_px + self.resolution / 2),
+                                   radius=self.resolution / 2, width=0)
                 pygame.draw.rect(self.canvas, WHITE,[x_px+width/2, y_px+height/4,width/3,height/2])
             elif agent.orientation == 1:
-                pygame.draw.rect(self.canvas, RED,[x_px, y_px,self.resolution,self.resolution])
+                #pygame.draw.rect(self.canvas, RED,[x_px, y_px,self.resolution,self.resolution])
+                pygame.draw.circle(self.canvas, RED, (x_px + self.resolution / 2, y_px + self.resolution / 2),
+                                   radius=self.resolution / 2, width=0)
                 pygame.draw.rect(self.canvas, WHITE,[x_px+width/4, y_px+height/4,width/2,height/3])
             elif agent.orientation == 2:
-                pygame.draw.rect(self.canvas, RED,[x_px, y_px,self.resolution,self.resolution])
+                #pygame.draw.rect(self.canvas, RED,[x_px, y_px,self.resolution,self.resolution])
+                pygame.draw.circle(self.canvas, RED, (x_px + self.resolution / 2, y_px + self.resolution / 2),
+                                   radius=self.resolution / 2, width=0)
                 pygame.draw.rect(self.canvas, WHITE,[x_px+width/4, y_px+height/4,width/3,height/2])
             elif agent.orientation == 3:
-                pygame.draw.rect(self.canvas, RED,[x_px, y_px,self.resolution,self.resolution])
+                #pygame.draw.rect(self.canvas, RED,[x_px, y_px,self.resolution,self.resolution])
+                pygame.draw.circle(self.canvas, RED, (x_px + self.resolution / 2, y_px + self.resolution / 2),
+                                   radius=self.resolution / 2, width=0)
                 pygame.draw.rect(self.canvas, WHITE,[x_px+width/4, y_px+height/2,width/2,height/3])
 
 
@@ -123,10 +134,10 @@ class Display:
                 for target in targets:
                     row,col = target
                     x_px, y_px = col * self.resolution, row * self.resolution
-                    pygame.draw.rect(self.canvas, BLUE_LIGHT, [x_px, y_px, self.resolution, self.resolution])#WHITE
+                    pygame.draw.rect(self.canvas, ORANGE, [x_px, y_px, self.resolution, self.resolution])#WHITE
                     pygame.draw.circle(self.canvas,WHITE,
                                        (x_px + self.resolution / 2, y_px + self.resolution / 2),
-                                       radius=self.resolution/2,
+                                       radius=self.resolution/2.5,
                                        width=0)
 
 
@@ -182,8 +193,17 @@ class Display:
                 self.canvas.blit(text, textRect)
 
     def plot_stats(self):
-        data = random.sample(range(10, 100), 80)
-        time = np.linspace(0, 1, 80)
+
+
+
+        try:
+            dataframe = pandas.read_csv('stored_data/agent0.csv')
+            time = dataframe['sim_time'].to_list()
+            data = dataframe['num_conflicts'].to_list()
+        except:
+            data = random.sample(range(10, 100), 80)
+            time = np.linspace(0, 1, 80)
+
 
         matplotlib.use("Agg")
 

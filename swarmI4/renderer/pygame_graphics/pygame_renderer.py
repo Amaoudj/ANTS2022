@@ -1,7 +1,7 @@
 from swarmI4.renderer.renderer_interface import RendererInterface
 from swarmI4.renderer.pygame_graphics.display import Display
 import pygame
-from swarmI4.renderer.pygame_graphics.write_info import Info
+from swarmI4.renderer.pygame_graphics.info import Info
 
 class PygameRenderer (RendererInterface):
     """
@@ -30,6 +30,11 @@ class PygameRenderer (RendererInterface):
         """
         Display a frame
         """
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                raise SystemExit
+
         self._display.reset_canvas()
         for node in self._graph.nodes:
             self._display.draw_node(node_pos=node,graph=self._my_map.graph)
@@ -41,7 +46,6 @@ class PygameRenderer (RendererInterface):
         self.sim_info_display(step, lapsed_time, sim_arguments = args)
         self._display.write_info(self._sim_info)
         pygame.display.update()
-
 
     def sim_info_display(self, step, lapsed_time: float = 0, sim_arguments=None):
         self._sim_info = []

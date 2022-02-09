@@ -9,7 +9,6 @@ from ..map import Map
 import time
 
 
-
 class Simulator(object):
     """ The Simulator"""
 
@@ -25,9 +24,10 @@ class Simulator(object):
         self._step = 0
         self._renderer = renderer
 
-
         self._start_time = 0
         self._lapsed_time = 0
+        self._simulation_time = 0
+
 
 
     def start(self,args) -> None:
@@ -53,16 +53,18 @@ class Simulator(object):
         """
         # call the setup of the _renderer
         self._renderer.setup(args)
-
         self._start_time = time.time()
 
         while not self.stop():
-            time.sleep(0.05)
+            time.sleep(0.1)
+
             logging.debug(f"Turn {self._step} is now running")
             self._renderer.display_frame(args,self._step,lapsed_time=self._lapsed_time)
-            self._my_swarm.move_all(dt=self._lapsed_time)
+            self._my_swarm.move_all(simulation_time=self._simulation_time,dt=self._lapsed_time)
+
             self._step += 1
             self._lapsed_time = time.time() - self._start_time
+            self._simulation_time += self._lapsed_time
 
         self._renderer.display_frame(step=self._step,args=args)
         logging.info("Simulation is done")

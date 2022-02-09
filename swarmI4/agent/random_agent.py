@@ -30,6 +30,7 @@ class RandomAgent(AgentInterface):
         return self._position
 
 
+
 def random_agent_generator() -> Callable:
     """ Create a random agent generator
     :returns: A generator function

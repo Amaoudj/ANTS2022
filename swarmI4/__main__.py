@@ -6,9 +6,6 @@ import logging
 from swarmI4.experiment  import *
 
 
-# Since some arguments are local to individual components (see for instance map generators), we ise the singleton
-# argument parser from the configargparse lib.
-
 parser = configargparse.get_arg_parser() # ArgumentParser(description="Swarm robotics for I4.0 abstract simulator.")
 
 def parse_args():
@@ -33,8 +30,13 @@ def parse_args():
                         default=(600,1200))
 
     parser.add_argument("-m", "--map", help="Map/map generator to use", nargs=1, metavar="map", type=str,
-                        default="WarehouseMapGenerator", choices=["WarehouseMapGenerator", "SimpleMapGenerator"])
+                        default="WarehouseMapGenerator", choices=["WarehouseMapGenerator", "SimpleMapGenerator","CustomMapGenerator"])
 
+    parser.add_argument("-pat", "--pattern_map_file",
+                        help="Experiment to run",
+                        nargs=1, metavar="pattern_map_file",
+                        type=str,
+                        default="map_patterns/arena.txt")
     parser.add_argument("--seed",
                         help="Random seed",
                         nargs=1, metavar="seed", type=int,
@@ -60,7 +62,8 @@ def parse_args():
                         help="Agent placement function",
                         nargs=1, metavar="agent_placement", choices=["random_placement", "horizontal_placement",
                                                                      "vertical_placement",
-                                                                     "center_placement"],
+                                                                     "center_placement",
+                                                                     "custom_placement"],
                         type=str,
                         default="random_placement")
 
@@ -99,6 +102,9 @@ def main(args):
 
     if type(args.num_targets) == list:
         args.num_targets = args.num_targets[0]
+
+    if type(args.pattern_map_file) == list:
+        args.pattern_map_file = args.pattern_map_file[0]
 
 
     logging.basicConfig(format='%(asctime)s %(message)s')

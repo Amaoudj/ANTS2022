@@ -28,7 +28,7 @@ class AndersTestAgent(AgentInterface):
         """
         return random.choice(["UP", "DOWN", "LEFT", "RIGHT", "RANDOM"])
 
-    def move(self, my_map: map,time_lapsed:float=0):
+    def move(self, my_map: map,sim_time:float = 0,time_lapsed:float=0):
         x, y = self._position
         if self._direction == "UP":
             y += 1
@@ -47,6 +47,13 @@ class AndersTestAgent(AgentInterface):
         else:
             self._direction = self._new_direction()
 
+
+    def get_neighbors(self, map):
+        pass
+
+
+    def send_my_data(self, map):
+        pass
 
 def anders_test_agent_generator() -> Callable:
     """
@@ -68,7 +75,7 @@ class AndersTestExperiment(BaseExperiment):
     """
 
     def _create_swarm(self, args, my_map: Map):
-        return Swarm([[args.swarm_size, anders_test_agent_generator()]], globals()[args.agent_placement], my_map)
+        return Swarm(args,[[args.swarm_size, anders_test_agent_generator()]], globals()[args.agent_placement], my_map)
 
 
 

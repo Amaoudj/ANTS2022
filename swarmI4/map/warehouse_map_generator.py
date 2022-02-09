@@ -119,5 +119,4 @@ class WarehouseMapGenerator(object):
                         my_map.nodes[(wx, wy)]["state"] = 'obstacle'
 
         logging.info("World generated")
-        print(my_map.nodes)
         return Map(my_map, self._number_of_nodes)

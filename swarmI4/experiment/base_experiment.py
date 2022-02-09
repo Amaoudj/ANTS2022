@@ -24,7 +24,7 @@ class BaseExperiment(ExperimentInterface):
 
     def _create_swarm(self, args, my_map: Map):
         """ Create the swarm """
-        return Swarm([(args.swarm_size, random_agent_generator())], globals()[args.agent_placement], my_map)
+        return Swarm(args,[(args.swarm_size, random_agent_generator())], globals()[args.agent_placement], my_map)
 
     def _create_renderer(self, args, my_map, my_swarm) -> RendererInterface:
         """ Create the renderer """
