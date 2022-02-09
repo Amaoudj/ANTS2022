@@ -78,6 +78,7 @@ def center_placement(agent_number: int, total_number_of_agents: int, my_map) -> 
     y = int(my_map.size_y / 2 - square_side_length / 2) + row
     return (x, y),None
 
+
 def custom_placement(agent_number: int, total_number_of_agents: int, my_map) -> Tuple:
     """ Place agents and their targets according to a custom map
     :my_map: the map

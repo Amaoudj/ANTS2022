@@ -62,7 +62,6 @@ class Swarm(object):
         """
         print(f'------------< iteration started >-----------------------------')
         print(f'Phase 01 : planning the next step ')
-
         for agent in self._agents:
             if type(agent) is SmartAgent:
                 agent.next_step(self._my_map)
@@ -74,7 +73,6 @@ class Swarm(object):
                 print(f'agent: {agent.id}, requests : {num_pos_requests}')
                 agent.handle_conflicts(self._my_map)
 
-        #print(len(self._my_map.msg_box), self._my_map.msg_box)
         print(f'Phase 03 : AGVs are moving ...')
         for agent in self._agents:
 
