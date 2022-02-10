@@ -55,7 +55,7 @@ class Simulator(object):
         self._start_time = time.time()
 
         while not self.stop():
-            time.sleep(0.1)
+            time.sleep(0.5)
 
             logging.debug(f"Turn {self._step} is now running")
             self._renderer.display_frame(args,self._step,lapsed_time=self._lapsed_time)
