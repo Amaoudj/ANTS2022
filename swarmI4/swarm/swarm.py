@@ -67,7 +67,6 @@ class Swarm(object):
                 #logging.info(f'Phase 01 : planning the next step ')
                 agent.next_step(self._my_map)
 
-
         for agent in self._agents:
             if type(agent) is SmartAgent:
                 #logging.info(f'Phase 02 : Handling rising conflicts ')
