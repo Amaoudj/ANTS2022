@@ -158,6 +158,36 @@ class Map(object):
 
         return _node,move_backward
 
+    def get_move_away_free_node(self, node1, threshold_node)->tuple:
+        """
+        return the nearest node for the node1 while note passing threshold_node
+        :return: random node
+        """
+        row, col= node1
+
+        row1, col1 = threshold_node
+        _node = None
+        node_state = ''
+        if row ==row1 :  # in the same line
+           _node = (row-1, col)
+           node_state = self._graph.nodes[_node]["state"]
+           if node_state is not 'free_space':
+              _node = (row + 1 ,col)
+              node_state = self._graph.nodes[_node]["state"]
+              if node_state is not 'free_space':
+                  _node = None
+
+        elif col==col1: # the same col
+           _node = (row , col- 1)
+           node_state = self._graph.nodes[_node]["state"]
+           if node_state is not 'free_space':
+               _node = (row , col+ 1)
+               node_state = self._graph.nodes[_node]["state"]
+               if node_state is not 'free_space':
+                   _node = None
+
+        return _node
+
 
     def get_nearest_free_node(self,node1, threshold_node)->tuple:
         """

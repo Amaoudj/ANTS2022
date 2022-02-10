@@ -25,10 +25,11 @@ class Swarm(object):
 
         self._agents = []
         self._positions = {}
-
+        self.Time_Step = 1
+        self.agent_done=0
         self.create_swarm(args,agent_generators, my_map, placement_func)
         self._my_map = my_map
-
+        self.done=False
 
 
     def create_swarm(self,args, agent_generators: List[Tuple[int, Func]], my_map: Map, placement_func: Func) -> None:
@@ -60,32 +61,42 @@ class Swarm(object):
         :world: The world
         :returns: None
         """
+        #while not self.done:
+
         print(f'------------< iteration started >-----------------------------')
         for agent in self._agents:
             if type(agent) is SmartAgent:
-
                 #logging.info(f'Phase 01 : planning the next step ')
                 agent.next_step(self._my_map)
+
+        #update msg box
+        for agent in self._agents:
+            if type(agent) is SmartAgent:
+                agent.send_my_data(self._my_map)
 
         for agent in self._agents:
             if type(agent) is SmartAgent:
                 #logging.info(f'Phase 02 : Handling rising conflicts ')
-                num_pos_requests, _ = agent.pos_requests(agent.position)
+                num_pos_requests, _ = agent.pos_requests(self._my_map,agent.position)
                 #logging.info(f'agent: {agent.id}, requests : {num_pos_requests}')
                 agent.handle_conflicts(self._my_map)
-
+        #update msg box
+        for agent in self._agents:
+            if type(agent) is SmartAgent:
+                agent.send_my_data(self._my_map)
 
         for agent in self._agents:
           if type(agent) is SmartAgent:
             #logging.info(f'Phase 03 : AGVs are moving ...')
-            if agent.remaining_nodes >0 :
+            if len(agent.remaining_path) > 0 :
+
                agent.move(self._my_map,simulation_time, time_lapsed=dt)
                self.store_data(agent.storage_container,self.data_storage_dir,f'agent_{agent.id}.csv')
-
+            else:
+               self.agent_done += 1
           else:
               agent.move(self._my_map, simulation_time, time_lapsed=dt)
 
-        print('------------<iteration ended>-----------------------------')
         #clear this list for the next use
         self._my_map.new_paths_node.clear()
 
@@ -99,6 +110,15 @@ class Swarm(object):
                                                      "Conflict", 1)
                     sys.exit()
 
+        if self.agent_done < len(self._agents):
+            self.Time_Step += 1
+
+        else:
+            self.done = True
+            #ctypes.windll.user32.MessageBoxW(0,f"End Task--Time_Step : {self.Time_Step} ","Done", 1)
+            #print('--------------------------------------------------')
+            #print('End Task--Time_Step : ', self.Time_Step)
+            #print('---------------------------------------------------------')
 
     def set_positions(self, position: int) -> None:
         """ Set the same position for all agents in swarm
