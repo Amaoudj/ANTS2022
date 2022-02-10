@@ -66,7 +66,6 @@ class Map(object):
             self._graph.nodes[node_pos]["obstacle"] = True
             self._graph.nodes[node_pos]["state"] = 'obstacle'
 
-
     def set_as_free(self,node_pos:tuple or list):
         """
         set a note to be in free space
@@ -118,10 +117,71 @@ class Map(object):
         while node_state is not 'free_space' :
             random_node_id = np.random.choice(range(0,len(self._graph.nodes)-1))
             random_node = list(self._graph.nodes)[random_node_id]
-
             node_state = self._graph.nodes[random_node]["state"]
-
         return random_node
+
+
+    def get_nearest_free_node(self,node1, threshold_node)->tuple:
+        """
+        return the nearest node for the node1 while note passing threshold_node
+        :return: random node
+        """
+        row, col= node1
+        row1, col1 = threshold_node
+        _node = []
+        node_state = ''
+        while node_state is not 'free_space':
+          i = 1
+          if row==row1 :  # in the same line
+             if i==1 :
+                _node = (row-1, col)
+             if i==2:
+                _node = (row +1 ,col)
+
+             if i == 3:
+               if col1>col: # search left side
+                 _node = (row, col-1)
+                 col-=1
+               else:        # search right side
+                 _node = (row, col + 1)
+                 col += 1   # go
+               i = 1
+
+          elif col ==col1: # the same col
+              if i == 1:
+                  _node = (row , col- 1)
+              if i == 2:
+                  _node = (row , col+ 1)
+
+              if i == 3:
+                  if row1 > row:  # search Up-side
+                      _node = (row - 1, col)
+                      row -= 1
+                  else:  # search down-side
+                      _node = (row +1, col )
+                      row += 1  # go
+                  i = 1
+
+          node_state = self._graph.nodes[_node]["state"]
+
+        return _node
+
+
+    def free_neighboring_node(self,pos,prohibited_nodes):
+        """
+        find a free node in the neighborhood
+        """
+        neighborhood = self.get_neighbors(pos,diagonal=False)
+        for node in neighborhood:
+            if node in prohibited_nodes:
+                continue
+            else:
+                if node in self._graph.nodes and self._graph.nodes[node]["state"] == 'free_space':
+                    if self._graph.nodes[node]["agent"] is not None:
+                        return None
+                    else:
+                        return node
+
 
     def occupied(self, position: Tuple[int, int]):
         """
@@ -133,22 +193,6 @@ class Map(object):
             return True
 
         return "agent" not in self._graph.nodes[position] or self._graph.nodes[position]["agent"] is not None
-
-    def free_neighboring_node(self,pos,prohibited_nodes):
-        """
-        find a free node in the neighborhood
-        """
-
-        neighborhood = self.get_neighbors(pos,diagonal=False)
-        for node in neighborhood:
-            if node in prohibited_nodes:
-                continue
-            else:
-                if node in self._graph.nodes and self._graph.nodes[node]["state"] == 'free_space':
-                    if self._graph.nodes[node]["agent"] is not None:
-                        return None
-                    else:
-                        return node
 
     def move_agent(self, agent: AgentInterface, new_position: Tuple[int, int]):
         assert self._graph.nodes[agent.position]["agent"] == agent, \
