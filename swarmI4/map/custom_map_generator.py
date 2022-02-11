@@ -41,7 +41,6 @@ class CustomMapGenerator(object):
         :nodes: number of nodes (x * y)
         :nodes: number of obstacles (x * y)
         :seed: The seed for the random generator
-
         """
 
         self._number_of_nodes = None

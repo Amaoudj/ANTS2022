@@ -80,6 +80,7 @@ class Swarm(object):
                 num_pos_requests, _ = agent.pos_requests(self._my_map,agent.position)
                 #logging.info(f'agent: {agent.id}, requests : {num_pos_requests}')
                 agent.handle_conflicts(self._my_map)
+
         #update msg box
         for agent in self._agents:
             if type(agent) is SmartAgent:
@@ -89,7 +90,6 @@ class Swarm(object):
           if type(agent) is SmartAgent:
             #logging.info(f'Phase 03 : AGVs are moving ...')
             if len(agent.remaining_path) > 0 :
-
                agent.move(self._my_map,simulation_time, time_lapsed=dt)
                self.store_data(agent.storage_container,self.data_storage_dir,f'agent_{agent.id}.csv')
             else:
@@ -108,7 +108,7 @@ class Swarm(object):
                     ctypes.windll.user32.MessageBoxW(0,
                                                      f"Collision in node {agent1.position} between : {agent1.id} and {agent2.id}",
                                                      "Conflict", 1)
-                    sys.exit()
+                    #sys.exit()
 
         if self.agent_done < len(self._agents):
             self.Time_Step += 1

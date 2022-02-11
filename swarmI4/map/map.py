@@ -232,7 +232,6 @@ class Map(object):
 
         return _node
 
-
     def get_nearest_free_node(self,node1, threshold_node)->tuple:
         """
         return the nearest node for the node1 while note passing threshold_node
@@ -278,7 +277,6 @@ class Map(object):
 
         return _node
 
-
     def free_neighboring_node(self,pos,prohibited_nodes):
         """
         find a free node in the neighborhood
@@ -293,7 +291,6 @@ class Map(object):
                         return None
                     else:
                         return node
-
 
     def occupied(self, position: Tuple[int, int]):
         """

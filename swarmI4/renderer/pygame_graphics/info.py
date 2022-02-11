@@ -1,6 +1,7 @@
 import csv
 import pandas
 class Info:
+
     def __init__(self,text, is_title:bool=False):
         """
         class for storing info
@@ -13,7 +14,6 @@ class Info:
         """
         store the info in a csv file
         """
-
         dataframe = pandas.DataFrame(data)
         print(dataframe)
         with open(file_path, 'a') as f:
