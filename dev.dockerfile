@@ -54,8 +54,8 @@ WORKDIR /home/developer
 #    && ln -sf /home/developer/.PyCharm /home/developer/$pycharm_local_dir
 
 # Installing dependices
-COPY requirement.txt /home/developer
-RUN python -m pip install -r requirement.txt
+COPY requirements.txt /home/developer
+RUN python -m pip install -r requirements.txt
 
 
 # CMD [ "/opt/pycharm/bin/pycharm.sh" ]
