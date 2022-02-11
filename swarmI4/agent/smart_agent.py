@@ -75,7 +75,8 @@ class SmartAgent(AgentInterface):
               "moving_away_node": self.my_move_away_node,
               "my_last_node":self.last_node,
               "got_priority_last_step":self.got_priority_last_step,
-              "my_pos_will_be_free":self.my_pos_will_be_free}
+              "my_pos_will_be_free":self.my_pos_will_be_free,
+              "next_action": self.action}
 
         map.msg_box[self.id] = data
 
@@ -84,13 +85,11 @@ class SmartAgent(AgentInterface):
         Find the agents requesting this position in the next or the next-next step
         args:
         position:(tuple) the coordinates of the node ( row,col)
-
         return:
          pos_requests:(int) the number of agents requesting this position
          in the next step or in the next-next step
          pos_requests_list: (list) list of agents requesting this position
          in the next step or in the next-next step
-
         """
         pos_requests = 0
         pos_requests_list = []
@@ -107,7 +106,7 @@ class SmartAgent(AgentInterface):
 
     def handle_conflicts(self,map):
         # solve conflicts for all agents
-        is_conflict, is_chase, critic_node = self.check_for_conflict(map)
+        is_conflict, End_barrier, critic_node = self.check_for_conflict(map)
 
         if is_conflict:
             if len(critic_node) == 1:
@@ -123,8 +122,9 @@ class SmartAgent(AgentInterface):
             else:
                _, solution = self.solve_opposite_conflict(map, critic_node)
 
-        #elif is_chase:
-           # _, solution =self.solve_following_conflict(map)
+        elif End_barrier:
+            self.critic_node = critic_node[0]
+            _, solution = self.solve_End_barrier_conflict(map, self.critic_node)
 
         else:
             self.action = "move"
@@ -179,6 +179,19 @@ class SmartAgent(AgentInterface):
                         neighbors.append(msg)
             return neighbors
 
+    def get_End_barrier_neighbors(self, map):
+        neighbors = []
+        my_next_node = None
+        if len(self.remaining_path) > 0:
+            my_next_node = self.remaining_path[0]
+
+        for msg in map.msg_box.values():
+            if msg["pos"] != None:
+                if ((msg["pos"] == my_next_node) and msg["pos"] == msg["next_node"]) or \
+                        msg["AgentID"] == self.id:
+                    neighbors.append(msg)
+        return neighbors
+
     def get_opposite_conflict_neighbors(self, map):
             """
             return: the neighbors list of this agent
@@ -207,14 +220,16 @@ class SmartAgent(AgentInterface):
             if msg["AgentID"] == self.id:
                 continue
             else:
-                # 1-intersection conflict
-                if (msg["next_node"] == my_next_node) :
+                # -intersection conflict
+                if (msg["next_node"] == my_next_node):
+
                     self.neighbors = self.get_intersection_conflict_neighbors(map)
                     next_nodes.append(my_next_node)
                     logging.debug(f'Intersection conflict in node: {my_next_node}')
-                    return True,False, next_nodes
+                    return True, False, next_nodes
 
-                #2-opposite conflict (two conflict nodes)
+                #-opposite conflict (two conflict nodes)
+                #TODO : elif
                 elif (msg["next_node"] == self.position) and (my_next_node == msg["pos"]):
                     self.neighbors = self.get_opposite_conflict_neighbors(map)
                     next_nodes.append(self.position)
@@ -223,12 +238,12 @@ class SmartAgent(AgentInterface):
                     logging.debug(f'Opposite conflict nodes: {next_nodes}')# between agent {self.id} and agent {msg["AgentID"]}')
                     return True,False, next_nodes
 
-                # 3- There are other AGVs docked on my path
-                elif (msg["next_node"] != self.position) and (my_next_node == msg["pos"] and msg["next_node"]==msg["pos"]):
-                     self.neighbors = self.get_opposite_conflict_neighbors(map)
-                     next_nodes.append(my_next_node)
-                     logging.debug(f'There are other AGVs docked on my path in node: {my_next_node}')
-                     return True,False, next_nodes
+                 # There is an AGV finished his tasks and docked on my path
+                elif (msg["next_node"] != self.position) and ( my_next_node == msg["pos"] and msg["next_node"] == msg["pos"]):  #
+                    self.neighbors = self.get_End_barrier_neighbors(map)
+                    next_nodes.append(self.position)
+                    logging.debug(f'There are other AGVs docked on my path in node: {my_next_node}')
+                    return False, True, next_nodes
 
                 # 4- chase-conflict
                 #elif msg["next_node"] != self.position and my_next_node == msg["pos"] and msg["next_node"]!=msg["pos"]:
@@ -261,6 +276,7 @@ class SmartAgent(AgentInterface):
                 if priority_agent == self.id: # it is me
                    self.got_priority_last_step = False #
                 break
+
 
         if priority_agent is None and len(candidates) > 1 :
             if self.neighbors[0]['AgentID'] == self.id:
@@ -332,12 +348,11 @@ class SmartAgent(AgentInterface):
                         if self.neighbors[0]['AgentID'] == self.id:
                            logging.info(f'rule 03 failed--we take the agent with the highest id : (agent{priority_agent})')
 
-
-
         elif priority_agent is None and len(candidates) == 1:
              priority_agent = candidates[0]['AgentID']
 
         for neighbor in self.neighbors:
+          #if not End_barrier_situation :
             if neighbor['AgentID'] == priority_agent:
                 solution[neighbor['AgentID']] = "move"
 
@@ -616,9 +631,90 @@ class SmartAgent(AgentInterface):
             self.move_away(map,self.critic_node)#de, self.critic_node])
             self.moving_backward = True
 
-        #self.send_my_data(map)
+        return priority_agent,solution
+
+    def solve_End_barrier_conflict(self, map, critic_node:tuple)->tuple: ############################################################
+        """
+        return the id of the agent with the priority to move in the next step
+        """
+        solution = {}
+        if self.neighbors[0]['AgentID'] == self.id:
+          logging.info(f'-----------< solving an End_barrier_conflict >--------------------')
+        priority_agent = None
+        agent_move_away = None
+        node_=None
+
+        candidates = self.neighbors.copy()
+
+        if self.neighbors[0]['AgentID'] == self.id:
+           logging.info(f'End_barrier candidates : {candidates}')
+           logging.info(f'The critic node(s) :  {critic_node}')
+           logging.info('---Determine which agent will have priority for an opposite_conflict---')
+
+        for agent in candidates:
+
+            if agent['pos'] == critic_node:
+               priority_agent   = agent['AgentID']
+               solution[agent['AgentID']] = "move"
+            else:
+               agent_move_away = agent['AgentID']
+               solution[agent['AgentID']] = "move_to_node_and_wait"
+               node_=map.get_move_away_nearest_node(agent['pos'],critic_node)
+               if agent['AgentID'] == self.id:  # it is me
+                   self.my_move_away_node = node_
+
+
+
+        if candidates[priority_agent]['pos'] ==node_: # means no solution for the other AGV, it will take my node
+            solution[priority_agent] = "move_away"
+            self.critic_node = candidates[agent_move_away]['pos']
+
+        for n in self.neighbors:
+          if n['AgentID'] not in list(solution.keys()):
+             solution[n['AgentID']] = "wait"
+
+        if self.neighbors[0]['AgentID'] == self.id:
+          logging.info(f'calculated solution :{solution}')
+
+        # move away to let priority agent pass
+        self.action = solution[self.id]
+
+        if self.action =="move":
+            # to informs other agents not figured in the list that my node is free to move to
+            self.my_pos_will_be_free = True
+
+        if self.action == "move_away":
+            #don't move backward and don't move to the critic_node pos
+            self.move_away(map,self.critic_node)#de, self.critic_node])
+            self.moving_backward = True
+            self.critic_node=critic_node
+
+
+        if self.action == "move_to_node_and_wait":
+            self.move_to_node_and_wait(map, self.my_move_away_node)
 
         return priority_agent,solution
+
+    def solve_following_conflict(self, map) -> tuple:
+
+        #TODO: give the priority to the successor agent to pass if his path longest than my path
+
+
+        solution={}
+        # move away to let priority agent pass
+        self.action = solution[self.id]
+
+        if self.action == "move":
+            # to informs other agents not figured in the list that my node is free to move to
+            self.my_pos_will_be_free = True
+
+        if self.action == "move_away":
+            # don't move backward and don't move to the critic_node pos
+            self.move_away(map, self.critic_node)  # de, self.critic_node])
+            self.moving_backward = True
+
+
+        return self.priority_agent, solution
 
     def move_away(self, map, prohibited_node):
         """
@@ -799,7 +895,6 @@ class SmartAgent(AgentInterface):
             self.next_target   = self.target_list[self._current_target_id]
             self.next_waypoint = self.remaining_path[0]
 
-
         if self.action == "------" and len(self.remaining_path) > 0 :
             #check whether an agent will move away to my node
             for msg in map.msg_box.values():
@@ -818,8 +913,18 @@ class SmartAgent(AgentInterface):
 
         if self.action == "wait":
             self.wait()
-        else: # you can move in this step
 
+        else: # your planned action is move
+            #- dont move if your predesessor next-step is wait
+            for msg in map.msg_box.values():
+                if msg["pos"] == self.next_waypoint and msg["next_action"] =="wait":
+                    #self.action = "wait"
+                    #logging.info(f'Action of agent {self.id} changed to --wait-- ')
+                    break
+
+            if self.action == "wait":
+                self.wait()
+            else:
                 self.face_to(self.next_waypoint)
                 self.last_node = (self.row, self.col)
                 self.my_pos_will_be_free = False
@@ -918,5 +1023,3 @@ def smart_agent_generator(args,my_map) -> Callable:
         return SmartAgent(None,my_map, position=position, num_targets=args.num_targets)
 
     return generator
-
-
