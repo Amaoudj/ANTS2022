@@ -469,7 +469,7 @@ class SmartAgent(AgentInterface):
                                         solution[n['AgentID']] = "move"
                                         priority_agent = n['AgentID']
 
-                                #TODO: another case is not included
+                                #check: another case is not included (when the critic node dose not have neighbring free node)
                                 else: #get the free_neighboring_node of the critic node and move there to allow the other agent pass
                                     solution[neighbor['AgentID']] = "wait"
                                     solution[n['AgentID']] = "move_to_node_via_critic_node" #######################################################################
@@ -956,16 +956,16 @@ class SmartAgent(AgentInterface):
                 self.wait()
             else:
                 self.face_to(self.next_waypoint)
-                self.last_node = (self.row, self.col)
+                self.last_node = self._position
                 self.my_pos_will_be_free = False
 
                 #update the graph
-                map.graph.nodes[(self.row, self.col)]["agent"] = None
-                map.graph.nodes[self._position]["state"] = 'free_space'
+                #map.graph.nodes[(self.row, self.col)]["agent"] = None
+                #map.graph.nodes[self._position]["state"] = 'free_space'
+                map.set_as_free(self._position)
                 self._position = self.next_waypoint
 
                 map.graph.nodes[self._position]["agent"] = self
-                #map.graph.nodes[self._position]["state"] = 'agent'
 
                 # update self.remaining_path by removing the waypoint from it
                 if self.next_waypoint in self.remaining_path:

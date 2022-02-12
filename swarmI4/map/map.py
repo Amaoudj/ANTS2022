@@ -133,10 +133,10 @@ class Map(object):
         if row ==row1 :  # in the same line
            _node = (row-1, col)
            node_state = self._graph.nodes[_node]["state"]
-           if node_state is not 'free_space':
+           if not self.is_free(_node):#node_state is not 'free_space':
               _node = (row + 1 ,col)
               node_state = self._graph.nodes[_node]["state"]
-              if node_state is not 'free_space':
+              if not self.is_free(_node):#node_state is not 'free_space':
                  move_backward = True
                  if col1>col: # search left side
                     _node = (row, col-1)
@@ -146,10 +146,10 @@ class Map(object):
         elif col==col1: # the same col
            _node = (row , col- 1)
            node_state = self._graph.nodes[_node]["state"]
-           if node_state is not 'free_space':
+           if not self.is_free(_node):#node_state is not 'free_space':
                _node = (row , col+ 1)
                node_state = self._graph.nodes[_node]["state"]
-               if node_state is not 'free_space':
+               if not self.is_free(_node):#node_state is not 'free_space':
                   move_backward = True
                   if row1 > row:  # search Up-side
                       _node = (row - 1, col)
@@ -173,10 +173,10 @@ class Map(object):
         if row == row1:  # in the same line
             _node = (row - 1, col)
             node_state = self._graph.nodes[_node]["state"]
-            if node_state is not 'free_space':
+            if not self.is_free(_node):#node_state is not 'free_space':
                 _node = (row + 1, col)
                 node_state = self._graph.nodes[_node]["state"]
-                if node_state is not 'free_space':
+                if not self.is_free(_node):#node_state is not 'free_space':
                     move_backward = True
                     if col1 > col:  # search left side
                         _node = (row, col - 1)
@@ -186,10 +186,10 @@ class Map(object):
         elif col == col1:  # the same col
             _node = (row, col - 1)
             node_state = self._graph.nodes[_node]["state"]
-            if node_state is not 'free_space':
+            if not self.is_free(_node):#node_state is not 'free_space':
                 _node = (row, col + 1)
                 node_state = self._graph.nodes[_node]["state"]
-                if node_state is not 'free_space':
+                if not self.is_free(_node):#node_state is not 'free_space':
                     move_backward = True
                     if row1 > row:  # search Up-side
                         _node = (row - 1, col)
@@ -224,10 +224,10 @@ class Map(object):
         elif col==col1: # the same col
            _node = (row , col- 1)
            node_state = self._graph.nodes[_node]["state"]
-           if node_state is not 'free_space':
+           if not self.is_free(_node):#node_state is not 'free_space':
                _node = (row , col+ 1)
                node_state = self._graph.nodes[_node]["state"]
-               if node_state is not 'free_space':
+               if not self.is_free(_node):#node_state is not 'free_space':
                    _node = None
 
         return _node
@@ -241,7 +241,7 @@ class Map(object):
         row1, col1 = threshold_node
         _node = None
         node_state = ''
-        while node_state is not 'free_space':
+        while (node_state is not 'free_space' or node_state is not 'atrget'):
           i = 1
           if row==row1 :  # in the same line
              if i==1 :
@@ -286,7 +286,7 @@ class Map(object):
             if node in prohibited_nodes:
                 continue
             else:
-                if node in self._graph.nodes and self._graph.nodes[node]["state"] == 'free_space':
+                if node in self._graph.nodes and (self._graph.nodes[node]["state"] == 'free_space' or self._graph.nodes[node]["state"] == 'target'):
                     if self._graph.nodes[node]["agent"] is not None:
                         return None
                     else:
@@ -302,6 +302,16 @@ class Map(object):
             return True
 
         return "agent" not in self._graph.nodes[position] or self._graph.nodes[position]["agent"] is not None
+
+    def is_free(self,node):
+        x,y=node
+
+        if x < 0 or x >= self.size_x or y < 0 or y >= self.size_y:
+            return False
+        elif self._graph.nodes[node]["state"] == 'free_space' or self._graph.nodes[node]["state"] == 'target':
+            return True
+        else:
+            return False
 
     def move_agent(self, agent: AgentInterface, new_position: Tuple[int, int]):
         assert self._graph.nodes[agent.position]["agent"] == agent, \
