@@ -120,6 +120,7 @@ class Map(object):
             node_state = self._graph.nodes[random_node]["state"]
         return random_node
 
+
     def get_move_away_node(self, node1, threshold_node)->tuple:
         """
         return the nearest node for the node1 while note passing threshold_node
@@ -129,27 +130,26 @@ class Map(object):
         row1, col1 = threshold_node
         _node = None
         move_backward=False
-        node_state = ''
+
         if row ==row1 :  # in the same line
            _node = (row-1, col)
-           node_state = self._graph.nodes[_node]["state"]
-           if not self.is_free(_node):#node_state is not 'free_space':
+
+           if not self.is_free(_node):
               _node = (row + 1 ,col)
-              node_state = self._graph.nodes[_node]["state"]
-              if not self.is_free(_node):#node_state is not 'free_space':
+              if not self.is_free(_node):
                  move_backward = True
                  if col1>col: # search left side
                     _node = (row, col-1)
-                 else:   # search right side
+                 else:   #search right side
                   _node = (row, col + 1)
 
         elif col==col1: # the same col
            _node = (row , col- 1)
-           node_state = self._graph.nodes[_node]["state"]
-           if not self.is_free(_node):#node_state is not 'free_space':
+
+           if not self.is_free(_node):
                _node = (row , col+ 1)
-               node_state = self._graph.nodes[_node]["state"]
-               if not self.is_free(_node):#node_state is not 'free_space':
+
+               if not self.is_free(_node):
                   move_backward = True
                   if row1 > row:  # search Up-side
                       _node = (row - 1, col)
@@ -161,6 +161,7 @@ class Map(object):
         return _node,move_backward
 
     def get_move_away_nearest_node(self, node1, threshold_node) -> tuple:
+
         """
         return the nearest node for the node1 while note passing threshold_node
         :return: random node
@@ -172,11 +173,11 @@ class Map(object):
         node_state = ''
         if row == row1:  # in the same line
             _node = (row - 1, col)
-            node_state = self._graph.nodes[_node]["state"]
-            if not self.is_free(_node):#node_state is not 'free_space':
+
+            if not self.is_free(_node):
                 _node = (row + 1, col)
-                node_state = self._graph.nodes[_node]["state"]
-                if not self.is_free(_node):#node_state is not 'free_space':
+
+                if not self.is_free(_node):
                     move_backward = True
                     if col1 > col:  # search left side
                         _node = (row, col - 1)
@@ -185,11 +186,11 @@ class Map(object):
 
         elif col == col1:  # the same col
             _node = (row, col - 1)
-            node_state = self._graph.nodes[_node]["state"]
-            if not self.is_free(_node):#node_state is not 'free_space':
+
+            if not self.is_free(_node):
                 _node = (row, col + 1)
-                node_state = self._graph.nodes[_node]["state"]
-                if not self.is_free(_node):#node_state is not 'free_space':
+
+                if not self.is_free(_node):
                     move_backward = True
                     if row1 > row:  # search Up-side
                         _node = (row - 1, col)
@@ -198,11 +199,11 @@ class Map(object):
 
         x, y = _node
         if x>=self.size_x or y>=self.size_y:
-            _node=threshold_node  #no solution, thus return the 'threshold_node'
+            _node=threshold_node # no solution, thus return the 'threshold_node'
 
         return _node, move_backward
 
-    def get_move_away_free_node(self, node1, threshold_node)->tuple:
+    def get_Up_Down_free_node(self, node1, threshold_node)->tuple: # search only in two sides
         """
         return the nearest node for the node1 while note passing threshold_node
         :return: random node
@@ -211,26 +212,25 @@ class Map(object):
 
         row1, col1 = threshold_node
         _node = None
-        node_state = ''
-        if row ==row1 :  # in the same line
+        if row == row1 :  # in the same line
            _node = (row-1, col)
-           node_state = self._graph.nodes[_node]["state"]
-           if node_state is not 'free_space':
+
+           if not self.is_free(_node):
               _node = (row + 1 ,col)
-              node_state = self._graph.nodes[_node]["state"]
-              if node_state is not 'free_space':
+
+              if not self.is_free(_node):
                   _node = None
 
         elif col==col1: # the same col
            _node = (row , col- 1)
-           node_state = self._graph.nodes[_node]["state"]
-           if not self.is_free(_node):#node_state is not 'free_space':
+
+           if not self.is_free(_node):
                _node = (row , col+ 1)
-               node_state = self._graph.nodes[_node]["state"]
-               if not self.is_free(_node):#node_state is not 'free_space':
+               if not self.is_free(_node):
                    _node = None
 
         return _node
+
 
     def get_nearest_free_node(self,node1, threshold_node)->tuple:
         """
@@ -322,9 +322,6 @@ class Map(object):
         self._graph.nodes[agent.position]["agent"] = None
         self._graph.nodes[new_position]["agent"] = agent
         agent.position = new_position
-
-
-
 
     def add_agent_to_map(self, agent: AgentInterface):
         assert self._graph.nodes[agent.position]["agent"] is None, \
