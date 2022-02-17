@@ -266,7 +266,6 @@ class SmartAgent(AgentInterface):
                 break
         return  agent
 
-
     def check_for_conflict(self,map):
 
         if len(self.remaining_path) >= 1:
@@ -322,7 +321,6 @@ class SmartAgent(AgentInterface):
         is_conflict, End_barrier, critic_node = self.check_for_conflict(map)
 
         if is_conflict:
-
             self.had_conflict = True
 
             if len(critic_node) == 1:
@@ -404,18 +402,23 @@ class SmartAgent(AgentInterface):
                logging.info(f'<rule 01 : the next-next node of an agent is free ? > : under checking...')
 
                # rule 00: choose the agent with highest successor
-            if len(candidates) > 1:  # in case of equality in rule 01 apply rule 02
+            if priority_agent is None and len(candidates) > 1:  # in case of equality in rule 01 apply rule 02
                    if self.neighbors[0]['AgentID'] == self.id:
                        logging.info(f'<rules 2: choose the agent successor agents > : under checking... ')
                    highest_requests_num = []
+                   done=False
                    for i in candidates:
                        highest_requests_num.append(i['successors'])
+                       if i["im_done"]:
+                           done=True
+                           break
 
-                   indx = highest_requests_num.index(max(highest_requests_num))
-                   highest_requests = highest_requests_num[indx]
-                   newcandidates = [i for i in candidates if i['successors'] == highest_requests]
-                   candidates.clear()
-                   candidates.extend(newcandidates)
+                   if not done: # if an agent is done, dont applied this rule
+                     indx = highest_requests_num.index(max(highest_requests_num))
+                     highest_requests = highest_requests_num[indx]
+                     newcandidates = [i for i in candidates if i['successors'] == highest_requests]
+                     candidates.clear()
+                     candidates.extend(newcandidates)
 
                    if len(candidates) == 1:  # if only one candidate left then it will have the priority
                        priority_agent = candidates[0]['AgentID']
@@ -423,7 +426,7 @@ class SmartAgent(AgentInterface):
                        if self.neighbors[0]['AgentID'] == self.id:
                            logging.info(f'priority rule 02: True for agent{priority_agent}')
 
-            if len(candidates) > 1:
+            if priority_agent is None and len(candidates) > 1:
               #rule 01: is the agent next-next node is free ?
               newlist = []
               for agent in candidates:
@@ -442,7 +445,7 @@ class SmartAgent(AgentInterface):
                    logging.info(f'rule 01: True for agent{priority_agent}')
 
             # rule 02: choose the agent with the most position requests
-            if len(candidates) > 1 : # in case of equality in rule 01 apply rule 02
+            if priority_agent is None and len(candidates) > 1 : # in case of equality in rule 01 apply rule 02
 
                 if self.neighbors[0]['AgentID'] == self.id:
                     logging.info(f'rule 01 : failed')
@@ -464,7 +467,7 @@ class SmartAgent(AgentInterface):
                        logging.info(f'priority rule 02: True for agent{priority_agent}')
 
             #rule 03 : choose the agent with the longest path
-            if len(candidates) > 1: # in case of equality in rule 01 apply rule 02
+            if priority_agent is None and len(candidates) > 1: # in case of equality in rule 01 apply rule 02
                     if self.neighbors[0]['AgentID'] == self.id:
                        logging.info('rule 02 failed')
                        logging.info(f'< rules 3: choose the agent with the longest path > : under checking... ')
@@ -491,21 +494,19 @@ class SmartAgent(AgentInterface):
                         if self.neighbors[0]['AgentID'] == self.id:
                            logging.info(f'rule 03 failed--we take the agent with the highest id : (agent{priority_agent})')
 
-        elif priority_agent is None and len(candidates) == 1:
-             priority_agent = candidates[0]['AgentID']
+        #elif priority_agent is None and len(candidates) == 1:
+             #priority_agent = candidates[0]['AgentID']
 
         prohibited_node=None
         prohibited_node_critic = None
         # update variables:
         self.moving_away = False
         self.moving_backward = False
-        self.got_priority_last_step = False  #
+        self.got_priority_last_step = False #
 
         for neighbor in self.neighbors:
-          #if not End_barrier_situation :
-            if neighbor['AgentID'] == priority_agent:
 
-                #solution[neighbor['AgentID']] = "move"
+            if neighbor['AgentID'] == priority_agent:
 
                 if self.neighbors[0]['AgentID'] == self.id:
                     logging.info(f'agent{neighbor["AgentID"]} has priority to move')
@@ -699,7 +700,7 @@ class SmartAgent(AgentInterface):
 
         self.action = solution[self.id]
 
-        if self.im_done and self.action=="wait" :# :
+        if self.im_done :#and self.action=="wait" : # :
             #if not is_critic_node_free : #critic node is not free
                 #if id_critic ==self.id: #i need to move out away
                     self.im_done = False
@@ -1015,7 +1016,7 @@ class SmartAgent(AgentInterface):
         """
         i=0
         # only the agent did not participate in the conflict resolution should execute this code
-        if not self.had_conflict and i==0 :
+        if not self.had_conflict and i==1 :
 
                 my_predecessors = self.get_predecessors(map)
                 if my_predecessors is not None and len(my_predecessors) > 0:
