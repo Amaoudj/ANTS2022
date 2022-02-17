@@ -26,14 +26,16 @@ class PygameRenderer (RendererInterface):
         """
         Tear down the rendering. Called after every simulation.
         """
-    def display_frame(self,args=None, step: int=0,lapsed_time: float = 0):
+    def display_frame(self,args=None, step: int=0,lapsed_time: float = 0) -> str or None:
         """
         Display a frame
         """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                raise SystemExit
+                return 'stop'
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    return 'reset'
 
         self._display.reset_canvas()
         for node in self._graph.nodes:
@@ -46,6 +48,7 @@ class PygameRenderer (RendererInterface):
         self.sim_info_display(step, lapsed_time, sim_arguments = args)
         self._display.write_info(self._sim_info)
         pygame.display.update()
+        return None
 
     def sim_info_display(self, step, lapsed_time: float = 0, sim_arguments=None):
         self._sim_info = []

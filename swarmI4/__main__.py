@@ -106,17 +106,23 @@ def main(args):
     if type(args.pattern_map_file) == list:
         args.pattern_map_file = args.pattern_map_file[0]
 
-
     logging.basicConfig(format='%(asctime)s %(message)s')
     logging.root.setLevel(getattr(logging, args.loglevel.upper(), None))
     logging.info(f"Runtime arguments f{args}")
 
-
     my_experiment = globals()[args.experiment]()
-    my_sim = my_experiment.create_simulator(args)
 
-    my_sim.start(args)
-    my_sim.main_loop(args)
+    while True:
+        my_sim = my_experiment.create_simulator(args)
+        sim_action = my_sim.start(args)
+
+        if sim_action == 'reset':
+            logging.info(f"Resetting the Simulation ...")
+            continue
+
+        sim_action = my_sim.main_loop(args)
+        if sim_action == 'stop':
+            break
 
 
 if __name__ == "__main__":

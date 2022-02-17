@@ -34,7 +34,7 @@ class Display:
                              'obstacle':GREEN,
                              'start': None,
                              'target':WHITE,
-                             'path':BLACK,#BLUE_LIGHT,
+                             'path':BLACK,
                              'agent':WHITE,
                              'critic':RED}
 
@@ -71,10 +71,13 @@ class Display:
         """
 
         node_state = graph.nodes[node_pos]["state"]
-        color      = self.nodes_states[node_state]
-        row,col    = node_pos
-        x,y = col * self.resolution, row * self.resolution
-        pygame.draw.rect(self.canvas, color, (x, y, self.resolution, self.resolution))
+        if node_state == 'agent': # the agent will be drawn by draw_agent not by draw_node
+            pass
+        else:
+            color      = self.nodes_states[node_state]
+            row,col    = node_pos
+            x,y = col * self.resolution, row * self.resolution
+            pygame.draw.rect(self.canvas, color, (x, y, self.resolution, self.resolution))
 
 
     def to_grid_coords(self, canvas_coords):
@@ -128,13 +131,14 @@ class Display:
         :param agents: a list of all the agents
         :return:
         """
+
         for agent in agents:
             if type(agent) is SmartAgent:
                 targets = agent.target_list[agent.target_id:]
                 for target in targets:
                     row,col = target
                     x_px, y_px = col * self.resolution, row * self.resolution
-                    pygame.draw.rect(self.canvas, ORANGE, [x_px, y_px, self.resolution, self.resolution])#WHITE
+                    pygame.draw.rect(self.canvas, ORANGE, [x_px, y_px, self.resolution, self.resolution])
                     pygame.draw.circle(self.canvas,WHITE,
                                        (x_px + self.resolution / 2, y_px + self.resolution / 2),
                                        radius=self.resolution/2.5,

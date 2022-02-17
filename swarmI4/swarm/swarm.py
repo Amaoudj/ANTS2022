@@ -29,7 +29,7 @@ class Swarm(object):
         self.agent_done=0
         self.create_swarm(args,agent_generators, my_map, placement_func)
         self._my_map = my_map
-        self.done=False
+        self.done = False
 
 
     def create_swarm(self,args, agent_generators: List[Tuple[int, Func]], my_map: Map, placement_func: Func) -> None:
@@ -55,18 +55,15 @@ class Swarm(object):
 
 
     def move_all(self,simulation_time,dt=0) -> None:
-
         """
         Move all agents in the swarm
         :world: The world
         :returns: None
         """
-        #while not self.done:
-
         print(f'------------< iteration started >-----------------------------')
+        #logging.info(f'Phase 01 : planning the next step ')
         for agent in self._agents:
             if type(agent) is SmartAgent:
-                #logging.info(f'Phase 01 : planning the next step ')
                 agent.next_step(self._my_map)
 
         #update msg box
@@ -74,11 +71,15 @@ class Swarm(object):
             if type(agent) is SmartAgent:
                 agent.send_my_data(self._my_map)
 
+        #update msg box
+        for agent in self._agents:
+                    if type(agent) is SmartAgent:
+                        agent.send_my_data(self._my_map)
+
+        # logging.info(f'Phase 02 : Handling rising conflicts ')
         for agent in self._agents:
             if type(agent) is SmartAgent:
-                #logging.info(f'Phase 02 : Handling rising conflicts ')
-                num_pos_requests, _ = agent.pos_requests(self._my_map,agent.position)
-                #logging.info(f'agent: {agent.id}, requests : {num_pos_requests}')
+                agent.num_pos_requests_and_successors(self._my_map, agent.position)
                 agent.handle_conflicts(self._my_map)
 
         #update msg box
@@ -86,22 +87,36 @@ class Swarm(object):
             if type(agent) is SmartAgent:
                 agent.send_my_data(self._my_map)
 
+        # post_coordination
+        for agent in self._agents:
+            if type(agent) is SmartAgent:
+               agent.post_coordination_to_solve_conflict(self._my_map)
+
+        # logging.info(f'Phase 03 : AGVs are moving ...')
         for agent in self._agents:
           if type(agent) is SmartAgent:
-            #logging.info(f'Phase 03 : AGVs are moving ...')
-            if len(agent.remaining_path) > 0 :
+
+            if not agent.im_done:#len(agent.remaining_path) > 0 :
                agent.move(self._my_map,simulation_time, time_lapsed=dt)
                self.store_data(agent.storage_container,self.data_storage_dir,f'agent_{agent.id}.csv')
-            else:
-               self.agent_done += 1
+
           else:
               agent.move(self._my_map, simulation_time, time_lapsed=dt)
 
         #clear this list for the next use
         self._my_map.new_paths_node.clear()
+        self.Time_Step += 1
 
+        self.done = True
+        for agent in self._agents:
+            if type(agent) is SmartAgent:
+                if not agent.im_done:
+                    self.done = False
+                    break
+            else:
+                self.done = False
+                break
 
-        #TODO: I need to add a func to reset and run the simulation again
         for agent1 in self._agents:
             for agent2 in self._agents:
                 if agent1.id != agent2.id and agent1.position == agent2.position :
@@ -109,16 +124,6 @@ class Swarm(object):
                                                      f"Collision in node {agent1.position} between : {agent1.id} and {agent2.id}",
                                                      "Conflict", 1)
                     #sys.exit()
-
-        if self.agent_done < len(self._agents):
-            self.Time_Step += 1
-
-        else:
-            self.done = True
-            #ctypes.windll.user32.MessageBoxW(0,f"End Task--Time_Step : {self.Time_Step} ","Done", 1)
-            #print('--------------------------------------------------')
-            #print('End Task--Time_Step : ', self.Time_Step)
-            #print('---------------------------------------------------------')
 
     def set_positions(self, position: int) -> None:
         """ Set the same position for all agents in swarm

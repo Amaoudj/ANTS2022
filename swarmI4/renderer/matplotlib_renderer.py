@@ -47,4 +47,6 @@ class MatPlotLibRenderer (RendererInterface):
         plt.show(block=False)
         plt.pause(0.001)
 
+        return None
+
 
