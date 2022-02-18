@@ -53,6 +53,10 @@ class Swarm(object):
                 my_map.add_agent_to_map(agent)
                 self._agents.append(agent)
 
+    def update_msg_box(self):
+        for agent in self._agents:
+            if type(agent) is SmartAgent:
+                agent.send_my_data(self._my_map)
 
     def move_all(self,simulation_time,dt=0) -> None:
         """
@@ -66,26 +70,26 @@ class Swarm(object):
             if type(agent) is SmartAgent:
                 agent.next_step(self._my_map)
 
-        #update msg box
-        for agent in self._agents:
-            if type(agent) is SmartAgent:
-                agent.send_my_data(self._my_map)
 
-        #update msg box
-        for agent in self._agents:
-                    if type(agent) is SmartAgent:
-                        agent.send_my_data(self._my_map)
+        # update msg box
+        self.update_msg_box()
+        self.update_msg_box()
 
         # logging.info(f'Phase 02 : Handling rising conflicts ')
         for agent in self._agents:
             if type(agent) is SmartAgent:
-                agent.num_pos_requests_and_successors(self._my_map, agent.position)
                 agent.handle_conflicts(self._my_map)
 
         #update msg box
+        self.update_msg_box()
+
+        # post_negotiation
         for agent in self._agents:
             if type(agent) is SmartAgent:
-                agent.send_my_data(self._my_map)
+               agent.post_negotiation(self._my_map)
+
+        # update msg box
+        self.update_msg_box()
 
         # post_coordination
         for agent in self._agents:
@@ -121,7 +125,9 @@ class Swarm(object):
             for agent2 in self._agents:
                 if agent1.id != agent2.id and agent1.position == agent2.position :
                     ctypes.windll.user32.MessageBoxW(0,
-                                                     f"Collision in node {agent1.position} between : {agent1.id} and {agent2.id}",
+                                                     f"Collision in node {agent1.position} between : {agent1.id} from {agent1.last_node} and {agent2.id} from in {agent1.last_node}"
+                                                     f""
+                                                     f"",
                                                      "Conflict", 1)
                     #sys.exit()
 
