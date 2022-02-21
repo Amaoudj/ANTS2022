@@ -221,12 +221,12 @@ class Map(object):
                 else:
 
                     if col1 > col:  # search left side
-                        #if self.is_free((row, col - 1)):
+                        if  self._graph.nodes[(row, col - 1)]["state"] == 'free_space' or self._graph.nodes[(row, col - 1)]["state"] == 'target':
                           _node = (row, col - 1)
                           move_backward = True
 
                     else:  # search right side
-                       # if self.is_free((row, col + 1)):
+                        if self._graph.nodes[(row, col + 1)]["state"] == 'free_space' or self._graph.nodes[(row, col + 1)]["state"] == 'target':
                           _node = (row, col + 1)
                           move_backward = True
 
@@ -243,16 +243,15 @@ class Map(object):
 
 
                     if row1 > row:  # search Up-side
-                        #if self.is_free((row - 1, col)):
+                       if self._graph.nodes[(row- 1, col )]["state"] == 'free_space' or self._graph.nodes[(row- 1, col )]["state"] == 'target':########################
                           _node = (row - 1, col)
                           move_backward = True
                     else:  # search down-side
-                        #if self.is_free((row + 1, col)):
+                        if self._graph.nodes[(row + 1, col)]["state"] == 'free_space' or self._graph.nodes[(row + 1, col)]["state"] == 'target':  ########################
                            _node = (row + 1, col)
                            move_backward = True
 
         return _node,move_backward
-
 
     def get_Up_Down_free_node(self, node1, threshold_node,prohibited_node)->tuple: # search only in two sides
        """
@@ -308,8 +307,6 @@ class Map(object):
                else:
                    _node = None
        return _node
-
-
 
     def get_move_away_nearest_node(self, node1, threshold_node) -> tuple:
 
@@ -406,6 +403,7 @@ class Map(object):
         """
         neighborhood = self.get_neighbors(pos,diagonal=False)
         node_=None
+
         for node in neighborhood:
             if node in prohibited_nodes:
                 continue

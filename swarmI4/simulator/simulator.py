@@ -62,8 +62,8 @@ class Simulator(object):
         self._renderer.setup(args)
         self._start_time = time.time()
 
-        while not self.stop() and not self._my_swarm.done:
-            time.sleep(0.5)
+        while not self._my_swarm.done:
+            time.sleep(0.3)
             logging.debug(f"Turn {self._step} is now running")
             sim_action = self._renderer.display_frame(args,self._step,lapsed_time=self._lapsed_time)
             if sim_action is not None:

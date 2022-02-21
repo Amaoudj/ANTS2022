@@ -64,7 +64,7 @@ class Swarm(object):
         :world: The world
         :returns: None
         """
-        print(f'------------< iteration started >-----------------------------')
+        logging.info(f'------------<New iteration started >-----------------------------')
         #logging.info(f'Phase 01 : planning the next step ')
         for agent in self._agents:
             if type(agent) is SmartAgent:
@@ -72,7 +72,6 @@ class Swarm(object):
 
 
         # update msg box
-        self.update_msg_box()
         self.update_msg_box()
 
         # logging.info(f'Phase 02 : Handling rising conflicts ')
@@ -82,6 +81,8 @@ class Swarm(object):
 
         #update msg box
         self.update_msg_box()
+        self.update_msg_box()
+
 
         # post_negotiation
         for agent in self._agents:
@@ -90,11 +91,15 @@ class Swarm(object):
 
         # update msg box
         self.update_msg_box()
+        self.update_msg_box()
 
         # post_coordination
         for agent in self._agents:
             if type(agent) is SmartAgent:
                agent.post_coordination_to_solve_conflict(self._my_map)
+
+        self.update_msg_box()
+        self.update_msg_box()
 
         # logging.info(f'Phase 03 : AGVs are moving ...')
         for agent in self._agents:
@@ -107,10 +112,12 @@ class Swarm(object):
           else:
               agent.move(self._my_map, simulation_time, time_lapsed=dt)
 
+        # update msg box
+        self.update_msg_box()
+
         #clear this list for the next use
         self._my_map.new_paths_node.clear()
         self.Time_Step += 1
-
         self.done = True
         for agent in self._agents:
             if type(agent) is SmartAgent:
@@ -123,12 +130,13 @@ class Swarm(object):
 
         for agent1 in self._agents:
             for agent2 in self._agents:
-                if agent1.id != agent2.id and agent1.position == agent2.position :
-                    ctypes.windll.user32.MessageBoxW(0,
-                                                     f"Collision in node {agent1.position} between : {agent1.id} from {agent1.last_node} and {agent2.id} from in {agent1.last_node}"
+                if agent1.id != agent2.id :
+                    if agent1.position == agent2.position :
+                       ctypes.windll.user32.MessageBoxW(0,
+                                                     f"Collision between : {agent1.id} from {agent1.last_node} and {agent2.id} from in {agent2.last_node}"
                                                      f""
                                                      f"",
-                                                     "Conflict", 1)
+                                                     f"Conflict in node {agent1.position}", 1)
                     #sys.exit()
 
     def set_positions(self, position: int) -> None:

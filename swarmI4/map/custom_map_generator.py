@@ -109,6 +109,7 @@ class CustomMapGenerator(object):
             for y in range(0, self._number_of_nodes[1]):
                 my_map.add_node((x, y))
                 my_map.nodes[(x, y)]["agent"] = None
+                #my_map.nodes[(x, y)]["obstacle"] = False
                 my_map.nodes[(x, y)]["state"] = 'free_space'
 
                 if x > 0:
