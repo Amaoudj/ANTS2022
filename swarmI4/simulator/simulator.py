@@ -76,7 +76,9 @@ class Simulator(object):
 
         logging.info("Simulation is done")
         self._step -= 2  # remove the step to the start-node and the repeated step to end-node
-        ctypes.windll.user32.MessageBoxW(0, f"End Task--Time_Step : {self._step} ", "Simulation is done", 1)
+
+        # The following is Windows-specific and causes a crash on Linux and MacOS:
+        # ctypes.windll.user32.MessageBoxW(0, f"End Task--Time_Step : {self._step} ", "Simulation is done", 1)
         print('--------------------------------------------------')
         print('End Task--Time_Step : ', self._step)
         print('---------------------------------------------------------')

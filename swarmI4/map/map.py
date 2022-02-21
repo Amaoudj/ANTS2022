@@ -114,7 +114,7 @@ class Map(object):
         """
         random_node = None
         node_state = ''
-        while node_state is not 'free_space' :
+        while node_state != 'free_space' :
             random_node_id = np.random.choice(range(0,len(self._graph.nodes)-1))
             random_node = list(self._graph.nodes)[random_node_id]
             node_state = self._graph.nodes[random_node]["state"]
