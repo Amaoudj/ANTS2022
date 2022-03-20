@@ -44,7 +44,7 @@ class PygameRenderer (RendererInterface):
         self._display.draw_selections(self._swarm.agents)
         self._display.draw_targets(self._swarm.agents)
         self._display.draw_agents(self._swarm.agents)
-        self._display.plot_stats()
+        #self._display.plot_stats()
         self.sim_info_display(step, lapsed_time, sim_arguments = args)
         self._display.write_info(self._sim_info)
         pygame.display.update()
@@ -53,9 +53,9 @@ class PygameRenderer (RendererInterface):
     def sim_info_display(self, step, lapsed_time: float = 0, sim_arguments=None):
         self._sim_info = []
         self._sim_info.append(Info(f'Simulation Info', is_title=True))
-        self._sim_info.append(Info(f'GRAPH SIZE: {sim_arguments.nodes}'))
-        self._sim_info.append(Info(f'NUMBER OF AGVs: {sim_arguments.swarm_size}'))
-        self._sim_info.append(Info(f'NUMBER OF TARGETS OF EACH AGV: {sim_arguments.num_targets}'))
+        self._sim_info.append(Info(f'GRAPH SIZE: {self._my_map.size_xy}'))
+        self._sim_info.append(Info(f'NUMBER OF AGVs: {len(self._swarm.agents)}'))
+        self._sim_info.append(Info(f'NUMBER OF TARGETS OF EACH AGV: {self._my_map.number_of_targets}'))
         self._sim_info.append(Info(f'Simulation Statistics', is_title=True))
         self._sim_info.append(Info(f'Step: {step}'))
         self._sim_info.append(Info(f'Lapsed Time: {round(lapsed_time, 1)}  sec'))

@@ -35,7 +35,7 @@ class CustomMapGenerator(object):
         """
         return CustomMapGenerator(args.pattern_map_file)
 
-    def __init__(self, pattern_file_path:str = 'map_patterns/arena.txt'):
+    def __init__(self, pattern_file_path:str = 'map_storage/map_1.txt'):
         """ Create a generator
 
         :nodes: number of nodes (x * y)
@@ -44,9 +44,11 @@ class CustomMapGenerator(object):
         """
 
         self._number_of_nodes = None
-        self._number_of_obstacles = None
+        self._number_of_obstacles = 0
         self._obstacle_size = None
         self._pattern_file_path = pattern_file_path
+        self.number_of_targets = None
+
         self.reset()
 
     def reset(self) -> None:
@@ -68,7 +70,7 @@ class CustomMapGenerator(object):
         f = open(self._pattern_file_path, 'r')
         # first line: #rows #columns
         line = f.readline()
-        rows, columns = [int(x) for x in line.split(' ')]
+        rows, columns = [line.split(' ')[0],line.split(' ')[1]]
         rows = int(rows)
         columns = int(columns)
         # #rows lines with the map
@@ -89,11 +91,15 @@ class CustomMapGenerator(object):
         goals = []
         for a in range(num_agents):
             line = f.readline()
-            sx, sy, gx, gy = [int(x) for x in line.split(' ')]
+            line = line.split(' ')
+            if '\n' in line:
+                line.remove('\n')
+            sx, sy, gx, gy = [int(x) for x in line]
             starts.append((sx, sy))
             goals.append((gx, gy))
         f.close()
-        return np.array(my_map), starts, goals
+        return np.array(my_map), starts, goals, self._pattern_file_path
+
 
     def generate(self) -> Map:
         """
@@ -101,34 +107,45 @@ class CustomMapGenerator(object):
         """
         logging.info("Generating custom MAP")
 
-        pattern_map,start_list,goal_list = self.read_map_pattern()
-        print(start_list,goal_list)
+        pattern_map,start_list,goal_list,pattern_file_path = self.read_map_pattern()
+        self.number_of_targets = len(goal_list)//len(start_list)
         self._number_of_nodes = pattern_map.shape
+
+
         my_map: nx.Graph = nx.Graph()
+        copy_graph: nx.Graph = nx.Graph()
         for x in range(0, self._number_of_nodes[0]):
             for y in range(0, self._number_of_nodes[1]):
                 my_map.add_node((x, y))
                 my_map.nodes[(x, y)]["agent"] = None
-                #my_map.nodes[(x, y)]["obstacle"] = False
+                my_map.nodes[(x, y)]["obstacle"] = False
                 my_map.nodes[(x, y)]["state"] = 'free_space'
 
+                copy_graph.add_node((x, y))
+                copy_graph.nodes[(x, y)]["obstacle"] = False
+                copy_graph.nodes[(x, y)]["agent"] = None
+                copy_graph.nodes[(x, y)]["state"] = 'free_space'
+
                 if x > 0:
-                    my_map.add_edge((x - 1, y), (x, y))
+                    my_map.add_edge((x - 1, y), (x, y), weight=1)
+                    copy_graph.add_edge((x - 1, y), (x, y), weight=1)
                 if y > 0:
-                    my_map.add_edge((x, y - 1), (x, y))
+                    my_map.add_edge((x, y - 1), (x, y), weight=1)
+                    copy_graph.add_edge((x, y - 1), (x, y), weight=1)
 
-        logging.info("Isolating nodes where obstacles are present")
-
+        # logging.info("Isolating nodes where obstacles are present")
         for row in range(0, self._number_of_nodes[0]):
             for col in range(0, self._number_of_nodes[1]):
-                if not pattern_map[row,col]:
-                    logging.info(f"world {row}, {col}")
+                if not pattern_map[row, col]:
+                    # logging.info(f"world {row}, {col}")
                     my_map.remove_node((row, col))
+                    #######################################################################
+                    copy_graph.remove_node((row, col))
+                    ########################################################################
                     my_map.add_node((row, col))
                     my_map.nodes[(row, col)]["obstacle"] = True
+                    my_map.nodes[(row, col)]["agent"] = None
                     my_map.nodes[(row, col)]["state"] = 'obstacle'
 
-        logging.info("World generated")
-        print('start_goal_list',(start_list,goal_list))
 
-        return Map(my_map, self._number_of_nodes,(start_list,goal_list))
+        return Map(my_map,copy_graph, self._number_of_nodes,(start_list,goal_list),self._number_of_obstacles,self.number_of_targets,pattern_file_path)

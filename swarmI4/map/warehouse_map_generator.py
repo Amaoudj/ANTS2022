@@ -83,27 +83,38 @@ class WarehouseMapGenerator(object):
 
         logging.info("Generating regular lattice")
         my_map: nx.Graph = nx.Graph()
+        copy_graph: nx.Graph = nx.Graph()
         for x in range(0, self._number_of_nodes[0]):
             for y in range(0, self._number_of_nodes[1]):
                 my_map.add_node((x, y))
+                my_map.nodes[(x, y)]["obstacle"] = False
                 my_map.nodes[(x, y)]["agent"] = None
                 my_map.nodes[(x, y)]["state"] = 'free_space'
 
-                #                logging.info(f"Adding {x} and {y}")
-                if x > 0:
-                    my_map.add_edge((x - 1, y), (x, y))
-                if y > 0:
-                    my_map.add_edge((x, y - 1), (x, y))
+                copy_graph.add_node((x, y))
+                copy_graph.nodes[(x, y)]["obstacle"] = False
+                copy_graph.nodes[(x, y)]["agent"] = None
+                copy_graph.nodes[(x, y)]["state"] = 'free_space'
 
-        logging.info("Isolating nodes where obstacles are present")
+                # logging.info(f"Adding {x} and {y}")
+                if x > 0:
+                    my_map.add_edge((x - 1, y), (x, y), weight=1)
+                    copy_graph.add_edge((x - 1, y), (x, y), weight=1)
+                if y > 0:
+                    my_map.add_edge((x, y - 1), (x, y), weight=1)
+                    copy_graph.add_edge((x, y - 1), (x, y), weight=1)
+
+        # logging.info("Isolating nodes where obstacles are present")
 
         spacing_x = math.ceil(self._number_of_obstacles[1] * ((self._number_of_nodes[0] / self._number_of_obstacles[0])
-                        - self._obstacle_size[0])) / (self._number_of_obstacles[0] + 1)
+                                                              - self._obstacle_size[0])) / (
+                                self._number_of_obstacles[0] + 1)
 
-        spacing_y = math.ceil(self._number_of_obstacles[1] * ((self._number_of_nodes[1] / self._number_of_obstacles[1]) -
-                         self._obstacle_size[1])) / (self._number_of_obstacles[1] + 1)
+        spacing_y = math.ceil(
+            self._number_of_obstacles[1] * ((self._number_of_nodes[1] / self._number_of_obstacles[1]) -
+                                            self._obstacle_size[1])) / (self._number_of_obstacles[1] + 1)
 
-        logging.info(f"Obstacle spacing{spacing_x}, {spacing_y}")
+        # logging.info(f"Obstacle spacing{spacing_x}, {spacing_y}")
 
         for ox in range(0, self._number_of_obstacles[0]):
             for oy in range(0, self._number_of_obstacles[1]):
@@ -112,11 +123,16 @@ class WarehouseMapGenerator(object):
                         wx = math.ceil(spacing_x * (ox + 1) + self._obstacle_size[0] * ox + x)
                         wy = math.ceil(spacing_y * (oy + 1) + self._obstacle_size[1] * oy + y)
 
-                        logging.info(f"world {wx}, {wy}")
+                        # logging.info(f"world {wx}, {wy}")
                         my_map.remove_node((wx, wy))
+                        ######################################################################
+                        copy_graph.remove_node((wx, wy))
+                        ########################################################################
+
                         my_map.add_node((wx, wy))
                         my_map.nodes[(wx, wy)]["obstacle"] = True
                         my_map.nodes[(wx, wy)]["state"] = 'obstacle'
+                        my_map.nodes[(wx, wy)]["agent"] = None
 
-        logging.info("World generated")
-        return Map(my_map, self._number_of_nodes)
+        # logging.info("World generated")
+        return Map(my_map,copy_graph, self._number_of_nodes,number_of_obstacles=self._number_of_obstacles)

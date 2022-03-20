@@ -2,13 +2,12 @@ import math
 import random
 from typing import Tuple
 
-MAX_PLACEMENT_TRIES = 1000
+MAX_PLACEMENT_TRIES = 3000
 
 """
 Initial agent placement functions. When agents are created and initially placed, a placement function is called
 iteratively for each agent to determine its initial coordinates.
 """
-
 
 def random_placement(agent_number: int, total_number_of_agents: int, my_map) -> Tuple:
     """ Randomly place agents across the whole maps. x and y are sampled from a uniform distribution until a free
@@ -21,18 +20,18 @@ def random_placement(agent_number: int, total_number_of_agents: int, my_map) -> 
 
     tries = 0
     placed = False
-
     while not placed and tries < MAX_PLACEMENT_TRIES:
         x, y = random.randint(0, my_map.size_x - 1), random.randint(0, my_map.size_y - 1)
-        if not my_map.occupied((x, y)):
+        if not my_map.occupied((x, y)) and not my_map.is_target((x, y)): #(x, y) not in generated_nodes and
             placed = True
+            #generated_nodes.append((x, y))
         else:
             tries += 1
 
     if not placed:
         assert False, f"Tried to place agent number {agent_number} {tries} times, but without luck"
 
-    return (x, y),None
+    return (x, y), None
 
 
 def horizontal_placement(agent_number: int, total_number_of_agents: int, my_map) -> Tuple:

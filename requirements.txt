@@ -4,3 +4,4 @@ matplotlib
 configargparse
 pandas
 pygame
+pyautogui

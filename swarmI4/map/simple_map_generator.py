@@ -56,16 +56,27 @@ class SimpleMapGenerator(object):
 
         logging.info("Generating regular lattice")
         my_map: nx.Graph = nx.Graph()
+        copy_graph: nx.Graph = nx.Graph()
         for x in range(0, self._number_of_nodes[0]):
             for y in range(0, self._number_of_nodes[1]):
                 my_map.add_node((x, y))
+
+                my_map.nodes[(x, y)]["obstacle"] = False
                 my_map.nodes[(x, y)]["agent"] = None
+                my_map.nodes[(x, y)]["state"] = 'free_space'
+
+                copy_graph.add_node((x, y))
+                copy_graph.nodes[(x, y)]["obstacle"] = False
+                copy_graph.nodes[(x, y)]["agent"] = None
+                copy_graph.nodes[(x, y)]["state"] = 'free_space'
 #                logging.info(f"Adding {x} and {y}")
                 if x > 0:
-                    my_map.add_edge((x - 1, y), (x, y))
+                    my_map.add_edge((x - 1, y), (x, y), weight=1)
+                    copy_graph.add_edge((x - 1, y), (x, y), weight=1)
                 if y > 0:
-                    my_map.add_edge((x, y - 1), (x, y))
+                    my_map.add_edge((x, y - 1), (x, y), weight=1)
+                    copy_graph.add_edge((x, y - 1), (x, y), weight=1)
 
         logging.info("World generated")
 
-        return Map(my_map, self._number_of_nodes)
+        return Map(my_map, self._number_of_nodes,number_of_obstacles=0)

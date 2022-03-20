@@ -13,6 +13,7 @@ from swarmI4.experiment.experiment_interface import ExperimentInterface
 from swarmI4.renderer.pygame_graphics.utils import EventHandler
 
 
+
 class BaseExperiment(ExperimentInterface):
 
     def __init__(self):
@@ -30,8 +31,6 @@ class BaseExperiment(ExperimentInterface):
         """ Create the renderer """
         # I added the : _event_handler = EventHandler()
         renderer       = globals()[args.renderer](args,my_map, my_swarm)
-        _event_handler = EventHandler()
-        _event_handler.handle_init_events(args, renderer, my_map, my_swarm)
 
         return renderer
 
