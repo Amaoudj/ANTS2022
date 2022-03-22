@@ -72,9 +72,9 @@ class Simulator(object):
         self._renderer.setup(args)
         self._start_time = time.time()
 
-        while not self._my_swarm.done and self._my_swarm.success and self._step < 700:
+        while not self._my_swarm.done and self._my_swarm.success and self._step < 1200:
 
-            #time.sleep(0.5)
+            #time.sleep(0.7)
             logging.debug(f"Turn {self._step} is now running")
             sim_action = self._renderer.display_frame(args,self._step,lapsed_time=self._lapsed_time)
             if sim_action is not None:
@@ -86,7 +86,7 @@ class Simulator(object):
             self._simulation_time += self._lapsed_time
 
         logging.info("Simulation is done")
-        if self._step > 699:
+        if self._step > 1199:
             logging.info(f'The number of steps has exceeded the threshold ! ')
 
         if not self._my_swarm.success:

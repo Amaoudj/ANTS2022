@@ -79,7 +79,7 @@ class StatisticsPlotter:
         :type dataframe: pd.DataFrame
         :return: The dataframe with the new column added.
         """
-        dataframe['obstacles_density'] = dataframe['obstacles_number']/dataframe['map_size']
+        dataframe['obstacles_density'] = round(100* dataframe['obstacles_number']/dataframe['map_size'])
         return  dataframe
 
     def group_data_by(self,data:pd.DataFrame,cat:str)->tuple:
@@ -99,6 +99,7 @@ class StatisticsPlotter:
         for group_id in groupedby.groups.keys():
             data_groups.append(self.data.loc[groupedby.groups[group_id],:])
         return  data_groups,groupedby.groups.keys()
+
 
     def plot_s_rate(self,dataframe:pd.DataFrame,
                     x_axis:str='agents_number',
@@ -126,6 +127,6 @@ class StatisticsPlotter:
         title = f'success rate in function of {x_axis} for different densities'
         plt.xlabel(x_axis)
         plt.ylabel('success rate')
-        plt.legend([f'obstacles density % : {int(i)}' for i in densities ])
+        plt.legend([f'obstacles density % : {i}' for i in densities ])
         plt.title(title)
         return title

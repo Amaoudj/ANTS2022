@@ -16,8 +16,8 @@ class Map(object):
     def __init__(self, graph,copy_graph,
                  number_of_nodes: Tuple[int, int],
                  start_goal:tuple=(None,None),
-                 number_of_obstacles = 0,
-                number_of_targets = 0,
+                 number_of_obstacles =0,
+                number_of_targets =0,
                 pattern_file_path=None):
 
         logging.debug("Initializing the world")
@@ -442,6 +442,64 @@ class Map(object):
 
             return ocuupied_nodes
 
+    def get_nearest_free_node_on_right_left_mode(self, node1, drection_node,mode) -> tuple:
+            """
+            return the nearest node for the node1 while following the direction_node
+            :return: random node
+            """
+
+            row, col = node1
+            row1, col1 = drection_node
+
+            _node = None
+            i = 0
+            num_tries = 0
+
+            while _node is None or self.obstacle(_node) and num_tries < 50:
+                num_tries += 1
+                i += 1
+                if row == row1:  # in the same line
+                    if i == 1:
+                        if mode ==1:
+                          _node = (row1 - 1, col1)  #
+                        else:
+                          _node = (row1 + 1, col1)
+                    if i == 2:
+                        if mode == 1:
+                          _node = (row1 + 1, col1)
+                        else:
+                            _node = (row1 - 1, col1)  #
+
+                        if col1 < col:  # search left side
+                            col1 -= 1
+                        else:  # search right side
+                            col1 += 1  # go
+                        i = 0
+
+
+                elif col == col1:  # the same col
+                    if i == 1:
+                      if mode == 1:
+                        _node = (row1, col1 - 1)
+                      else:
+                         _node = (row1, col1 + 1)
+                    if i == 2:
+                        if  mode == 1:
+                          _node = (row1, col1 + 1)
+                        else:
+                            node = (row1, col1 - 1)
+
+                        if row1 < row:  # search Up-side
+                            row1 -= 1
+                        else:  # search down-side
+                            row1 += 1  # go
+                        i = 0
+
+            if num_tries == 49:
+                _node = None
+
+            return _node
+
     def get_nearest_free_node_on_right_left(self, node1, drection_node) -> tuple:
             """
             return the nearest node for the node1 while following the direction_node
@@ -460,9 +518,9 @@ class Map(object):
                 i += 1
                 if row == row1:  # in the same line
                     if i == 1:
-                        _node = (row1 + 1, col1)  #
+                        _node = (row1 - 1, col1)  #
                     if i == 2:
-                        _node = (row1 - 1, col1)
+                        _node = (row1 + 1, col1)
 
                         if col1 < col:  # search left side
                             col1 -= 1
@@ -483,10 +541,11 @@ class Map(object):
                             row1 += 1  # go
                         i = 0
 
-            if num_tries == 15:
+            if num_tries == 49:
                 _node = None
 
             return _node
+
 
     def move_agent(self, agent: AgentInterface, new_position: Tuple[int, int]):
             assert self._graph.nodes[agent.position]["agent"] == agent, \

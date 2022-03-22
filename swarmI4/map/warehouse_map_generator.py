@@ -64,6 +64,7 @@ class WarehouseMapGenerator(object):
 
         self._number_of_nodes = number_of_nodes
         self._number_of_obstacles = number_of_obstacles
+        self.number_of_obstacles = 0
         self._obstacle_size = obstacle_size
         self._seed = seed
         self.reset()
@@ -125,6 +126,7 @@ class WarehouseMapGenerator(object):
 
                         # logging.info(f"world {wx}, {wy}")
                         my_map.remove_node((wx, wy))
+                        self.number_of_obstacles += 1
                         ######################################################################
                         copy_graph.remove_node((wx, wy))
                         ########################################################################
@@ -135,4 +137,7 @@ class WarehouseMapGenerator(object):
                         my_map.nodes[(wx, wy)]["agent"] = None
 
         # logging.info("World generated")
-        return Map(my_map,copy_graph, self._number_of_nodes,number_of_obstacles=self._number_of_obstacles)
+        return Map(my_map,copy_graph, self._number_of_nodes,number_of_obstacles=self.number_of_obstacles)
+
+
+

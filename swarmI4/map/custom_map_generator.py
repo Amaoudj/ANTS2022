@@ -28,7 +28,6 @@ class CustomMapGenerator(object):
     """
      generating warehouse maps as a regular grids with regular obstacles:
     """
-
     @staticmethod
     def create_from_args(args):
         """ Static method for creating a warehouse map from args.
@@ -85,6 +84,7 @@ class CustomMapGenerator(object):
                     my_map[-1].append(True)
         #agents
         line = f.readline()
+        print("*****",line)
         num_agents = int(line)
         #agents lines with the start/goal positions
         starts = []
@@ -110,7 +110,6 @@ class CustomMapGenerator(object):
         pattern_map,start_list,goal_list,pattern_file_path = self.read_map_pattern()
         self.number_of_targets = len(goal_list)//len(start_list)
         self._number_of_nodes = pattern_map.shape
-
 
         my_map: nx.Graph = nx.Graph()
         copy_graph: nx.Graph = nx.Graph()
@@ -139,6 +138,7 @@ class CustomMapGenerator(object):
                 if not pattern_map[row, col]:
                     # logging.info(f"world {row}, {col}")
                     my_map.remove_node((row, col))
+                    self._number_of_obstacles += 1
                     #######################################################################
                     copy_graph.remove_node((row, col))
                     ########################################################################

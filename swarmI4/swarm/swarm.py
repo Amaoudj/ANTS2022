@@ -52,7 +52,7 @@ class Swarm(object):
                 agent = gen(position)
                 if targets is not None:
                     agent.target_list = [targets]
-                    my_map.set_as_target(targets) ########
+                    my_map.set_as_target(targets)
 
                 agent.id = i
                 # set targets as they come in the custom map
@@ -86,6 +86,7 @@ class Swarm(object):
             if type(agent) is SmartAgent:
                 agent.plan_last_step_after_negotiation(self._my_map)
         self.update_msg_box()
+
 
     def get_sum_cost(self):
         cost=0
