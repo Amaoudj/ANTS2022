@@ -47,7 +47,8 @@ class Swarm(object):
         for number, gen in agent_generators:
             for i in range(total_number_of_agents):
                 position,targets= placement_func(i, total_number_of_agents, my_map)
-                targets, _ = placement_func(i, total_number_of_agents, my_map) ########
+                if args.agent_placement == "random_placement":
+                   targets, _ = placement_func(i, total_number_of_agents, my_map) ########
                 logging.info(f'position {position},{targets}')
                 agent = gen(position)
                 if targets is not None:
@@ -67,7 +68,7 @@ class Swarm(object):
 
     def agents_post_coordination(self):
 
-        for i in range(0,4):
+        for i in range(0,5):
           self.update_msg_box()
           # post_negotiation
           for agent in self._agents:
@@ -80,7 +81,7 @@ class Swarm(object):
                 agent.post_negotiation(self._my_map)
 
 
-        for i in range(3):
+        for i in range(6):
           self.update_msg_box()
           for agent in self._agents:
             if type(agent) is SmartAgent:

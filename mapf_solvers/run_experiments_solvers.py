@@ -10,7 +10,7 @@ from single_agent_planner import get_sum_of_cost
 from sipp_independent import SIPP_IndependentSolver
 from sipp_cbs import SIPP_CBSSolver
 from graph_generation import SippGraph
-
+import re
 SOLVER = "CBS"
 
 def print_mapf_instance(my_map, starts, goals):
@@ -49,7 +49,9 @@ def import_mapf_instance(filename):
     f = open(filename, 'r')
     # first line: #rows #columns
     line = f.readline()
-    rows, columns = [int(x) for x in line.split(' ')]
+    print(line)
+
+    rows, columns = [int(line.split(' ')[0]),int(line.split(' ')[1])]#[int(x) for x in line.split(' ')]
     rows = int(rows)
     columns = int(columns)
     # #rows lines with the map
@@ -70,7 +72,8 @@ def import_mapf_instance(filename):
     goals = []
     for a in range(num_agents):
         line = f.readline()
-        sx, sy, gx, gy = [int(x) for x in line.split(' ')]
+        sx, sy, gx, gy = [int(line.split(' ')[0]),int(line.split(' ')[1]),int(line.split(' ')[2]),int(line.split(' ')[3])]#[int(x) for x in line.split(' ')]
+
         starts.append((sx, sy))
         goals.append((gx, gy))
     f.close()
@@ -78,20 +81,22 @@ def import_mapf_instance(filename):
 
 
 if __name__ == '__main__':
-    #parser = argparse.ArgumentParser(description='Runs various MAPF algorithms')
+   #parser = argparse.ArgumentParser(description='Runs various MAPF algorithms')
     #parser.add_argument('--instance', type=str, default=None,help='The name of the instance file(s)')
     #parser.add_argument('--batch', action='store_true', default=False,help='Use batch output instead of animation')
     #parser.add_argument('--disjoint', action='store_true', default=False,help='Use the disjoint splitting')
     #parser.add_argument('--solver', type=str, default=SOLVER,help='The solver to use (one of: {CBS,Independent,Prioritized}), defaults to ' + str(SOLVER))
     #args = parser.parse_args()
+   for i in range(1,21):
+
+    map_name="map_"+str(i)+".txt"
+    #map_name = "warehouse.txt"
+    instance = "conf_experiments/maps_storage/"+map_name
+
+    SOLVER_ = "prioritized"  # cbs,independent,prioritized,sipp_cbs,sipp_independent
     result_file = open("results.csv", "w", buffering=1)
-
-
-    SOLVER_ = "prioritized"  #cbs,independent,prioritized,sipp_cbs,sipp_independent
-    instance = 'conf_experiments/maps_storage/test_47.txt'
-
     disjoint_cbs      =False
-    display_simulation=True
+    display_simulation=False
 
     #for file in sorted(glob.glob(args.instance)):
     if os.path.isfile(instance):

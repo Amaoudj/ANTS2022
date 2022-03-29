@@ -77,7 +77,7 @@ class Map(object):
 
         return ToReturn
 
-    def obstacle(self, node):
+    def is_obstacle(self, node):
 
             ToReturn = False
             x, y = node
@@ -260,12 +260,12 @@ class Map(object):
                     move_backward = True
                     if col1 > col:  # search left side
                         _node = (row, col - 1)
-                        if not self.within_map_size(_node) or self.obstacle(_node):
+                        if not self.within_map_size(_node) or self.is_obstacle(_node):
                             _node = None#node1
                             move_backward = False
                     else:  # search right side
                         _node = (row, col + 1)
-                        if not self.within_map_size(_node) or self.obstacle(_node):
+                        if not self.within_map_size(_node) or self.is_obstacle(_node):
                             _node = None#node1
                             move_backward = False
 
@@ -285,13 +285,13 @@ class Map(object):
                     if row1 > row:  # search Up-side
 
                         _node = (row - 1, col)
-                        if not self.within_map_size(_node) or self.obstacle(_node):
+                        if not self.within_map_size(_node) or self.is_obstacle(_node):
                             _node = None#node1
                             move_backward = False
 
                     else:  # search down-side
                         _node = (row + 1, col)
-                        if not self.within_map_size(_node) or self.obstacle(_node):
+                        if not self.within_map_size(_node) or self.is_obstacle(_node):
                             _node = None#node1
                             move_backward = False
 
@@ -412,6 +412,62 @@ class Map(object):
                         _node = None
             return _node
 
+    def get_right_or_left_node(self, node1, threshold_node,prohibited_node) -> tuple:  # search only in two sides
+            """
+            return the nearest node for the node1 while note passing threshold_node
+            :return: random node
+            """
+            row, col = node1
+
+            row1, col1 = threshold_node
+            _node = None
+            if prohibited_node is None:
+                if row == row1:  # in the same line
+                    _node1 = (row - 1, col)
+                    _node2 = (row + 1, col)
+
+                    if self.within_map_size(_node1):  # and not self.is_free(_node2):
+                        _node = _node1
+                    elif self.within_map_size(_node2):  # and not self.is_free(_node1):
+                        _node = _node2
+                    else:
+                        _node = None
+
+                elif col == col1:  # the same col
+                    _node1 = (row, col - 1)
+                    _node2 = (row, col + 1)
+
+                    if self.within_map_size(_node1):  # and not self.is_free(_node2):
+                        _node = _node1
+                    elif self.within_map_size(_node2):  # and not self.is_free(_node1):
+                        _node = _node2
+                    else:
+                        _node = None
+            else:
+
+                if row == row1:  # in the same line
+                    _node1 = (row - 1, col)
+                    _node2 = (row + 1, col)
+
+                    if self.within_map_size(_node1) and _node1 != prohibited_node:  # and not self.is_free(_node2):
+                        _node = _node1
+                    elif self.within_map_size(_node2) and _node2 != prohibited_node:  # and not self.is_free(_node1):
+                        _node = _node2
+                    else:
+                        _node = None
+
+                elif col == col1:  # the same col
+                    _node1 = (row, col - 1)
+                    _node2 = (row, col + 1)
+
+                    if self.within_map_size(_node1) and _node1 != prohibited_node:  # and not self.is_free(_node2):
+                        _node = _node1
+                    elif self.within_map_size(_node2) and _node2 != prohibited_node:  # and not self.is_free(_node1):
+                        _node = _node2
+                    else:
+                        _node = None
+            return _node
+
     def free_neighboring_node(self, pos, prohibited_nodes):
             """
             find a free node in the neighborhood
@@ -455,7 +511,7 @@ class Map(object):
             i = 0
             num_tries = 0
 
-            while _node is None or self.obstacle(_node) and num_tries < 50:
+            while _node is None or self.is_obstacle(_node) and num_tries < 50:
                 num_tries += 1
                 i += 1
                 if row == row1:  # in the same line
@@ -487,7 +543,7 @@ class Map(object):
                         if  mode == 1:
                           _node = (row1, col1 + 1)
                         else:
-                            node = (row1, col1 - 1)
+                            _node = (row1, col1 - 1)
 
                         if row1 < row:  # search Up-side
                             row1 -= 1
@@ -513,7 +569,7 @@ class Map(object):
             i = 0
             num_tries = 0
 
-            while _node is None or self.obstacle(_node) and num_tries < 50:
+            while _node is None or self.is_obstacle(_node) and num_tries < 70:
                 num_tries += 1
                 i += 1
                 if row == row1:  # in the same line
@@ -541,7 +597,7 @@ class Map(object):
                             row1 += 1  # go
                         i = 0
 
-            if num_tries == 49:
+            if num_tries == 60:
                 _node = None
 
             return _node

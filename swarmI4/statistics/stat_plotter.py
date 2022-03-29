@@ -33,19 +33,31 @@ class StatisticsPlotter:
         :param save_path: The path to save the plot to, defaults to conf_experiments/fig.png
         :type save_path: str (optional)
         """
-        for i,x_i in enumerate(x):
-            title = None
-            if y[i] == 'success_rate':
-                title = self.plot_s_rate(self.data,x_axis=x_i,cat=categorical_vars[i])
-            else:
-                continue
+        title = None
+        if y[0] == 'success_rate':
+            title = self.plot_data_srate(self.data, x_axis=x[0], cat=categorical_vars[0])
             if save:
-                plt.savefig(os.path.join(save_path,title))
+                plt.savefig(os.path.join(save_path, title))
+            if show:
+                plt.show()
+        else:
+
+            ax = self.plot_data(self.data,x_axis=x[0],y_axis=y[0])
+            fig = ax.get_figure()
+            y_label = y[0].replace("_", " ")
+            x_label = x[0].replace("_", " ")
+            title = f'{y_label} in function of {x_label}'
+            plt.xlabel(x_label)
+            plt.ylabel(y_label)
+            ax.get_legend().remove()
+            if save:
+                fig.savefig(os.path.join(save_path, title))
             if show:
                 plt.show()
 
 
-    def process_data(self,data_frame:pd.DataFrame):
+
+    def process_data(self,data_frame:pd.DataFrame,x_axis):
         """
         This function takes in a dataframe and two column names, and returns a sorted dataframe
 
@@ -53,11 +65,17 @@ class StatisticsPlotter:
         :type data_frame: pd.DataFrame
 
         """
-        data = []
-        for i in range(len(self.x)):
-            data.append(data_frame.sort_values([self.x[i]],ascending=True))
+        print(x_axis)
+        data = data_frame.sort_values(x_axis,ascending=True)
         #self.group_data_by(data,None)
         return data
+
+    def plot_data(self,dataframe,x_axis,y_axis):
+        print(dataframe)
+        data = self.process_data(dataframe,x_axis)
+        ax = data.plot(x=x_axis,y=y_axis)
+        return ax
+
 
     def success_rate(self,dataframe:pd.DataFrame):
         """
@@ -79,8 +97,8 @@ class StatisticsPlotter:
         :type dataframe: pd.DataFrame
         :return: The dataframe with the new column added.
         """
-        dataframe['obstacles_density'] = round(100* dataframe['obstacles_number']/dataframe['map_size'])
-        return  dataframe
+        dataframe['obstacles_density'] = dataframe['obstacles_number']/dataframe['map_size'] *100
+        return  dataframe.round()
 
     def group_data_by(self,data:pd.DataFrame,cat:str)->tuple:
         """
@@ -100,33 +118,50 @@ class StatisticsPlotter:
             data_groups.append(self.data.loc[groupedby.groups[group_id],:])
         return  data_groups,groupedby.groups.keys()
 
-
-    def plot_s_rate(self,dataframe:pd.DataFrame,
-                    x_axis:str='agents_number',
-                    cat:str='obstacle_density'):
+    def plot_data_srate(self, dataframe:pd.DataFrame,
+                        x_axis:str='agents_number',
+                        cat:str='obstacle_density'):
         """
         :param dataframe: the dataframe containing the data to be plotted
         :type dataframe: pd.DataFrame
-        :param x_axis: the x-axis of the plot, defaults to
-        agents_number
+        :param x_axis: the x-axis of the plot, defaults to agents_number
         :type x_axis: str (optional)
         :param cat: the category you want to plot, defaults to obstacle_density
         :type cat: str (optional)
         """
+        s_rate_list = []
+        x_axis_list  = []
+        title = None
+        if cat == 'None':
+            x_axis_groups, keys = self.group_data_by(dataframe, x_axis)
+            s_rate_list.append([self.success_rate(group) for group in x_axis_groups])
+            x_axis_list.append(keys)
 
-        dataframe = self.add_obstacles_density(dataframe)
-        density_groups,densities = self.group_data_by(dataframe,cat)
-        s_rates = []
+            title = f'success rate in function of {x_axis.replace("_", " ")}'
+            plt.xlabel(x_axis.replace("_", " "))
+            plt.ylabel('success rate')
+            plt.autoscale()
+            for i,rate in enumerate(s_rate_list):
+                plt.plot(x_axis_list[i],[i/100 for i in rate])
+        else:
+            dataframe = self.add_obstacles_density(dataframe)
+            density_groups,densities = self.group_data_by(dataframe,cat)
+            s_rate_list = []
+            x_axis_list  = []
+            for group in density_groups:
+                x_axis_groups,keys = self.group_data_by(group,x_axis)
+                s_rate_list.append ([self.success_rate(group) for group in x_axis_groups])
+                x_axis_list.append (keys)
 
-        for group in density_groups:
-            agent_number_groups,_ = self.group_data_by(group,x_axis)
-            s_rates.append ([self.success_rate(group) for group in agent_number_groups])
-        for i,rate in enumerate(s_rates):
-            plt.plot(list(range(len(rate))),rate)
+            title = f'success rate in function of {x_axis.replace("_", " ")} for different densities'
+            plt.xlabel(x_axis.replace("_", " "))
+            plt.ylabel('success rate')
+            plt.autoscale()
 
-        title = f'success rate in function of {x_axis} for different densities'
-        plt.xlabel(x_axis)
-        plt.ylabel('success rate')
-        plt.legend([f'obstacles density % : {i}' for i in densities ])
+            for i,rate in enumerate(s_rate_list):
+                plt.plot(x_axis_list[i],[i/100 for i in rate])
+
+            plt.legend([f'obstacles density : {i} %' for i in densities])
+
         plt.title(title)
         return title

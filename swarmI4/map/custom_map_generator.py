@@ -59,7 +59,7 @@ class CustomMapGenerator(object):
     def read_map_pattern(self):
         """
         return:
-               my_map   - matrix specifying obstacle positions
+               my_map   - matrix specifying is_obstacle positions
                starts   - [(x1, y1),  ...] list of start locations
                goals    - [(x1, y1),  ...] list of goal locations
         """
