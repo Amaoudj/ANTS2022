@@ -5,7 +5,7 @@ import numpy as np
 # from networkx.drawing.nx_agraph import graphviz_layout
 import logging
 from swarmI4.agent import AgentInterface
-
+import  random
 from .color import FREE, AGENT, OBSTACLE, TARGET, PATH
 
 
@@ -14,9 +14,9 @@ class Map(object):
     """ The world representation """
 
     def __init__(self, graph,copy_graph,
-                 number_of_nodes: Tuple[int, int],
-                 start_goal:tuple=(None,None),
-                 number_of_obstacles =0,
+                number_of_nodes: Tuple[int, int],
+                start_goal:tuple=(None,None),
+                number_of_obstacles =0,
                 number_of_targets =0,
                 pattern_file_path=None):
 
@@ -30,10 +30,11 @@ class Map(object):
         self.pattern_file_path = pattern_file_path
         self.number_of_obstacles = number_of_obstacles
         self.number_of_targets = number_of_targets
-
+        self.new_OBS = []
         #Defining a list of dictionaries as message box for agents to leave data
         self.msg_box= {}
         self.new_paths_node = {}
+
 
     @property
     def size_xy(self) -> Tuple[int, int]:
@@ -153,21 +154,17 @@ class Map(object):
                     #        self._graph.add_edge((x, y), n, weight=1000000)
                     ###############################################################
             else:
-                self._graph.remove_node(node_pos)
+
+
                 if node_pos in self._copy_graph:
                     self._copy_graph.remove_node(node_pos)
 
+                self._graph.remove_node(node_pos)
                 self._graph.add_node(node_pos)
                 self._graph.nodes[node_pos]["obstacle"] = True
                 self._graph.nodes[node_pos]["state"] = 'obstacle'
                 self._graph.nodes[node_pos]["agent"] = None
-                ###############################################################
-                # x, y = node_pos
-                # N = [(x, y + 1), (x, y - 1), (x + 1, y), (x - 1, y)]
-                # for n in N:
-                #    if n in self._graph.nodes:
-                #        self._graph.add_edge((x, y), n, weight=1000000)
-                ###############################################################
+
 
     def set_as_free(self, node_pos: tuple or list):
             """
@@ -175,41 +172,58 @@ class Map(object):
             which means it will be connected with it's
             neighbors
             """
+
             if type(node_pos) is list:
                 for node_pos_i in node_pos:
                     self._graph.remove_node(node_pos_i)
                     self._graph.add_node(node_pos_i)
+                    neighbors = self.get_neighbors(node_pos_i, diagonal=False)
 
                     if node_pos_i not in self._copy_graph:
                         self._copy_graph.add_node(node_pos_i)
-                        for neighbor in self.get_neighbors(node_pos_i, diagonal=False):
-                            if neighbor in self._copy_graph.nodes:
+                    else:
+                        self._copy_graph.remove_node(node_pos_i)
+                        self._copy_graph.add_node(node_pos_i)
+
+
+                    for neighbor in neighbors:
+                            if neighbor in self._copy_graph.nodes and not self.is_obstacle(neighbor):
                                 self._copy_graph.add_edge(node_pos_i, neighbor, weight=1)
 
                     self._graph.nodes[node_pos_i]["obstacle"] = False
                     self._graph.nodes[node_pos_i]["agent"] = None
                     self._graph.nodes[node_pos_i]["state"] = 'free_space'
 
-                    for neighbor in self.get_neighbors(node_pos_i, diagonal=False):
-                        if self.is_free(neighbor) and neighbor in self._graph.nodes:
+                    for neighbor in neighbors :
+                        if neighbor in self._graph.nodes and not self.is_obstacle(neighbor):
                             self._graph.add_edge(node_pos_i, neighbor, weight=1)
-            else:
 
+            else:
+                neighbors=self.get_neighbors(node_pos, diagonal=False)
                 self._graph.remove_node(node_pos)
                 self._graph.add_node(node_pos)
+
                 self._graph.nodes[node_pos]["obstacle"] = False
                 self._graph.nodes[node_pos]["agent"] = None
-                self._graph.nodes[node_pos]["state"] = 'free_space'
+                self._graph.nodes[node_pos]["state"] = "free_space"
 
                 if node_pos not in self._copy_graph:
                     self._copy_graph.add_node(node_pos)
-                    for neighbor in self.get_neighbors(node_pos, diagonal=False):
-                        if neighbor in self._copy_graph.nodes:
-                            self._copy_graph.add_edge(node_pos, neighbor, weight=1)
+                else:
+                    self._copy_graph.remove_node(node_pos)
+                    self._copy_graph.add_node(node_pos)
 
-                for neighbor in self.get_neighbors(node_pos, diagonal=False):
-                    if neighbor in self._graph.nodes and self.is_free(neighbor):
+
+                for neighbor in neighbors:
+                     if neighbor in self._copy_graph.nodes :
+                       if not self.is_obstacle(neighbor) :
+                          self._copy_graph.add_edge(node_pos, neighbor, weight=1)
+
+                for neighbor in neighbors:
+                   if neighbor in self._graph.nodes :
+                     if not self.is_obstacle(neighbor):
                         self._graph.add_edge(node_pos, neighbor, weight=1)
+
 
     def get_neighbors(self, node_pos, diagonal: bool = False):
             """
@@ -237,15 +251,33 @@ class Map(object):
                 node_state = self._graph.nodes[random_node]["state"]
             return random_node
 
-    def get_WayNode_include_moveBackward(self, node1, threshold_node) -> tuple:
+    def get_random_OBS(self) -> tuple:
+
             """
-            return the nearest node for the node1 while note passing threshold_node
+            return a node located in the free space
             :return: random node
             """
+            random_node = None
+            node_state = ''
+            while node_state != 'obstacle':
+                random_node_id = np.random.choice(range(0, len(self._graph.nodes) - 1))
+                random_node = list(self._graph.nodes)[random_node_id]
+                node_state = self._graph.nodes[random_node]["state"]
+            return random_node
+
+    def get_WayNode_include_moveBackward(self, node1, threshold_node) -> tuple:
+         """
+            return the nearest node for the node1 while note passing threshold_node
+            :return: random node
+         """
+
+         _node = None
+         move_backward = False
+
+         if node1 is not None and threshold_node is not None:
             row, col = node1
             row1, col1 = threshold_node
-            _node = None
-            move_backward = False
+
 
             if row == row1:  # in the same line
                 _node1 = (row - 1, col)
@@ -295,17 +327,20 @@ class Map(object):
                             _node = None#node1
                             move_backward = False
 
-            return _node, move_backward
+         return _node, move_backward
 
     def get_Free_WayNode(self, node1, threshold_node, prohibited_node) -> tuple:
-            """
+         """
             return the nearest node for the node1 while note passing threshold_node
             :return: random node
-            """
+         """
+         _node = None
+         move_backward = False
+
+         if  node1 is not None and threshold_node is not None:
             row, col = node1
             row1, col1 = threshold_node
-            _node = None
-            move_backward = False
+
 
             if prohibited_node is not None:
                 if row == row1:  # in the same line
@@ -353,18 +388,20 @@ class Map(object):
                                 _node = (row + 1, col)
                                 move_backward = True
 
-            return _node, move_backward
+         return _node, move_backward
 
-    def get_right_or_left_free_node(self, node1, threshold_node,
-                                        prohibited_node) -> tuple:  # search only in two sides
-            """
+
+    def get_right_or_left_free_node(self, node1, threshold_node,prohibited_node) -> tuple:  # search only in two sides
+          """
             return the nearest node for the node1 while note passing threshold_node
             :return: random node
-            """
+          """
+          _node = None
+          if node1 is not None and threshold_node is not None:
             row, col = node1
 
             row1, col1 = threshold_node
-            _node = None
+
             if prohibited_node is None:
                 if row == row1:  # in the same line
                     _node1 = (row - 1, col)
@@ -410,17 +447,20 @@ class Map(object):
                         _node = _node2
                     else:
                         _node = None
-            return _node
+
+          return _node
 
     def get_right_or_left_node(self, node1, threshold_node,prohibited_node) -> tuple:  # search only in two sides
-            """
+          """
             return the nearest node for the node1 while note passing threshold_node
             :return: random node
-            """
-            row, col = node1
+          """
+          _node = None
+          if node1 is not None and threshold_node is not None:
 
+            row, col = node1
             row1, col1 = threshold_node
-            _node = None
+
             if prohibited_node is None:
                 if row == row1:  # in the same line
                     _node1 = (row - 1, col)
@@ -466,24 +506,25 @@ class Map(object):
                         _node = _node2
                     else:
                         _node = None
-            return _node
+
+          return _node
 
     def free_neighboring_node(self, pos, prohibited_nodes):
-            """
+          """
             find a free node in the neighborhood
-            """
+          """
+          node_ = None
+          if pos is not None:
             neighborhood = self.get_neighbors(pos, diagonal=False)
-            node_ = None
 
             for node in neighborhood:
-                if node in prohibited_nodes:
+                if prohibited_nodes is not None and node in prohibited_nodes:
                     continue
                 else:
                     if node in self._graph.nodes and self.is_free(node):
                         node_ = node
                         break
-
-            return node_
+          return node_
 
     def occupied_neighboring_nodes(self, pos):
             """
@@ -499,15 +540,16 @@ class Map(object):
             return ocuupied_nodes
 
     def get_nearest_free_node_on_right_left_mode(self, node1, drection_node,mode) -> tuple:
-            """
+           """
             return the nearest node for the node1 while following the direction_node
             :return: random node
-            """
+           """
 
+           _node = None
+           if drection_node is not None:
             row, col = node1
             row1, col1 = drection_node
 
-            _node = None
             i = 0
             num_tries = 0
 
@@ -602,7 +644,6 @@ class Map(object):
 
             return _node
 
-
     def move_agent(self, agent: AgentInterface, new_position: Tuple[int, int]):
             assert self._graph.nodes[agent.position]["agent"] == agent, \
                 f"Error, agent is not currently located at {agent.position}"
@@ -663,7 +704,7 @@ class Map(object):
             mark the nodes of a path with the path state
             :return:
             """
-            self._graph.nodes[node]["state"] = 'target'
+            self._graph.nodes[node]["state"] = "target"
 
     def view(self, block=True):
             """ Show the world

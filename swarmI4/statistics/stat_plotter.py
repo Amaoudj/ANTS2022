@@ -51,6 +51,7 @@ class StatisticsPlotter:
             plt.ylabel(y_label)
             ax.get_legend().remove()
             if save:
+
                 fig.savefig(os.path.join(save_path, title))
             if show:
                 plt.show()
@@ -98,7 +99,7 @@ class StatisticsPlotter:
         :return: The dataframe with the new column added.
         """
         dataframe['obstacles_density'] = dataframe['obstacles_number']/dataframe['map_size'] *100
-        return  dataframe.round()
+        return  dataframe.round(2)
 
     def group_data_by(self,data:pd.DataFrame,cat:str)->tuple:
         """
@@ -124,11 +125,15 @@ class StatisticsPlotter:
         """
         :param dataframe: the dataframe containing the data to be plotted
         :type dataframe: pd.DataFrame
-        :param x_axis: the x-axis of the plot, defaults to agents_number
+        :param x_axis: the x-axis of the plot, defaults to
+        agents_number
         :type x_axis: str (optional)
         :param cat: the category you want to plot, defaults to obstacle_density
         :type cat: str (optional)
         """
+
+        marker_style = dict(color='blueviolet', linestyle='-', marker='D',
+                            markersize=5, mfc='white')
         s_rate_list = []
         x_axis_list  = []
         title = None
@@ -137,12 +142,13 @@ class StatisticsPlotter:
             s_rate_list.append([self.success_rate(group) for group in x_axis_groups])
             x_axis_list.append(keys)
 
+
             title = f'success rate in function of {x_axis.replace("_", " ")}'
             plt.xlabel(x_axis.replace("_", " "))
             plt.ylabel('success rate')
-            plt.autoscale()
+            plt.ylim(bottom=0,top=1.05)
             for i,rate in enumerate(s_rate_list):
-                plt.plot(x_axis_list[i],[i/100 for i in rate])
+                plt.plot(x_axis_list[i],[i/100 for i in rate],**marker_style)
         else:
             dataframe = self.add_obstacles_density(dataframe)
             density_groups,densities = self.group_data_by(dataframe,cat)
@@ -157,6 +163,7 @@ class StatisticsPlotter:
             plt.xlabel(x_axis.replace("_", " "))
             plt.ylabel('success rate')
             plt.autoscale()
+            plt.ylim(bottom=0,top=1.05)
 
             for i,rate in enumerate(s_rate_list):
                 plt.plot(x_axis_list[i],[i/100 for i in rate])

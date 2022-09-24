@@ -30,12 +30,12 @@ def export_results(args, map, swarm, step, simulation_time, storage_path: str = 
             'map_size': map.size_x*map.size_y,
             'obstacles_number': map.number_of_obstacles,
             'agents_number': len(swarm.agents),
+            'solver':"DCMAPF",
             'is_done': swarm.done,
-            'sum_of_costs': round(swarm.get_sum_cost()),
-            'steps_number': step,
-            'simulation_time': round(simulation_time)}
-    data = {k: [v] for k, v in data.items()}  # WORKAROUND
-
+            'soc': swarm.get_sum_cost(),
+            'makespan': step,
+            'simulation_time': round(simulation_time,1)}
+    data = {k: [v] for k, v in data.items()}
 
     df = pd.DataFrame(data)
     print(data)
@@ -70,7 +70,7 @@ def store_map_txt(map_storage_directory,map_rep):
 def save_map_pattern(map, swarm):
     """
     save this map and swarm info into a file
-    for future use
+    '@' = obstacle,   '.' = free_space
     """
     nodes = map.nodes
     new_map = []
@@ -78,7 +78,7 @@ def save_map_pattern(map, swarm):
     # representing nodes states by symbols
     for row in range(0,map.size_x):
         map_line = []
-        # @ = obstacle  . = free_space
+
         for col in range(0, map.size_y):
             if nodes[(row,col)]['state'] == 'free_space':
                 map_line.append('.')
@@ -323,8 +323,8 @@ def main(args,id=None,map = None, is_benchmark:bool=True):
             export_results(args,
                            my_sim.map,
                            my_sim.swarm,
-                           my_sim.step_t,
-                           my_sim.simulation_time,
+                           my_sim._step,#step_t
+                           my_sim._simulation_time,
                            RESULTS_PATH)
         try:  # run this block if the create_map and run_experiments exist
 

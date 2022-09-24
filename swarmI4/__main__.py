@@ -110,8 +110,10 @@ def main(args):
     logging.info(f"Runtime arguments f{args}")
 
     my_experiment = globals()[args.experiment]()
+    i=0
 
     while True:
+
         my_sim = my_experiment.create_simulator(args)
         sim_action = my_sim.start(args)
 

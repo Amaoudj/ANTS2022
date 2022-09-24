@@ -82,7 +82,7 @@ class BenchmarkMapGenerator(object):
             line = f.readline()
             my_map.append([])
             for cell in line:
-                if cell == '@':
+                if cell == '@' or cell == 'T':
                     my_map[-1].append(False)
                 elif cell == '.':
                     my_map[-1].append(True)
@@ -101,11 +101,13 @@ class BenchmarkMapGenerator(object):
         """
         Generate a world
         """
-        logging.info("Generating custom MAP")
 
         pattern_map,start_list,goal_list,pattern_file_path = self.read_map_pattern()
         self.number_of_targets = len(goal_list)//len(start_list)
         self._number_of_nodes = pattern_map.shape
+
+        logging.info(self._number_of_nodes)
+
         my_map: nx.Graph = nx.Graph()
         copy_graph: nx.Graph = nx.Graph()
         for x in range(0, self._number_of_nodes[0]):

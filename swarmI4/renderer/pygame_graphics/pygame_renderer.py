@@ -13,6 +13,7 @@ class PygameRenderer (RendererInterface):
         self._display = Display(args.display_size,args.resolution)
         self._sim_info = []
         self._graph = self._my_map
+        self.new_added_obs_node = []
 
 
     def setup(self,args):
@@ -40,13 +41,25 @@ class PygameRenderer (RendererInterface):
         self._display.reset_canvas()
         for node in self._graph.nodes:
             self._display.draw_node(node_pos=node,graph=self._my_map.graph)
+
+        #*******************************<New added obstacles>********************************************
+        if self.new_added_obs_node is not None and len(self.new_added_obs_node) > 0:
+            for node in self._graph.nodes:
+                self._display.draw_node(node_pos=node, graph=self._my_map.graph)
+            self.new_added_obs_node.clear()
+        if self._my_map.new_OBS is not None :
+          for node in self._my_map.new_OBS:
+            self.new_added_obs_node.append(node)
+            self._display.draw_new_added_node(node_pos=node,graph=self._my_map.graph)
+        #******************************************************************************
+
         self._display.draw_grid_lines(self._my_map.size_xy)
         self._display.draw_selections(self._swarm.agents)
         self._display.draw_targets(self._swarm.agents)
         self._display.draw_agents(self._swarm.agents)
         #self._display.plot_stats()
         self.sim_info_display(step, lapsed_time, sim_arguments = args)
-        self._display.write_info(self._sim_info)
+        #self._display.write_info(self._sim_info)
         pygame.display.update()
         return None
 

@@ -78,7 +78,7 @@ class CustomMapGenerator(object):
             line = f.readline()
             my_map.append([])
             for cell in line:
-                if cell == '@':
+                if cell == '@' or cell == 'T':
                     my_map[-1].append(False)
                 elif cell == '.':
                     my_map[-1].append(True)

@@ -59,7 +59,7 @@ class SippGraph(object):
 
         # first line: #rows #columns
         line = f.readline()
-        rows, columns = [int(line.split(' ')[0]),int(line.split(' ')[1])]
+        rows, columns = [int(x) for x in line.split(' ')]
         rows = int(rows)
         columns = int(columns)
 
@@ -92,7 +92,7 @@ class SippGraph(object):
         self.agent_info = []
         for a in range(num_agents):
             line = f.readline()
-            sx, sy, gx, gy = [int(line.split(' ')[0]),int(line.split(' ')[1]),int(line.split(' ')[2]),int(line.split(' ')[3])]
+            sx, sy, gx, gy = [int(x) for x in line.split(' ')]
             self.agent_info.append((sx, sy))
             self.agent_info.append((gx, gy))
         f.close()

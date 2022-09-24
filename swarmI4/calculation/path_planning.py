@@ -17,6 +17,7 @@ class PathFinder:
         :return:
       """
       if agent_pos is not None and  target_pos is not None:
+       if agent_pos != target_pos:
         agent_row,agent_col = agent_pos
         target_row,target_col = target_pos
         try:
@@ -25,8 +26,13 @@ class PathFinder:
         except (nx.NetworkXNoPath, nx.NodeNotFound) as e:
             logging.info(f'No path found')
             return None
+       else:
+           return None
+      else:
+          return None
 
-    def astar_replan(self, graph, agent_pos, target_pos,neighbors):
+
+    def astar_replan(self, graph, agent_pos, target_pos,neighbors_2_remove):
       """
         plan a path in the graph providing an agent with a target pos
         :param map : the graph
@@ -35,12 +41,13 @@ class PathFinder:
         :return:
       """
       if agent_pos is not None and target_pos is not None:
+       if    agent_pos != target_pos :
         G: nx.Graph = nx.Graph()
-        G = copy.deepcopy(graph) #graph.copy()
+        G = copy.deepcopy(graph)
 
-        if neighbors is not None and len(neighbors) > 0 :
-          for node_pos in neighbors:
-              if agent_pos != node_pos and node_pos in G.nodes:
+        if neighbors_2_remove is not None and len(neighbors_2_remove) > 0 :
+          for node_pos in neighbors_2_remove:
+              if node_pos != agent_pos and node_pos != target_pos and node_pos in G.nodes:
                  G.remove_node(node_pos)
 
 
@@ -49,13 +56,18 @@ class PathFinder:
 
         n=[(agent_row+1, agent_col),(agent_row-1, agent_col),(agent_row, agent_col+1),(agent_row, agent_col-1)]
 
-        if target_pos not in n or target_pos in n:# don't plan a path to a neighbor node
-          try:
+        #if target_pos not in n or target_pos in n:# don't plan a path to a neighbor node
+        try:
             path = nx.astar_path(G, (agent_row, agent_col), (target_row, target_col),weight='weight')
-            logging.info(f'New path found for : {agent_pos} -->{target_pos}!')
+            #logging.info(f'New path found for : {agent_pos} -->{target_pos}!')
             return path
 
-          except (nx.NetworkXNoPath, nx.NodeNotFound) as e:
+        except (nx.NetworkXNoPath, nx.NodeNotFound) as e:
             logging.info(f'Sorry no path found for: {agent_pos} -->{target_pos}')
             return None
-        logging.info(f'Attention try to plan a path to a neighbor node: {agent_pos} -->{target_pos}')
+        #logging.info(f'Attention try to plan a path to a neighbor node: {agent_pos} -->{target_pos}')
+
+       else:
+            return None
+      else:
+           return None

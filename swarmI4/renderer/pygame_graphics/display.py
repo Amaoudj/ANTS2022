@@ -62,6 +62,25 @@ class Display:
             pygame.draw.line(self.canvas, GREEN, (j * self.resolution, 0), (j * self.resolution, height_px))
         pygame.draw.rect(self.canvas, BLUE, [0, 0, width_px, height_px], 5)
 
+    def draw_new_added_node(self, node_pos:tuple, graph:nx)->None:
+        """
+        method for drawing a node in the canvas
+        :param node_pos: the node position in the grid (row,col)
+        :param node_state: the node state (free_space , obstacle .... etc)
+        :return:
+        """
+
+        node_state = graph.nodes[node_pos]["state"]
+        if node_state == 'agent' or node_state == 'target': # the agent will be drawn by draw_agent not by draw_node
+            pass
+        else:
+
+            color      = BLUE
+            row,col    = node_pos
+            x,y = col * self.resolution, row * self.resolution
+            pygame.draw.rect(self.canvas, color, (x, y, self.resolution, self.resolution))
+
+
     def draw_node(self, node_pos:tuple, graph:nx)->None:
         """
         method for drawing a node in the canvas
@@ -71,9 +90,10 @@ class Display:
         """
 
         node_state = graph.nodes[node_pos]["state"]
-        if node_state == 'agent': # the agent will be drawn by draw_agent not by draw_node
+        if node_state == 'agent' or node_state == 'target': # the agent will be drawn by draw_agent not by draw_node
             pass
         else:
+
             color      = self.nodes_states[node_state]
             row,col    = node_pos
             x,y = col * self.resolution, row * self.resolution
@@ -103,26 +123,41 @@ class Display:
 
             width, height = agent.size[0]*self.resolution,agent.size[1]*self.resolution
             x_px, y_px = col * self.resolution, row * self.resolution
+
             if agent.orientation == 0:
                 #pygame.draw.rect(self.canvas, RED,[x_px, y_px,self.resolution,self.resolution])
                 pygame.draw.circle(self.canvas, RED, (x_px + self.resolution / 2, y_px + self.resolution / 2),
                                    radius=self.resolution / 2, width=0)
-                pygame.draw.rect(self.canvas, WHITE,[x_px+width/2, y_px+height/4,width/3,height/2])
+                if agent.has_delayed:
+                  pygame.draw.rect(self.canvas, BLUE,[x_px+width/2, y_px+height/4,width/3,height/2])
+                else:
+                  pygame.draw.rect(self.canvas, WHITE, [x_px + width / 2, y_px + height / 4, width / 3, height / 2])
+
             elif agent.orientation == 1:
                 #pygame.draw.rect(self.canvas, RED,[x_px, y_px,self.resolution,self.resolution])
                 pygame.draw.circle(self.canvas, RED, (x_px + self.resolution / 2, y_px + self.resolution / 2),
                                    radius=self.resolution / 2, width=0)
-                pygame.draw.rect(self.canvas, WHITE,[x_px+width/4, y_px+height/4,width/2,height/3])
+                if agent.has_delayed:
+                  pygame.draw.rect(self.canvas, BLUE,[x_px+width/4, y_px+height/4,width/2,height/3])
+                else:
+                    pygame.draw.rect(self.canvas, WHITE, [x_px + width / 4, y_px + height / 4, width / 2, height / 3])
+
             elif agent.orientation == 2:
                 #pygame.draw.rect(self.canvas, RED,[x_px, y_px,self.resolution,self.resolution])
                 pygame.draw.circle(self.canvas, RED, (x_px + self.resolution / 2, y_px + self.resolution / 2),
                                    radius=self.resolution / 2, width=0)
-                pygame.draw.rect(self.canvas, WHITE,[x_px+width/4, y_px+height/4,width/3,height/2])
+                if agent.has_delayed:
+                  pygame.draw.rect(self.canvas, BLUE,[x_px+width/4, y_px+height/4,width/3,height/2])
+                else:
+                  pygame.draw.rect(self.canvas, WHITE, [x_px + width / 4, y_px + height / 4, width / 3, height / 2])
             elif agent.orientation == 3:
                 #pygame.draw.rect(self.canvas, RED,[x_px, y_px,self.resolution,self.resolution])
                 pygame.draw.circle(self.canvas, RED, (x_px + self.resolution / 2, y_px + self.resolution / 2),
                                    radius=self.resolution / 2, width=0)
-                pygame.draw.rect(self.canvas, WHITE,[x_px+width/4, y_px+height/2,width/2,height/3])
+                if agent.has_delayed:
+                  pygame.draw.rect(self.canvas, BLUE,[x_px+width/4, y_px+height/2,width/2,height/3])
+                else:
+                  pygame.draw.rect(self.canvas, WHITE, [x_px + width / 4, y_px + height / 2, width / 2, height / 3])
 
 
     def draw_targets(self,agents:list)->None:
@@ -135,7 +170,15 @@ class Display:
         for agent in agents:
             if type(agent) is SmartAgent:
                 targets = agent.target_list[agent.target_id:]
-                for target in targets:
+                if agent.has_new_target  :
+
+                    row, col = agent.target
+                    x_px, y_px = col * self.resolution, row * self.resolution
+                    pygame.draw.rect(self.canvas, ORANGE, [x_px, y_px, self.resolution, self.resolution])
+                    pygame.draw.circle(self.canvas, BLUE,(x_px + self.resolution / 2, y_px + self.resolution / 2),
+                                       radius=self.resolution / 2.5,width=0)
+                else:
+                  for target in targets:
                     row,col = target
                     x_px, y_px = col * self.resolution, row * self.resolution
                     pygame.draw.rect(self.canvas, ORANGE, [x_px, y_px, self.resolution, self.resolution])
