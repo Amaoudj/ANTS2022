@@ -2338,14 +2338,14 @@ class SmartAgent(AgentInterface):
                 self.remaining_path.extend(path_i)  #
                 #print(f' AgentID: {self.id}, waitingtime10, position {self.position}, target {self.target}, planed new path:{path_i}')
 
-        if len(self.repeated_nodes) > 7 and not self.im_done :
+        if len(self.repeated_nodes) > 9 and not self.im_done :
             num_repeatitons = []
             for node in self.repeated_nodes:
                 rep = self.repeated_nodes.count(node)
                 if rep > 2:  # a node already visited twice
                     num_repeatitons.append(rep)
 
-            if (len(num_repeatitons) >= 3)  :#or (len(num_repeatitons) >= 1 and len(self.remaining_path) < 3 ): # more than two nodes repeated many times
+            if (len(num_repeatitons) >= 4)  :#or (len(num_repeatitons) >= 1 and len(self.remaining_path) < 3 ): # more than two nodes repeated many times
               if self.last_node!=self.position:
                 forbi_node=[self.last_node]
                 path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target, forbi_node)#_copy_graph
