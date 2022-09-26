@@ -33,6 +33,7 @@ class SmartAgent(AgentInterface):
         self.path                 = None
         self.remaining_path       = None
         self._current_target_id   = 0
+
         self._current_waypoint_id = 0
         self.moving_away   = False
         self.next_target   = None
@@ -2146,8 +2147,7 @@ class SmartAgent(AgentInterface):
                    if x2 > x:
                        neighbors.remove(n)
                        break
-
-         elif x==x1: #in the same row
+         elif x==x1: # in the same row
              if y1 > y:
                  for n in neighbors:
                      x2, y2 = n
@@ -2160,9 +2160,7 @@ class SmartAgent(AgentInterface):
                      if y2 > y:
                         neighbors.remove(n)
                         break
-
         return  neighbors
-
 
     def uncertainty(self,map,new_target,num_delay,add_new_OBS):
         """
@@ -2241,7 +2239,6 @@ class SmartAgent(AgentInterface):
                 self.plan_path_to_all_targets(map)
                 self.im_done = False
 
-
         if self.waiting_steps > 6 and not self.im_done and self.num_TRIES ==0: # there is deadlock
           #plan another path
           self.num_TRIES +=1
@@ -2257,11 +2254,12 @@ class SmartAgent(AgentInterface):
 
                  if  path_i[0] == self.position and self.position!=self.target:
                      path_i.pop(0)
+
                  self.remaining_path.clear()
                  self.remaining_path.extend(path_i)  #
-                 #self.waiting_step=0
+                 #print(f' AgentID: {self.id}, waitingtime6, position {self.position}, target {self.target}, planed new path:{path_i}')
 
-        if self.waiting_steps > 7 and not self.im_done and self.num_TRIES ==1:  # there is deadlock
+        if self.waiting_steps > 7 and not self.im_done and self.num_TRIES == 1:  # there is deadlock
             neighbor = map.free_neighboring_node(self.position, self.position)
             self.num_TRIES += 1
             if neighbor is not None:
@@ -2272,21 +2270,22 @@ class SmartAgent(AgentInterface):
 
                 neighbors = []
                 for n in neighbors1:
-                   if n in map._copy_graph.nodes and not map.is_free(n):
-                     neighbors.append(n)
+                    if n in map._copy_graph.nodes and not map.is_free(n):
+                        neighbors.append(n)
 
-                if len(neighbors) < 4 :
+                if len(neighbors) < 4:
 
-                 path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target,neighbors)  # neighbors
-                 if path_i is not None and len(path_i) > 0:
+                    path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target_list[0],
+                                                            neighbors)  # neighbors
+                    if path_i is not None and len(path_i) > 0:
 
-                    if path_i[0] == self.position and self.position != self.target:
-                        path_i.pop(0)
-                    self.remaining_path.clear()
-                    self.remaining_path.extend(path_i)  #
-                    #self.waiting_step = 0
+                        if path_i[0] == self.position and self.position != self.target_list[0]:
+                            path_i.pop(0)
+                        self.remaining_path.clear()
+                        self.remaining_path.extend(path_i)  #
+                        #print(f' AgentID: {self.id}, waitingtime7, position {self.position}, target {self.target}, planed new path:{path_i}')
 
-        if self.waiting_steps > 8 and not self.im_done and self.num_TRIES ==2:  # there is deadlock
+        if self.waiting_steps > 8 and not self.im_done and self.num_TRIES == 2:  # there is deadlock
             neighbors = map.get_neighbors(self.position, diagonal=False)
             neighbor = map.free_neighboring_node(self.position, self.position)
             self.num_TRIES += 1
@@ -2298,59 +2297,58 @@ class SmartAgent(AgentInterface):
                 if n not in map._graph.nodes or not map.within_map_size(n) or map.is_free(n):
                     neighbors.remove(n)
 
-            path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target,neighbors)  # neighbors
+            path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target_list[0],
+                                                    neighbors)  # neighbors
             if path_i is not None and len(path_i) > 0:
 
-                if path_i[0] == self.position and self.position!=self.target:
+                if path_i[0] == self.position and self.position != self.target_list[0]:
                     path_i.pop(0)
                 self.remaining_path.clear()
                 self.remaining_path.extend(path_i)  #
-                #self.waiting_step = 0
+                #print(f' AgentID: {self.id}, waitingtime6, position {self.position}, target {self.target}, planed new path:{path_i}')
 
-        if self.waiting_steps > 9 and not self.im_done and self.num_TRIES ==3:  # there is deadlock
-          self.num_TRIES += 1
-          #self.num_TRIES = 0
+        if self.waiting_steps > 9 and not self.im_done and self.num_TRIES == 3:  # there is deadlock
+            self.num_TRIES += 1
+            # self.num_TRIES = 0
+            # self.waiting_step = 5
 
-          if self.remaining_path is not None and len(self.remaining_path) > 1 :
-           if self.remaining_path[0] != self.position:
-             path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target,[self.remaining_path[0]])  # neighbors
-             if path_i is not None and len(path_i) > 0:
-                if path_i[0] == self.position and self.position!=self.target:
+            if self.remaining_path is not None and len(self.remaining_path) > 1:
+                if self.remaining_path[0] != self.position and self.remaining_path[0] != self.target_list[
+                    0]:  # self.target
+                    path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target_list[0],
+                                                            [self.remaining_path[0]])  # neighbors
+                    if path_i is not None and len(path_i) > 0:
+                        if path_i[0] == self.position:
+                            path_i.pop(0)
+                        self.remaining_path.clear()
+                        self.remaining_path.extend(path_i)  #
+                        # self.waiting_step = 0
+
+        if self.waiting_steps >= 10 and not self.im_done and self.num_TRIES == 4:  # there is deadlock
+            self.num_TRIES = 0
+            self.waiting_step = 6
+            # remove my next node from the graph
+            path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target_list[0],
+                                                    [self.remaining_path[0]])
+            if path_i is not None and len(path_i) > 0:
+                if path_i[0] == self.position and self.position != self.target_list[0]:
                     path_i.pop(0)
+                self.path = path_i
                 self.remaining_path.clear()
                 self.remaining_path.extend(path_i)  #
-                #self.waiting_step = 0
+                #print(f' AgentID: {self.id}, waitingtime10, position {self.position}, target {self.target}, planed new path:{path_i}')
 
-        if self.waiting_steps > 11 and not self.im_done and self.num_TRIES ==4:  # there is deadlock
-             self.num_TRIES = 0
-             self.waiting_step = 5
-
-             path_i = self._path_finder.astar_planner(map._graph, self.position, self.target)
-             if path_i is not None and len(path_i) > 0:
-                 if path_i[0] == self.position and self.position!=self.target:
-                     path_i.pop(0)
-                 self.path = path_i
-                 self.remaining_path.clear()
-                 self.remaining_path.extend(path_i)  #
-                 self.im_done = False
-                 #self.waiting_step = 0
-
-        #print(self.position)
-        #print(self.remaining_path)
-
-        if len(self.repeated_nodes) > 6 and not self.im_done :# ################################################################ 5
+        if len(self.repeated_nodes) > 7 and not self.im_done :
             num_repeatitons = []
             for node in self.repeated_nodes:
                 rep = self.repeated_nodes.count(node)
-                if rep > 2:  # a node already visited two times
+                if rep > 2:  # a node already visited twice
                     num_repeatitons.append(rep)
 
             if (len(num_repeatitons) >= 3)  :#or (len(num_repeatitons) >= 1 and len(self.remaining_path) < 3 ): # more than two nodes repeated many times
               if self.last_node!=self.position:
                 forbi_node=[self.last_node]
-
                 path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target, forbi_node)#_copy_graph
-
                 if path_i is not None and len(path_i) > 1:
                     #self.previous_foundPath= path_i
                     self.repeated_nodes.clear()
@@ -2403,187 +2401,10 @@ class SmartAgent(AgentInterface):
                     if self._current_target_id + 1 < len(self.target_list):
                         self._current_target_id += 1
 
-    def next_step2(self, map) -> None:
-        """ Plan the next step of the agent
-        :returns: The next node
-        """
-        # plan the full path if you didn't do that before
-        if len(self.target_list) > 0:
-            if self.remaining_path is None:
-                self.plan_path_to_all_targets(map)
-                self.im_done = False
-
-        if self.waiting_steps > 6 and not self.im_done and self.num_TRIES == 0:  # there is deadlock
-            # plan another path
-            self.num_TRIES += 1
-            neighbor = map.free_neighboring_node(self.position, self.position)
-            if neighbor is not None:
-
-                neighbors_to_remove = self.get_node_to_remove_replan_path(map)
-                if len(neighbors_to_remove) < 4:
-
-                    path_i = self._path_finder.astar_replan(map._copy_graph, self.position,self.target_list[0] , neighbors_to_remove) #self.target
-                    if path_i is not None and len(path_i) > 0:
-                        if path_i[0] == self.position and self.position != self.target_list[0] :#self.target
-                            path_i.pop(0)
-                        self.remaining_path.clear()
-                        self.remaining_path.extend(path_i)  #
-                        #self.waiting_step=0
-
-        if self.waiting_steps > 7 and not self.im_done and self.num_TRIES == 1:  # there is deadlock
-            neighbor = map.free_neighboring_node(self.position, self.position)
-            self.num_TRIES += 1
-            if neighbor is not None:
-                neighbors1 = map.get_neighbors(self.position, diagonal=False)
-                for n in neighbors1:
-                    if n not in map._graph.nodes or not map.within_map_size(n):
-                        neighbors1.remove(n)
-
-                neighbors = []
-                for n in neighbors1:
-                    if n in map._copy_graph.nodes and not map.is_free(n):
-                        neighbors.append(n)
-
-                if len(neighbors) < 4:
-
-                    path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target_list[0],
-                                                            neighbors)  # neighbors
-                    if path_i is not None and len(path_i) > 0:
-
-                        if path_i[0] == self.position and self.position !=self.target_list[0]:
-                            path_i.pop(0)
-                        self.remaining_path.clear()
-                        self.remaining_path.extend(path_i)  #
-                        #self.waiting_step = 0
-
-        if self.waiting_steps > 8 and not self.im_done and self.num_TRIES == 2:  # there is deadlock
-            neighbors = map.get_neighbors(self.position, diagonal=False)
-            neighbor = map.free_neighboring_node(self.position, self.position)
-            self.num_TRIES += 1
-
-            if neighbor is not None and neighbor in neighbors:
-                neighbors.remove(neighbor)
-
-            for n in neighbors:
-                if n not in map._graph.nodes or not map.within_map_size(n) or map.is_free(n):
-                    neighbors.remove(n)
-
-            path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target_list[0], neighbors)  # neighbors
-            if path_i is not None and len(path_i) > 0:
-
-                if path_i[0] == self.position and self.position !=self.target_list[0]:
-                    path_i.pop(0)
-                self.remaining_path.clear()
-                self.remaining_path.extend(path_i)  #
-                #self.waiting_step = 0
-
-        if self.waiting_steps > 9 and not self.im_done and self.num_TRIES == 3:  # there is deadlock
-            self.num_TRIES += 1
-            #self.num_TRIES = 0
-            #self.waiting_step = 5
-
-            if self.remaining_path is not None and len(self.remaining_path) > 1:
-                if self.remaining_path[0] != self.position and self.remaining_path[0] != self.target_list[0]:#self.target
-                    path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target_list[0], [self.remaining_path[0]])  # neighbors
-                    if path_i is not None and len(path_i) > 0:
-                        if path_i[0] == self.position:
-                            path_i.pop(0)
-                        self.remaining_path.clear()
-                        self.remaining_path.extend(path_i)  #
-                        #self.waiting_step = 0
-
-        if self.waiting_steps >= 10 and not self.im_done and self.num_TRIES == 4:  # there is deadlock
-            self.num_TRIES     =  0
-            self.waiting_step  =  4
-            #remove my next node from the graph
-            path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target_list[0], [self.remaining_path[0]])
-            if path_i is not None and len(path_i) > 0:
-                if path_i[0] == self.position and self.position != self.target_list[0]:
-                    path_i.pop(0)
-                self.path = path_i
-                self.remaining_path.clear()
-                self.remaining_path.extend(path_i)  #
-                #self.im_done = False
-                # self.waiting_step = 0
-
-        #------------------Handel the looping behavior----------------------------------------
-        if len(self.repeated_nodes) > 5 and not self.im_done:  # and not self.special_case:
-            num_repeatitons = []  # Number of the nodes that the robot periodically visits
-            for node in self.repeated_nodes:
-                rep = self.repeated_nodes.count(node) # Number of repetitions...
-                if rep > 2:  # a node already visited two times
-                    num_repeatitons.append(rep)
-
-            if (len(num_repeatitons) >= 3):  # or (len(num_repeatitons) >= 1 and len(self.remaining_path) < 3 ): # more than two nodes repeated many times
-                if self.last_node != self.position:
-                    forbi_node = [self.last_node]
-
-                    path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target_list[0], forbi_node)
-
-                    if path_i is not None and len(path_i) > 1:
-                        # self.previous_foundPath= path_i
-                        self.repeated_nodes.clear()
-                        if path_i[0] == self.position and self.position != self.target_list[0]:
-                            path_i.pop(0)
-                        self.remaining_path.clear()
-                        self.remaining_path.extend(path_i)  #
-
-        if len(self.all_repeated_nodes) > 10 and not self.im_done:#20
-            num_repeatitons = []
-            for node in self.all_repeated_nodes:
-                rep = self.all_repeated_nodes.count(node)
-                if rep > 2:  # a node already visited two times
-                    num_repeatitons.append(rep)
-
-            if (len(num_repeatitons) >= 5):#15
-                if self.last_node != self.position:
-                    forbi_node = [self.last_node]
-                    path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target_list[0], forbi_node)
-
-                    if path_i is not None and len(path_i) > 1:
-                        self.repeated_nodes.clear()
-                        self.all_repeated_nodes.clear()
-                        if path_i[0] == self.position and self.position != self.target_list[0]:
-                            path_i.pop(0)
-                        self.remaining_path.clear()
-                        self.remaining_path.extend(path_i)  #
-
-        # plan the full path if you didn't do that before
-        if len(self.target_list) > 0:
-            if self.remaining_path is None:
-                self.plan_path_to_all_targets(map)
-                self.im_done = False
-                self.has_delayed = False
-                # resolve any conflicts before moving the next step
-
-        if self.remaining_path is None or len(self.remaining_path) == 0:
-            self.im_done = True
-
-            self.target_list = [self.position]
-            self.remaining_path = [self.position]
-            self.next_waypoint = self.position  # need it to know
-
-        else:
-            if len(self.remaining_path) >= 1:
-                # calculate the next target and next waypoint
-                if self._current_target_id < len(self.target_list):
-                    self.next_target = self.target_list[self._current_target_id]
-
-                self.next_waypoint = self.remaining_path[0]
-                if self.next_waypoint is None:
-                    self.next_waypoint = self.position
-                    self.remaining_path.pop(0)
-                    self.remaining_path.insert(0, self.position)
-
-                # if you get to the next target
-                if self.next_waypoint == self.next_target:
-                    if self._current_target_id + 1 < len(self.target_list):
-                        self._current_target_id += 1
-
 
     def move(self, map, sim_time, time_lapsed: float = 0):
 
-        self._current_target_id = 0
+        #self._current_target_id = 0      #######################
 
         for agent in map.msg_box.values():
             # if agent is not None and agent_me is not None and agent['AgentID'] !=agent_id:
@@ -2598,7 +2419,6 @@ class SmartAgent(AgentInterface):
         # wait for this step
         logging.info(f'Agent {self.id} --->action:{self.action} (changed:{self.changed_action})')
 
-
         self.delay_steps -= 1
         if self.delay_steps == 0:
             self.has_delayed = False
@@ -2609,19 +2429,21 @@ class SmartAgent(AgentInterface):
 
         if self.action == "wait":
             self.wait()
-            self.waiting_steps += 1
+            self.waiting_steps = self.waiting_steps + 1  #self.waiting_steps +=1
             logging.info(self.position)
 
         else: # your planned action is move
 
-           self.waiting_steps = 0
-           self.num_TRIES     = 0
            if (self.next_waypoint is None):
               # pyautogui.alert(text='Agent' + str(self.id) + ' with action ' + str(self._position) + ' is trying to reach a None node' , title='Moving to None node',
               #     button='OK')
               self.action="wait"
+              self.wait()                                   ########################
+              self.waiting_steps = self.waiting_steps + 1   ########################
 
            else:
+                self.waiting_steps = 0
+                self.num_TRIES = 0
                 if self.last_node != self.position:
                     self.steps += 1
 
