@@ -71,7 +71,7 @@ class Simulator(object):
         # call the setup of the _renderer
         self._renderer.setup(args)
         self._start_time = time.time()
-        self.steps_limit = 240
+        self.steps_limit = 400
 
         while not self._my_swarm.done and self._my_swarm.success and self._step < self.steps_limit:
 

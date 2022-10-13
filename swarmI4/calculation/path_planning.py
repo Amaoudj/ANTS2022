@@ -54,9 +54,8 @@ class PathFinder:
         agent_row, agent_col   = agent_pos
         target_row, target_col = target_pos
 
-        n=[(agent_row+1, agent_col),(agent_row-1, agent_col),(agent_row, agent_col+1),(agent_row, agent_col-1)]
+        #n=[(agent_row+1, agent_col),(agent_row-1, agent_col),(agent_row, agent_col+1),(agent_row, agent_col-1)]
 
-        #if target_pos not in n or target_pos in n:# don't plan a path to a neighbor node
         try:
             path = nx.astar_path(G, (agent_row, agent_col), (target_row, target_col),weight='weight')
             #logging.info(f'New path found for : {agent_pos} -->{target_pos}!')
@@ -65,7 +64,7 @@ class PathFinder:
         except (nx.NetworkXNoPath, nx.NodeNotFound) as e:
             logging.info(f'Sorry no path found for: {agent_pos} -->{target_pos}')
             return None
-        #logging.info(f'Attention try to plan a path to a neighbor node: {agent_pos} -->{target_pos}')
+
 
        else:
             return None

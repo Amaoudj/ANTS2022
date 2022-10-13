@@ -526,6 +526,7 @@ class Map(object):
                         break
           return node_
 
+
     def occupied_neighboring_nodes(self, pos):
             """
             find the occupied neighboring nodes
@@ -553,7 +554,7 @@ class Map(object):
             i = 0
             num_tries = 0
 
-            while _node is None or self.is_obstacle(_node) and num_tries < 50:
+            while _node is None or self.is_obstacle(_node) and num_tries < 70:
                 num_tries += 1
                 i += 1
                 if row == row1:  # in the same line
@@ -593,7 +594,7 @@ class Map(object):
                             row1 += 1  # go
                         i = 0
 
-            if num_tries == 49:
+            if num_tries == 70:
                 _node = None
 
             return _node
@@ -611,7 +612,7 @@ class Map(object):
             i = 0
             num_tries = 0
 
-            while _node is None or self.is_obstacle(_node) and num_tries < 70:
+            while _node is None or self.is_obstacle(_node) and num_tries < 100:
                 num_tries += 1
                 i += 1
                 if row == row1:  # in the same line
@@ -639,10 +640,23 @@ class Map(object):
                             row1 += 1  # go
                         i = 0
 
-            if num_tries == 60:
+            if num_tries == 100:
                 _node = None
 
             return _node
+
+    def get_nearest_randam_free_node(self, mypos):
+       _node = None
+       num_tries = 0
+       _node = self.free_neighboring_node(mypos, mypos)
+       while _node is None or self.is_obstacle(_node) and num_tries < 100:
+           num_tries +=1
+           neighborhood = self.get_neighbors(mypos, diagonal=False)
+           mypos =random.choice(neighborhood)
+           _node = self.free_neighboring_node(mypos, mypos)
+
+       return _node
+
 
     def move_agent(self, agent: AgentInterface, new_position: Tuple[int, int]):
             assert self._graph.nodes[agent.position]["agent"] == agent, \
