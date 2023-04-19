@@ -44,8 +44,7 @@ class Simulator(object):
         self._step = 0
         _event_handler = EventHandler()
         sim_action = _event_handler.handle_init_events(args, self._renderer, self._my_map, self._my_swarm)
-        logging.info("Getting the initialize position of the swarm agents")
-        logging.info("Starting the simulation")
+
         self.instance=args.pattern_map_file
 
         return sim_action
@@ -69,15 +68,17 @@ class Simulator(object):
         :swarm: The swarm
         """
         # call the setup of the _renderer
-        self._renderer.setup(args)
+        if args.renderer == "PygameRenderer":
+           self._renderer.setup(args)
+
         self._start_time = time.time()
-        self.steps_limit = 400
 
+        self.steps_limit = 602
+        sim_action=None
         while not self._my_swarm.done and self._my_swarm.success and self._step < self.steps_limit:
-
-            #time.sleep(0.7)
-            #logging.debug(f"Turn {self._step} is now running")
-            sim_action = self._renderer.display_frame(args,self._step,lapsed_time=self._lapsed_time)
+            #time.sleep(0.9)
+            if args.renderer == "PygameRenderer":
+                sim_action = self._renderer.display_frame(args,self._step,lapsed_time=self._lapsed_time)
             if sim_action is not None:
                 return sim_action
 
@@ -91,19 +92,21 @@ class Simulator(object):
             logging.info(f'The number of steps has exceeded the threshold')
 
         if not self._my_swarm.success:
-            #pyautogui.alert(text='Simulation failed', title='Simulation is done', button='OK')
-            logging.info(f'Simulation failed ! ')
+            #pyautogui.alert(text='Simulation failed', title='Simulation', button='OK')
+            #logging.info(f'Simulation failed ! ')
+            print(f'Simulation failed ! ')
 
         else:
           self._step -= 2  # remove the step to the start-node and the repeated step to end-node
           #pyautogui.alert(text='End Task--Time_Step : '+str(self._step),title='Simulation is done', button='OK')
-          logging.info(f'Simulation is done ! ')
+          #logging.info(f'Simulation is done ! ')
 
         self.sum_cost=self._my_swarm.get_sum_cost()
 
-        print('End Task--Time_Step : ', self._step)
-        self._renderer.display_frame(step=self._step, args=args)
-        self._renderer.tear_down()
+        print('Simulation completed--Time-Steps : ', self._step)
+        if args.renderer == "PygameRenderer":
+           self._renderer.display_frame(step=self._step, args=args)
+           self._renderer.tear_down()
 
 
     @property

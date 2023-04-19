@@ -1,5 +1,8 @@
 """ Main function """
 import os
+import sys
+sys.path.append('../swarm4I40sim')
+sys.path.append('../swarm4I40sim/swarmI4')
 import pandas as pd
 import configargparse
 from random import seed
@@ -15,30 +18,30 @@ from swarmI4.experiment  import *
 import numpy as np
 import json
 
-parser = configargparse.get_arg_parser() # ArgumentParser(description="Swarm robotics for I4.0 abstract simulator.")
-RESULTS_PATH = 'conf_experiments/results.csv'
-MAP_STORAGE_PATH = 'conf_experiments/maps_storage'
-BENCHMARK_STORAGE_PATH = 'benchmarks'
-PLOTS_STORAGE_PATH = 'conf_experiments/plots_storage'
+parser = configargparse.get_arg_parser()
+RESULTS_PATH = '../swarm4I40sim/results_plot/results_data_solvers/DCMAPF/results.csv'
+MAP_STORAGE_PATH = '../swarm4I40sim/conf_experiments/maps_storage'
+BENCHMARK_STORAGE_PATH = '../swarm4I40sim/benchmarks'
+PLOTS_STORAGE_PATH = '../swarm4I40sim/conf_experiments/plots_storage'
 
-
-def export_results(args, map, swarm, step, simulation_time, storage_path: str = 'conf_experiments/results.csv'):
+def export_results(args, map, swarm, step, simulation_time, storage_path: str = '../swarm4I40sim/results_plot/results_data_solvers/DCMAPF/results.csv'):
     """
     store the simulation results
     """
-    data = {'map_name': str(map.pattern_file_path),
+    file_path=str(map.pattern_file_path)
+    data = {'map_name': file_path.replace("../swarm4I40sim/benchmarks/", ""),
             'map_size': map.size_x*map.size_y,
             'obstacles_number': map.number_of_obstacles,
-            'agents_number': len(swarm.agents),
+            'num_agents': len(swarm.agents),
             'solver':"DCMAPF",
-            'is_done': swarm.done,
+            'solved': swarm.done,
             'soc': swarm.get_sum_cost(),
             'makespan': step,
             'simulation_time': round(simulation_time,1)}
     data = {k: [v] for k, v in data.items()}
-
+    # 'num_replanned_paths':swarm.get_num_replanned_paths(),
     df = pd.DataFrame(data)
-    print(data)
+    #print(data)
 
     if os.path.isfile(storage_path):
         df.to_csv(storage_path, mode='a', index=False, header=False)
@@ -103,7 +106,6 @@ def save_map_pattern(map, swarm):
 def parse_args():
     """ Handles the arguments """
     # parser = configargparse.get_arg_parser()
-
 
     parser.add('-c', '--config', is_config_file=True, help='Config file')
 
@@ -284,9 +286,9 @@ def main(args,id=None,map = None, is_benchmark:bool=True):
                         nargs=1, metavar="process_id", type=int,
                         default=id)
 
-    logging.basicConfig(format='%(asctime)s %(message)s')
-    logging.root.setLevel(getattr(logging, args.loglevel.upper(), None))
-    logging.info(f"Runtime arguments f{args}")
+    #logging.basicConfig(format='%(asctime)s %(message)s')
+    #logging.root.setLevel(getattr(logging, args.loglevel.upper(), None))
+    #logging.info(f"Runtime arguments f{args}")
 
     my_experiment = globals()[args.experiment]()
     map_creation_counter = 0 # counts how many random map have been created
@@ -297,7 +299,7 @@ def main(args,id=None,map = None, is_benchmark:bool=True):
         if args.create_map and not args.run_experiments and args.num_random_maps > 0:
             if map_creation_counter < args.num_random_maps:
                 store_map_txt(MAP_STORAGE_PATH, map_rep)
-                logging.info(f'you created {map_creation_counter} random maps')
+                #logging.info(f'you created {map_creation_counter} random maps')
                 map_creation_counter+=1
                 continue
             else:
@@ -335,7 +337,6 @@ def main(args,id=None,map = None, is_benchmark:bool=True):
         if sim_action == 'stop' or args.run_experiments:
             break
 
-
 # Process class
 class Process(multiprocessing.Process):
     """
@@ -349,7 +350,7 @@ class Process(multiprocessing.Process):
         self.is_benchmark = benchmark
 
     def run(self):
-        logging.info(f"I'm the process with id: {self.id}...")
+        #logging.info(f"I'm the process with id: {self.id}...")
         main(self.arg,self.id,self.map,self.is_benchmark)
 
 def choose_map_to_run(arg,maps_folder):
@@ -423,21 +424,8 @@ if __name__ == "__main__":
     arg.run_experiments = arg.run_experiments[0]
     arg.batch_size = arg.batch_size[0]
     arg.map = arg.map[0]
-    plotter = StatisticsPlotter(RESULTS_PATH)
 
-    """ ASK THE USER TO SPECIFY AND ACTION : RUN SIMULATION or RUN ANALYSIS"""
-    choice, values = sg.Window('please choose an action', [
-        [sg.Text('Select one '), sg.Listbox(['Run Simulation', 'Run Analysis'], size=(20, 3), key='LB')],
-        [sg.Button('Ok'), sg.Button('Cancel')]]).read(close=True)
-
-    if choice == 'Cancel': # exit the program
-        exit()
-
-    if arg.plot_experiments  and values["LB"][0] == 'Run Analysis': # analyze the results
-        plotter.plot(arg.plot_x_axis, arg.plot_y_axis,arg.plot_categories, show=True, save_path=PLOTS_STORAGE_PATH)
-
-    elif values["LB"][0] == 'Run Simulation': # run the simulation then analyze the results
-        if arg.run_experiments:
+    if arg.run_experiments:
             if arg.map == 'BenchmarkMapGenerator':
                 bench_list,benchs_paths = get_benchmarks_list(BENCHMARK_STORAGE_PATH)
                 benchmarks_data,index = get_benchmark_data(bench_list)
@@ -449,7 +437,7 @@ if __name__ == "__main__":
                         p = Process(id=p_id, arg=arg, map=benchmarks_data[p_id], benchmark=True)
                         p.start()
                         processes.append(p)
-                        logging.info(f'iteration {p_id} is finished')
+                        #logging.info(f'iteration {p_id} is finished')
 
                     for p in processes:
                         p.join()
@@ -463,14 +451,13 @@ if __name__ == "__main__":
                         p = Process(id=p_id,arg=arg,map=map_to_process[p_id])
                         p.start()
                         processes.append(p)
-                        logging.info(f'iteration {p_id} is finished')
+                        #logging.info(f'iteration {p_id} is finished')
 
                     for p  in processes:
                         p.join()
-            if arg.plot_experiments :
-                plotter.plot(arg.plot_x_axis, arg.plot_y_axis, arg.plot_categories, show=True, save_path=PLOTS_STORAGE_PATH)
 
-        else:
+
+    else:
             main(arg)
 
 

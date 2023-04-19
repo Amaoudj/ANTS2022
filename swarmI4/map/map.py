@@ -7,7 +7,8 @@ import logging
 from swarmI4.agent import AgentInterface
 import  random
 from .color import FREE, AGENT, OBSTACLE, TARGET, PATH
-
+from typing import List
+#from quadtree import QuadTree
 
 class Map(object):
 
@@ -20,7 +21,7 @@ class Map(object):
                 number_of_targets =0,
                 pattern_file_path=None):
 
-        logging.debug("Initializing the world")
+        #logging.debug("Initializing the world")
         self._graph = graph
         self._copy_graph = copy_graph  # graph
         self._swarm = None
@@ -32,9 +33,16 @@ class Map(object):
         self.number_of_targets = number_of_targets
         self.new_OBS = []
         #Defining a list of dictionaries as message box for agents to leave data
-        self.msg_box= {}
+        #self.msg_box= {}
         self.new_paths_node = {}
+        self.num_agents = 0
+        self.neighbors_agents_stat= None
 
+        # Update agent 0's stats
+        #agent_stats[0] = {'next_node': (1, 2), 'moving_backward': False, ...}
+
+        # Get agent 1's next node
+       # next_node = agent_stats[1]['next_node']
 
     @property
     def size_xy(self) -> Tuple[int, int]:
@@ -47,6 +55,21 @@ class Map(object):
     @property
     def size_y(self) -> int:
         return self._number_of_nodes[1]
+
+
+    #def get_agents_nearby(agent, map, radius) -> List[dict]:
+    #    """
+    #    Get all agents within a given radius of the current agent.
+    #    """
+    #    nearby_agents = []
+    #    qt = QuadTree(map.width, map.height)
+    #    for a in map.agents_stat:
+    #        if a['AgentID'] != agent.id:
+    #            qt.insert(a['pos'], a)
+    #    agents_in_radius = qt.query_radius(agent.position, radius)
+    #    for a in agents_in_radius:
+    #        nearby_agents.append(a.data)
+    #    return nearby_agents
 
     def within_map_size(self, node):
             Toreturn = True

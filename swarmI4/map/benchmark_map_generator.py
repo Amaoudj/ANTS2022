@@ -35,6 +35,7 @@ class BenchmarkMapGenerator(object):
         """
         return BenchmarkMapGenerator(args.pattern_map_file)
 
+
     def __init__(self, map:dict):
         """ Create a generator
 
@@ -106,7 +107,7 @@ class BenchmarkMapGenerator(object):
         self.number_of_targets = len(goal_list)//len(start_list)
         self._number_of_nodes = pattern_map.shape
 
-        logging.info(self._number_of_nodes)
+        #logging.info(self._number_of_nodes)
 
         my_map: nx.Graph = nx.Graph()
         copy_graph: nx.Graph = nx.Graph()
@@ -145,7 +146,7 @@ class BenchmarkMapGenerator(object):
                     my_map.nodes[(row, col)]["state"] = 'obstacle'
                     self._number_of_obstacles+=1
 
-        logging.info("World generated")
+        #logging.info("World generated")
 
         return Map(my_map,copy_graph, self._number_of_nodes,(start_list,goal_list),self._number_of_obstacles,self.number_of_targets,pattern_file_path)
 
