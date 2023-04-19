@@ -303,7 +303,7 @@ def main(args,id=None,map = None, is_benchmark:bool=True):
                 map_creation_counter+=1
                 continue
             else:
-                logging.info(f'you created {args.num_random_maps} random maps')
+                #logging.info(f'you created {args.num_random_maps} random maps')
                 break
 
 
@@ -314,7 +314,7 @@ def main(args,id=None,map = None, is_benchmark:bool=True):
             sim_action = my_sim.start(args)
             map_rep = save_map_pattern(my_sim.map, my_sim.swarm)
         if sim_action == 'reset':
-            logging.info(f"Resetting the Simulation ...")
+            #logging.info(f"Resetting the Simulation ...")
             continue
         elif sim_action == 'stop':
             break

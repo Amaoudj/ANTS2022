@@ -157,7 +157,7 @@ class SmartAgent(AgentInterface):
     def is_agent_involved_in_opposite_conflict(self, map, agent):
 
             return_ = False
-            for msg in map.neighbors_agents_stat:  # msg_box.values():
+            for msg in map.neighbors_agents_stat:
                 if msg["AgentID"] == agent["AgentID"]:
                     continue
                 else:
@@ -232,8 +232,7 @@ class SmartAgent(AgentInterface):
 
             # successors + other agents having 'next_next_node' = my_pos
             for agent in map.neighbors_agents_stat:  # map.msg_box.values():
-                if agent['AgentID'] != self.id and (
-                        (agent['next_node'] == position) or (agent['next_next_node'] == position)):
+                if agent['AgentID'] != self.id and ((agent['next_node'] == position) or (agent['next_next_node'] == position)):
                     pos_requests += 1
 
             return pos_requests, num_successors
@@ -283,8 +282,7 @@ class SmartAgent(AgentInterface):
                 agent_id = predecessor['AgentID']
             steps = 0
 
-            while (steps < 20 and predecessor is not None and predecessor['AgentID'] != self.id and predecessor[
-                'AgentID'] != _predecessors[-1]['AgentID']):  #
+            while (steps < 20 and predecessor is not None and predecessor['AgentID'] != self.id and predecessor['AgentID'] != _predecessors[-1]['AgentID']):  #
                 predecessor = self.get_leader_agent(map, agent_id)
                 steps += 1
                 if predecessor is not None and predecessor not in _predecessors and predecessor['AgentID'] != \
@@ -384,6 +382,7 @@ class SmartAgent(AgentInterface):
 
             return ret
 
+
     def get_agent_object(self, agent_id):
             return map.neighbors_agents_stat[agent_id]
 
@@ -470,14 +469,11 @@ class SmartAgent(AgentInterface):
                 successor = self.follower  # self.get_follower_agent(map, self.id)
                 if successor is not None and successor["AgentID"] != self.id:
 
-                    if not self.is_agent_involved_in_opposite_conflict(map,
-                                                                       successor) and not self.is_agent_involved_in_intersection_conflict(
+                    if not self.is_agent_involved_in_opposite_conflict(map, successor) and not self.is_agent_involved_in_intersection_conflict(
                             map, successor):
-                        if (successor["next_node"] == self.position) and (
-                                successor["next_next_node"] == my_next_node) and successor["remaining_nodes"] > len(
+                        if (successor["next_node"] == self.position) and (successor["next_next_node"] == my_next_node) and successor["remaining_nodes"] > len(
                                 self.remaining_path):
-                            if (len(self.remaining_path) > 10 and (
-                                    successor["remaining_nodes"] > len(self.remaining_path) + 1)) or (
+                            if (len(self.remaining_path) > 10 and (successor["remaining_nodes"] > len(self.remaining_path) + 1)) or (
                                     len(self.remaining_path) < 6 and (
                                     successor["remaining_nodes"] > len(self.remaining_path))):
                                 got_free_node = None
@@ -515,19 +511,14 @@ class SmartAgent(AgentInterface):
         else:
             self.conflict_agent = self.neighbors[0]['AgentID']
 
-        if self.neighbors[0]['AgentID'] == self.id:
-          logging.info(f'-----------<solving an intersection_conflict in node {critic_node} >--------------------')
+        #if self.neighbors[0]['AgentID'] == self.id:
+        #  logging.info(f'-----------<solving an intersection_conflict in node {critic_node} >--------------------')
 
         priority_agent = None
 
-        #if self.neighbors[0]['AgentID'] == self.id:
-        #   logging.info(f'intersection_conflict candidates:{candidates}')
-        #   logging.info(f'---Determine which agent will have priority for the intersection_conflict---')
-
+        #rule0>> got priority in the previous time step
         for agent in candidates:
             if (agent["got_priority_last_step"] and int(agent['remaining_nodes']) > 1):# or agent['moving_away']: #or agent["moving_away"]:
-                #if self.neighbors[0]['AgentID'] == self.id:
-                #   logging.info(f'agent{agent["AgentID"]} got priority last step and it will have the priority this step')
                 priority_agent = agent['AgentID']
                 if priority_agent == self.id: # it is me
                    self.got_priority_last_step = False #
@@ -545,17 +536,12 @@ class SmartAgent(AgentInterface):
 
         if priority_agent is None and len(candidates) > 1 :
 
-            #if self.neighbors[0]['AgentID'] == self.id:
-            #    logging.info(f'rules one checking .... neighbors list length = {len(self.neighbors)}')
-            #    logging.info(f'<rule 01 : the next-next node of an agent is free ? > : under checking...')
-
             # rule 01: is the agent next-next node is free ?
             if priority_agent is None and len(candidates) > 1:
                 newlist = []
                 for agent in candidates:
                     # if agent['next_next_node'] not in [cand['next_node'] for cand in candidates]:
-                    if agent['next_next_node'] not in [candidate['pos'] for candidate in candidates] and int(
-                            agent['remaining_nodes']) > 1:
+                    if agent['next_next_node'] not in [candidate['pos'] for candidate in candidates] and int(agent['remaining_nodes']) > 1:
                         # if agent['next_next_node'] not in [candidate['next_node'] for candidate in candidates] and int(agent['remaining_nodes']) > 1:
                         newlist.append(agent)
                 if len(newlist) > 0:
@@ -582,17 +568,10 @@ class SmartAgent(AgentInterface):
                                 # else:
                                 # priority_agent = agent['AgentID']
 
-            # rule 04 : choose the agent with the longest path
+            # rule 03 : choose the agent with the longest path
             if priority_agent is None and len(candidates) > 1:  # in case of equality in rule 01 apply rule 02
 
                 if len(candidates) == 2:
-                    # if candidates[0]['moving_backward'] and not candidates[1]['moving_backward']:
-                    # priority_agent = candidates[1]['AgentID']
-
-                    # elif not candidates[0]['moving_backward'] and  candidates[1]['moving_backward']:
-                    # priority_agent = candidates[0]['AgentID']
-
-                    # else:
 
                     if candidates[0]['remaining_nodes'] > candidates[1]['remaining_nodes']:
                         priority_agent = candidates[0]['AgentID']
@@ -600,9 +579,6 @@ class SmartAgent(AgentInterface):
                         priority_agent = candidates[1]['AgentID']
 
                 else:
-                    #if self.neighbors[0]['AgentID'] == self.id:
-                    #    logging.info('rule 02 failed')
-                    #    logging.info(f'< rules 3: choose the agent with the longest path > : under checking... ')
                     remaining_node = []
                     for i in candidates:
                         remaining_node.append(i['remaining_nodes'])
@@ -620,10 +596,9 @@ class SmartAgent(AgentInterface):
                         #if self.neighbors[0]['AgentID'] == self.id:
                         #    logging.info(f'priority rule 03: True for agent{priority_agent}')
 
-            # rule 02: choose the agent with highest num of successors
+            # rule 05: choose the agent with highest num of successors
             if priority_agent is None and len(candidates) > 1:  # in case of equality in rule 01 apply rule 02
-                #if self.neighbors[0]['AgentID'] == self.id:
-                #    logging.info(f'<rules 2: choose the agent with high number of followers > : under checking... ')
+
                 highest_requests_num = []
                 done = False
                 for i in candidates:
@@ -644,12 +619,9 @@ class SmartAgent(AgentInterface):
                     #if self.neighbors[0]['AgentID'] == self.id:
                     #   logging.info(f'priority rule 02: True for agent{priority_agent}')
 
-            # rule 03: choose the agent with the most position requests
+            # rule 05: choose the agent with the most position requests
             if priority_agent is None and len(candidates) > 1:  # in case of equality in rule 01 apply rule 02
 
-                #if self.neighbors[0]['AgentID'] == self.id:
-                    #logging.info(f'rule 01 : failed')
-                    #logging.info(f'<rules 2: choose the agent with the most position requests> : under checking... ')
                 highest_requests_num = []
                 for i in candidates:
                     highest_requests_num.append(i['num_pos_requests'])
@@ -663,8 +635,6 @@ class SmartAgent(AgentInterface):
                 if len(candidates) == 1:  # if only one candidate left then it will have the priority
                     priority_agent = candidates[0]['AgentID']
 
-                    #if self.neighbors[0]['AgentID'] == self.id:
-                    #    logging.info(f'priority rule 02: True for agent{priority_agent}')
 
                 # rule 05: in case every other rule failed , choose the agent with the highest id
                 else:
@@ -729,7 +699,7 @@ class SmartAgent(AgentInterface):
 
                                 solution[agent['AgentID']] = "move"
                                 self.remaining_path[0:0] = [got_to_node]
-                                logging.info(f'agent{self.id} done --> Solved--remaining path: {self.remaining_path}')
+
                         else:
                             solution[agent['AgentID']] = "wait"
                 else:
@@ -742,7 +712,7 @@ class SmartAgent(AgentInterface):
                                 self.im_done = False
                                 self.is_last_node = False
                                 self.remaining_path[0:0] = [moveAGVnode]  # , self.critic_node
-                                logging.info(f'Agent{self.id} move_to_AGV_node--remaining path: {self.remaining_path}')
+
                                 self.moving_away = True
 
                         elif agent['AgentID'] == agent_to_give_way['AgentID']:
@@ -775,8 +745,7 @@ class SmartAgent(AgentInterface):
                           # get a free node without moving back
                           got_free_node1 = map.get_right_or_left_free_node(n['pos'], critic_node, critic_node)
 
-                          if self.neighbors[0]['AgentID'] == self.id:
-                              logging.info(f'get_right_or_left_free_node return--{got_free_node1}')
+
 
                           if got_free_node1 is None :
                               solution[n['AgentID']] = "move_to_AGV_node"
@@ -801,10 +770,6 @@ class SmartAgent(AgentInterface):
                                  self.my_move_away_node= moveAGVnode
                               if agent_having_priority['AgentID']==self.id:
                                   self.got_priority_last_step=True
-
-                              if self.neighbors[0]['AgentID'] == self.id:
-                                logging.info(f'agent{agent_having_priority["AgentID"]} having priority should wait')
-                                logging.info(f'agent{n["AgentID"]} should move to AGV node {moveAGVnode}')
 
 
                           else:#if (got_free_node1 != msg['next_node'] for msg in map.msg_box.values() ):
@@ -864,7 +829,7 @@ class SmartAgent(AgentInterface):
 
                               solution[agent['AgentID']] = "move"
                               self.remaining_path[0:0] = [got_to_node]
-                              logging.info(f'agent{self.id} done --> Solved--remaining path: {self.remaining_path}')
+
                          else:
                              solution[agent['AgentID']] = "wait"
                   else:
@@ -877,7 +842,7 @@ class SmartAgent(AgentInterface):
                               self.im_done = False
                               self.is_last_node = False
                               self.remaining_path[0:0] = [moveAGVnode]  # , self.critic_node
-                              logging.info(f'Agent{self.id} move_to_AGV_node--remaining path: {self.remaining_path}')
+
                               self.moving_away = True
 
                        elif agent['AgentID'] == agent_to_give_way['AgentID']:
@@ -927,10 +892,6 @@ class SmartAgent(AgentInterface):
                              if n['AgentID'] == self.id:  # it is me
                                  self.my_move_away_node = got_free_node
 
-                             if self.neighbors[0]['AgentID'] == self.id:
-                                logging.info(f'agent{agent_having_priority["AgentID"]} is moving')
-                                logging.info(f'agent{n["AgentID"]} is moving_and_waiting in {got_free_node} ')
-
                          else:
 
                            #if map.is_free(critic_node):
@@ -942,8 +903,6 @@ class SmartAgent(AgentInterface):
                                  solution[agent_having_priority['AgentID']] = "wait"
                                  if agent_having_priority['AgentID'] == self.id:  # it is me
                                     self.got_priority_last_step = True
-                                 if self.neighbors[0]['AgentID'] == self.id:
-                                    logging.info(f'agent{n["AgentID"]} is moving_via_critic_node_and_waiting in {got_free_node1}')
 
                               else:
                                   solution[agent_having_priority['AgentID']] = "wait"
@@ -996,7 +955,7 @@ class SmartAgent(AgentInterface):
 
                                   solution[agent['AgentID']] = "move"
                                   self.remaining_path[0:0] = [got_to_node]
-                                  logging.info(f'agent{self.id} done --> Solved--remaining path: {self.remaining_path}')
+                                  #logging.info(f'agent{self.id} done --> Solved--remaining path: {self.remaining_path}')
                           else:
                               solution[agent['AgentID']] = "wait"
 
@@ -1010,7 +969,7 @@ class SmartAgent(AgentInterface):
                                   self.im_done = False
                                   self.is_last_node = False
                                   self.remaining_path[0:0] = [moveAGVnode]# , self.critic_node   ################################################
-                                  logging.info(f'Agent{self.id} move_to_AGV_node--remaining path: {self.remaining_path}')
+                                  #logging.info(f'Agent{self.id} move_to_AGV_node--remaining path: {self.remaining_path}')
                                   self.moving_away = True
 
                           elif agent['AgentID'] == agent_to_give_way['AgentID']:
@@ -1039,9 +998,6 @@ class SmartAgent(AgentInterface):
                                 got_free_node = map.get_right_or_left_free_node(n['pos'], critic_node, critic_node)
                                 got_free_node1 = map.get_right_or_left_free_node(agent_having_priority['pos'], critic_node, critic_node)
 
-                                if self.neighbors[0]['AgentID'] == self.id:
-                                    logging.info(f'Function get_right_or_left_free_node returned of the other agent: {got_free_node}')
-                                    logging.info( f'Function get_right_or_left_free_node for the priority-agent: {got_free_node1}')
 
                                 if got_free_node is not None and got_free_node != n['pos']:  # and got_free_node != critic_node:
                                     solution[agent_having_priority['AgentID']] = "move"
@@ -1080,8 +1036,7 @@ class SmartAgent(AgentInterface):
                                           self.move_out_of_the_way_intersection(map, self.critic_node, prohibited_node)
                                           self.moving_backward = True
 
-                                      if self.neighbors[0]['AgentID'] == self.id:
-                                           logging.info(f'agent{n["AgentID"]} is moving away')
+
 
                        else: #this means that the next_next_node of agent_having_priority is free
                            solution[agent_having_priority['AgentID']] = "move"
@@ -1091,10 +1046,7 @@ class SmartAgent(AgentInterface):
 
              agent_done   =None
              agent_moving = None
-             #got_free_node = None
-             #move_out_of_the_way=Fals
-             #threshould_=None
-             #free_node=None
+
              special_traitement = False
              if self.neighbors[0]['im_done'] or self.neighbors[1]['im_done'] :
 
@@ -1167,14 +1119,9 @@ class SmartAgent(AgentInterface):
 
                                       self.is_last_node = False
                                       self.moving_away = True
-                                      ###################################################################################################
-                                      #################################################################################################
-                                      ###################################################################################################
-                                      #################################################################################################
-                                      ###################################################################################################
-                                      #################################################################################################
+
                                       self.remaining_path[0:0] = [agent_moving['pos'], free_node2, agent_moving['pos']]#
-                                      logging.info(f'agent{self.id} done --> move to neighbor of the robot {self.remaining_path}')
+                                      #logging.info(f'agent{self.id} done --> move to neighbor of the robot {self.remaining_path}')
 
                                       self.special_path[0:0] = [agent_moving['pos'], free_node2, agent_moving['pos']]#
 
@@ -1183,7 +1130,7 @@ class SmartAgent(AgentInterface):
                                       self.action == "move_to_free_neibour_node"
                                       self.moving_away = True
                                       self.remaining_path[0:0] = [free_node1,self.position]#
-                                      logging.info(f'agent{self.id} --> move to free neighbor node {self.remaining_path}')
+                                      #logging.info(f'agent{self.id} --> move to free neighbor node {self.remaining_path}')
                                       self.special_path[0:0]   = [free_node1, self.position]
 
 
@@ -1207,7 +1154,7 @@ class SmartAgent(AgentInterface):
                                    if got_to_node2 is None :
                                      direction_node = self.get_back_node(agent_done['pos'], agent_moving['pos'])
                                      nearestFreenode=map.get_nearest_free_node_on_right_left_mode(agent_done['pos'],direction_node,1)
-                                     logging.info(f'direct_node{direction_node} --> nearestFreenode {nearestFreenode}: is between {self.is_node_between_two_nodes(nearestFreenode,agent_moving["pos"],agent_done["pos"])}')
+                                     #logging.info(f'direct_node{direction_node} --> nearestFreenode {nearestFreenode}: is between {self.is_node_between_two_nodes(nearestFreenode,agent_moving["pos"],agent_done["pos"])}')
 
                                      if nearestFreenode is not None and not self.is_target_between_two_nodes(Agent_moving_Target,agent_done['pos'],nearestFreenode):#agent_moving['target'] != agent_done['my_last_node'] and agent_moving['target'] not in map.get_neighbors(agent_done['pos'],diagonal=False):
                                          got_to_node2, m_ = map.get_Free_WayNode(agent_done['pos'], agent_moving['pos'], agent_moving['pos'])
@@ -1224,21 +1171,16 @@ class SmartAgent(AgentInterface):
                                      self.is_last_node = False
                                      self.moving_away = False
                                      i=1
-                                     ##################################################
-                                     ###################################################
-                                     #######################** i ==1 ***################
-                                     ####################################################
                                      if  got_to_node2 is not None and i==0: # *******************
                                             self.moving_backward = True
                                             self.remaining_path[0:0] = [got_to_node2]#################,self.positionI addade self.position##############################
-                                            logging.info(f'agent{self.id} done & solved--> move_backward--remaining path: {self.remaining_path}')
+                                            #logging.info(f'agent{self.id} done & solved--> move_backward--remaining path: {self.remaining_path}')
 
                                             self.special_path[0:0] = [got_to_node2]#,self.position
 
                                      else: # It's a special_case
-                                        ##################################################
 
-                                         logging.info(f'special traitement: Ok')
+                                         #logging.info(f'special traitement: Ok')
                                          solution[agent_done['AgentID']] = "replan_path"
                                          node_=None
 
@@ -1248,7 +1190,7 @@ class SmartAgent(AgentInterface):
                                              node_ = map.get_nearest_free_node_on_right_left_mode(self.position,
                                                                                                   agent_moving['pos'],1)
 
-                                         logging.info(f'found_nearest_node: {node_}')
+                                         #logging.info(f'found_nearest_node: {node_}')
                                          path = self._path_finder.astar_planner(map._graph, agent_done['pos'], node_)
                                          if path is not None and len(path) > 0:
                                             self.moving_backward = False
@@ -1322,7 +1264,7 @@ class SmartAgent(AgentInterface):
 
                                              else:
                                                solution[agent_moving['AgentID']] = "wait"
-                                               logging.info(f'solution for agent {agent_done["AgentID"]} changed to Wait')
+                                               #logging.info(f'solution for agent {agent_done["AgentID"]} changed to Wait')
                                                #self.im_done = True      #*************************************************************
                                                #self.is_last_node = True #**************************************************************
                                                self.moving_away = False
@@ -1395,10 +1337,7 @@ class SmartAgent(AgentInterface):
         else:
             self.conflict_agent = self.neighbors[0]['AgentID']
 
-        #if self.neighbors[0]['AgentID'] == self.id:
-            #logging.info('---Determine which agent will have priority for an opposite_conflict---')
-            #logging.info(f'candidates : {self.neighbors}')
-            #logging.info(f'rule 1: choose the agent having the state moving_away=True')
+
 
         # rule 0: choose the agent having the state 'moving_away' True
         if candidates[0]['moving_away'] and candidates[0]['conflict_agent'] != candidates[1]['AgentID'] and \
@@ -1436,7 +1375,6 @@ class SmartAgent(AgentInterface):
                                         #if self.neighbors[0]['AgentID'] == self.id:
                                              #logging.info(f'the agent{agent["AgentID"]} is moving backward,thus the other agent{priority_agent} has the priority')
 
-
         if priority_agent is None and len(candidates) == 2:
 
             # <rule 3 : choose the agent having a free neighbour node>
@@ -1447,9 +1385,6 @@ class SmartAgent(AgentInterface):
                 got_free_node2 = map.get_right_or_left_free_node(candidates[1]["pos"], candidates[0]["pos"],
                                                                  candidates[0]["next_next_node"])  #############
 
-                # if self.neighbors[0]['AgentID'] == self.id:
-                # logging.info(f'rule 3 : choose the agent having a free neighbour node')
-                # logging.info(f'free node of {candidates[0]["pos"]}= {got_free_node1}, free node of {candidates[1]["pos"]} = {got_free_node2}')
 
                 if got_free_node1 is None and got_free_node2 is not None:  # give the priority to this agent (it hasn't any free neighboring_node to got to)
                     priority_agent = candidates[0]['AgentID']
@@ -1535,8 +1470,7 @@ class SmartAgent(AgentInterface):
         elif len(candidates) == 1:
             priority_agent = candidates[0]['AgentID']
 
-        #if self.neighbors[1]['AgentID'] == self.id:
-            #logging.info(f'#####Agent {priority_agent} has the priority######')
+
         self.priority_neighbor = priority_agent
 
         # update variables:
@@ -1548,8 +1482,7 @@ class SmartAgent(AgentInterface):
         for neighbor in self.neighbors:  # two agents
             if neighbor['AgentID'] == priority_agent:
                 self.critic_node = neighbor['pos']  # this is the critic node and priority_agent should move
-                #if self.neighbors[0]['AgentID'] == self.id:
-                    #logging.info(f'critic node : {self.critic_node}')
+
                 break
 
         prohibited_node = None

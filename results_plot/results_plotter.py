@@ -157,7 +157,6 @@ def general_plot(filtered_res,axis,scen_num=np.nan,save_path:str='results_plot')
 r = import_results(RESULTS_FOLDER)
 filtered_res = filter_by_map(r)
 
-
 sucess_rate_plot(filtered_res)
 general_plot(filtered_res,['num_agents','soc'],scen_num=scen_num,save_path="results_plot")
 
