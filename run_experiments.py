@@ -28,7 +28,7 @@ def export_results(args, map, swarm, step, simulation_time, storage_path: str = 
     """
     store the simulation results
     """
-    file_path=str(map.pattern_file_path)
+    file_path=str(map.pattern_file_path).replace("txt", "map")
     data = {'map_name': file_path.replace("benchmarks/", ""),
             'map_size': map.size_x*map.size_y,
             'obstacles_number': map.number_of_obstacles,
@@ -41,7 +41,7 @@ def export_results(args, map, swarm, step, simulation_time, storage_path: str = 
     data = {k: [v] for k, v in data.items()}
     # 'num_replanned_paths':swarm.get_num_replanned_paths(),
     df = pd.DataFrame(data)
-    #print(data)
+
 
     if os.path.isfile(storage_path):
         df.to_csv(storage_path, mode='a', index=False, header=False)

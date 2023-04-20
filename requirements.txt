@@ -5,3 +5,4 @@ configargparse
 pandas
 pygame
 pyautogui
+pysimplegui
