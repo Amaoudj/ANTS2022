@@ -29,7 +29,7 @@ def export_results(args, map, swarm, step, simulation_time, storage_path: str = 
     store the simulation results
     """
     file_path=str(map.pattern_file_path)
-    data = {'map_name': file_path.replace("../swarm4I40sim/benchmarks/", ""),
+    data = {'map_name': file_path.replace("benchmarks/", ""),
             'map_size': map.size_x*map.size_y,
             'obstacles_number': map.number_of_obstacles,
             'num_agents': len(swarm.agents),
