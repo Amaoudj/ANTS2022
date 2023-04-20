@@ -544,10 +544,7 @@ class SmartAgent(AgentInterface):
             if priority_agent is None and len(candidates) > 1:
                 newlist = []
                 for agent in candidates:
-                    # if agent['next_next_node'] not in [cand['next_node'] for cand in candidates]:
-                    if agent['next_next_node'] not in [candidate['pos'] for candidate in candidates] and int(
-                            agent['remaining_nodes']) > 1:
-                        # if agent['next_next_node'] not in [candidate['next_node'] for candidate in candidates] and int(agent['remaining_nodes']) > 1:
+                    if agent['next_next_node'] not in [candidate['pos'] for candidate in candidates] and int(agent['remaining_nodes']) > 1:
                         newlist.append(agent)
                 if len(newlist) > 0:
                     candidates.clear()
@@ -556,46 +553,25 @@ class SmartAgent(AgentInterface):
                 if len(candidates) == 1:  # if only one candidate left then it will have the priority
                     priority_agent = candidates[0]['AgentID']
 
-            if priority_agent is None and len(candidates) == 2:  # both AGVs have a free neighboring_node or both AGVs don't have any free neighboring_node
+            if priority_agent is None and len(candidates) == 2:
                 for agent in candidates:
                     if agent['moving_backward'] or agent['moving_away']:
-                        # if self.neighbors[0]['AgentID'] == self.id:
-                        #    logging.info(f'the agent{agent["AgentID"]} is moving backward,thus the other agent will have the priority')
                         for n in candidates:
                             if n != agent:
                                 if agent['conflict_agent'] == n['AgentID']:
-                                    priority_agent = n['AgentID']
-                                    # if self.neighbors[0]['AgentID'] == self.id:
-                                    #    logging.info(f'Agent {priority_agent} has the priority')
-                                # else:
-                                # priority_agent = agent['AgentID']
+                                    priority_agent = n['AgentID']  #  robot Agent is moving out of the robot n, so  robot n is given priority to avoid livelock
 
             if priority_agent is None and len(candidates) > 1:  # in case of equality in rule 01 apply rule 02
+                # Find the maximum remaining nodes among all agents
+                max_remaining = max(agent['remaining_nodes'] for agent in candidates)
+                # Count the number of agents with the maximum remaining nodes
+                count = sum(1 for agent in candidates if agent['remaining_nodes'] == max_remaining)
 
-                if len(candidates) == 2:
+                if count == 1:  # only one agent
+                    remaining_node = [agent['remaining_nodes'] for agent in candidates]
+                    indx = remaining_node.index(max_remaining)
+                    priority_agent = candidates[indx]['AgentID']
 
-                    if candidates[0]['remaining_nodes'] > candidates[1]['remaining_nodes']:
-                        priority_agent = candidates[0]['AgentID']
-                    else:
-                        priority_agent = candidates[1]['AgentID']
-
-                else:
-                    remaining_node = []
-                    for i in candidates:
-                        remaining_node.append(i['remaining_nodes'])
-
-                    indx = remaining_node.index(max(remaining_node))
-                    longest_path = remaining_node[indx]
-
-                    newcandidates = [i for i in candidates if i['remaining_nodes'] == longest_path]
-                    candidates.clear()
-                    candidates.extend(newcandidates)
-
-                    if len(candidates) == 1:  # if only one candidate left then it will have the priority
-                        priority_agent = candidates[0]['AgentID']
-
-                        # if self.neighbors[0]['AgentID'] == self.id:
-                        #    logging.info(f'priority rule 03: True for agent{priority_agent}')
 
             if priority_agent is None and len(candidates) > 1:  # in case of equality in rule 01 apply rule 02
 
@@ -1559,7 +1535,7 @@ class SmartAgent(AgentInterface):
         #candidates_copy = candidates
         all_agents_move = True
 
-        #TODO comment out this part of the code
+        #TODO>> comment out this part of the code
         if len(candidates) > 1 :#and map.is_free(candidates[0]["next_node"]):  # == 2:
             for agent in candidates:
                 if agent["planned_action"] == "wait" : #and not agent['im_done']:
