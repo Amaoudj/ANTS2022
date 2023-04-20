@@ -1,8 +1,8 @@
 """ Main function """
 import os
 import sys
-sys.path.append('../swarm4I40sim')
-sys.path.append('../swarm4I40sim/swarmI4')
+#sys.path.append('../swarm4I40sim')
+#sys.path.append('../swarm4I40sim/swarmI4')
 import pandas as pd
 import configargparse
 from random import seed
@@ -19,12 +19,12 @@ import numpy as np
 import json
 
 parser = configargparse.get_arg_parser()
-RESULTS_PATH = '../swarm4I40sim/results_plot/results_data_solvers/DCMAPF/results.csv'
-MAP_STORAGE_PATH = '../swarm4I40sim/conf_experiments/maps_storage'
-BENCHMARK_STORAGE_PATH = '../swarm4I40sim/benchmarks'
-PLOTS_STORAGE_PATH = '../swarm4I40sim/conf_experiments/plots_storage'
+RESULTS_PATH = 'results_plot/results_data_solvers/DCMAPF/results.csv'#../swarm4I40sim/
+MAP_STORAGE_PATH = 'conf_experiments/maps_storage'
+BENCHMARK_STORAGE_PATH = 'benchmarks'
+PLOTS_STORAGE_PATH = 'conf_experiments/plots_storage'
 
-def export_results(args, map, swarm, step, simulation_time, storage_path: str = '../swarm4I40sim/results_plot/results_data_solvers/DCMAPF/results.csv'):
+def export_results(args, map, swarm, step, simulation_time, storage_path: str = 'results_plot/results_data_solvers/DCMAPF/results.csv'):
     """
     store the simulation results
     """
