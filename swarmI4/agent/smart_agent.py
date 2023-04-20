@@ -1093,7 +1093,7 @@ class SmartAgent(AgentInterface):
                                 self.special_path = [go_to_node1]  # , self.position
 
                             if agent_moving['AgentID'] == self.id:
-                                logging.info(f'agent{self.id} can move then')
+                                #logging.info(f'agent{self.id} can move then')
                                 self.action == "move"
                                 solution[agent_moving['AgentID']] = "move"
 
