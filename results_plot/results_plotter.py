@@ -105,7 +105,7 @@ def success_rate_plot(filtered_res):
         plt.xlabel('Number of robots', fontsize=13)
         plt.ylabel('Success rate', fontsize=13)
         plt.savefig(title)
-        plt.show()
+        #plt.show()
 
 
 def general_plot(filtered_res, axis):
@@ -147,9 +147,8 @@ def general_plot(filtered_res, axis):
         plt.xlabel('Number of robots', fontsize=13)
         plt.ylabel('Sum-of-costs', fontsize=13)
 
-        plt.savefig(title + ".pdf")
         plt.savefig(title)
-        plt.show()
+        #plt.show()
 
 def main():
    data = import_results(RESULTS_FOLDER)
