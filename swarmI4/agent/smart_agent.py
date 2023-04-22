@@ -76,19 +76,16 @@ class SmartAgent(AgentInterface):
             self.special_path = []
             self.num_pos_requests = 0
             self.num_followers = 0
-            # *************************
-            # ******uncertainty*******
-            # ************************
             self.goal_changed = False
             self.delay = False
             self.has_new_target = False
             self.has_delayed = False
             self.delay_steps = 0
             self.num_replanned_paths = 0
-            # ************ solve deadlocks and livlocks***********
             self.waitingThreshold = 8
             self.nodesThreshold = 7
             self.repetitionThreshold = 3
+
             # ***************** rules orders****************************
             self.priorityRuleTreeIntersectionConf = []
             self.priorityRuleTreeOppositeConf = []
@@ -271,6 +268,7 @@ class SmartAgent(AgentInterface):
 
             return predecessor
 
+
     def get_predecessors(self, map):
             """
             return the list of agent in front of me
@@ -382,9 +380,8 @@ class SmartAgent(AgentInterface):
 
             return ret
 
-
     def get_agent_object(self, agent_id):
-            return map.neighbors_agents_stat[agent_id]
+         return map.neighbors_agents_stat[agent_id]
 
     def check_for_conflict(self, map):
             # if len(self.remaining_path) >= 1:
@@ -1513,6 +1510,7 @@ class SmartAgent(AgentInterface):
         #if self.neighbors[0]['AgentID'] == self.id:
             #logging.info(f'Solution{solution}')
 
+
     def post_negotiation(self, map):
 
         #each agent checks if there are other agents planned the same next node, and then change their action to wait if they do not have a priority
@@ -1644,7 +1642,6 @@ class SmartAgent(AgentInterface):
               self.action = "wait"
               self.changed_action = True
         self.send_my_data(map)
-
 
     def post_coordination(self, map) -> tuple:
         """

@@ -6,3 +6,4 @@ pandas
 pygame
 pyautogui
 pysimplegui
+PySimpleGUI
