@@ -268,7 +268,9 @@ class Map(object):
             """
             random_node = None
             node_state = ''
-            while node_state != 'free_space':
+            num_tries = 0
+            while node_state != 'free_space' and num_tries< 100 :
+                num_tries += 1
                 random_node_id = np.random.choice(range(0, len(self._graph.nodes) - 1))
                 random_node = list(self._graph.nodes)[random_node_id]
                 node_state = self._graph.nodes[random_node]["state"]
@@ -281,8 +283,10 @@ class Map(object):
             :return: random node
             """
             random_node = None
+            num_tries=0
             node_state = ''
-            while node_state != 'obstacle':
+            while node_state != 'obstacle' and num_tries< 50 :
+                num_tries += 1
                 random_node_id = np.random.choice(range(0, len(self._graph.nodes) - 1))
                 random_node = list(self._graph.nodes)[random_node_id]
                 node_state = self._graph.nodes[random_node]["state"]
@@ -668,8 +672,8 @@ class Map(object):
 
             return _node
 
-    def get_nearest_randam_free_node(self, mypos):
-       _node = None
+    def get_nearest_random_free_node(self, mypos):
+       _node     = None
        num_tries = 0
        _node = self.free_neighboring_node(mypos, mypos)
        while _node is None or self.is_obstacle(_node) and num_tries < 100:

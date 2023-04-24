@@ -24,11 +24,13 @@ MAP_STORAGE_PATH = 'conf_experiments/maps_storage'
 BENCHMARK_STORAGE_PATH = 'benchmarks'
 PLOTS_STORAGE_PATH = 'conf_experiments/plots_storage'
 
+
 def export_results(args, map, swarm, step, simulation_time, storage_path: str = 'results_plot/results_data_solvers/DCMAPF/results.csv'):
     """
     store the simulation results
     """
     file_path=str(map.pattern_file_path).replace("txt", "map")
+
     data = {'map_name': file_path.replace("benchmarks/", ""),
             'map_size': map.size_x*map.size_y,
             'obstacles_number': map.number_of_obstacles,
@@ -286,9 +288,7 @@ def main(args,id=None,map = None, is_benchmark:bool=True):
                         nargs=1, metavar="process_id", type=int,
                         default=id)
 
-    #logging.basicConfig(format='%(asctime)s %(message)s')
-    #logging.root.setLevel(getattr(logging, args.loglevel.upper(), None))
-    #logging.info(f"Runtime arguments f{args}")
+
 
     my_experiment = globals()[args.experiment]()
     map_creation_counter = 0 # counts how many random map have been created
@@ -296,6 +296,11 @@ def main(args,id=None,map = None, is_benchmark:bool=True):
         my_sim = my_experiment.create_simulator(args)
         map_rep = save_map_pattern(my_sim.map, my_sim.swarm)
 
+        file_path = str(my_sim.map.pattern_file_path).replace(".txt", "")
+        mapName = file_path.replace("benchmarks/", "")
+        num_agents = len(my_sim.swarm.agents)
+
+        print(f'Running {num_agents} robots in the {mapName} map')
         if args.create_map and not args.run_experiments and args.num_random_maps > 0:
             if map_creation_counter < args.num_random_maps:
                 store_map_txt(MAP_STORAGE_PATH, map_rep)
@@ -320,7 +325,7 @@ def main(args,id=None,map = None, is_benchmark:bool=True):
             break
 
         sim_action = my_sim.main_loop(args)
-        print(args.create_map)
+        #print(args.create_map)
         if sim_action == None and (not args.create_map or args.run_experiments) : # the simulation ended normally ( without reset or stop )
             export_results(args,
                            my_sim.map,

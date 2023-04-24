@@ -16,19 +16,18 @@ from typing import Callable, Tuple
 class SmartAgent(AgentInterface):
 
     def __init__(self,conf,my_map,position,num_targets):
-        super().__init__(conf,position)
+            super().__init__(conf,position)
 
-        self._path_finder = PathFinder()
-        # initialize targets
-        self.num_targets = num_targets
-        self.target_list = []
-        self.targetReached= False
+            self._path_finder = PathFinder()
+            # initialize targets
+            self.num_targets = num_targets
+            self.target_list = []
+            self.targetReached= False
 
-        # create targets automatically
-        for n in range(0, self.num_targets):
-            target = my_map.get_random_free_node()
-            #if self.num_targets > 0 and len(self.target_list)==0:   #if num_targets == 0, then you should add targets manually
-               #self.target_list.append(target)  # make it a comment if you want to set the target pos manually
+            # create targets automatically
+            for n in range(0, self.num_targets):
+              target = my_map.get_random_free_node()
+
 
             # initial path info
             self.path = None
@@ -206,7 +205,7 @@ class SmartAgent(AgentInterface):
             if follower is not None:
                 _followers.append(follower)
                 agent_id = follower['AgentID']
-            steps = 0  # to avoid infinit loop
+            steps = 0
 
             while agent_id is not None and agent_id != self.id and steps < 20:
                 follower = self.get_follower_agent(map, agent_id)
@@ -280,7 +279,7 @@ class SmartAgent(AgentInterface):
                 agent_id = predecessor['AgentID']
             steps = 0
 
-            while (steps < 20 and predecessor is not None and predecessor['AgentID'] != self.id and predecessor['AgentID'] != _predecessors[-1]['AgentID']):  #
+            while (steps < 30 and predecessor is not None and predecessor['AgentID'] != self.id and predecessor['AgentID'] != _predecessors[-1]['AgentID']):  #
                 predecessor = self.get_leader_agent(map, agent_id)
                 steps += 1
                 if predecessor is not None and predecessor not in _predecessors and predecessor['AgentID'] != \
@@ -533,10 +532,8 @@ class SmartAgent(AgentInterface):
 
             if priority_agent is None and len(candidates) == 2:
 
-                got_free_node1 = map.get_right_or_left_free_node(candidates[0]["pos"], candidates[1]["pos"],
-                                                                 candidates[1]["next_next_node"])  #############
-                got_free_node2 = map.get_right_or_left_free_node(candidates[1]["pos"], candidates[0]["pos"],
-                                                                 candidates[0]["next_next_node"])  #############
+                got_free_node1 = map.get_right_or_left_free_node(candidates[0]["pos"], candidates[1]["pos"], candidates[1]["next_next_node"])  #############
+                got_free_node2 = map.get_right_or_left_free_node(candidates[1]["pos"], candidates[0]["pos"],candidates[0]["next_next_node"])  #############
 
                 if got_free_node1 is None and got_free_node2 is not None:  # give the priority to this agent (it hasn't any free neighboring_node to got to)
                     priority_agent = candidates[0]['AgentID']
@@ -544,9 +541,10 @@ class SmartAgent(AgentInterface):
                 elif got_free_node2 is None and got_free_node1 is not None:
                     priority_agent = candidates[1]['AgentID']
 
-            for agent in candidates:
-                if agent['pos']== critic_node:
-                    priority_agent = agent['AgentID']
+            #Already included
+            #for agent in candidates:
+            #    if agent['pos']== critic_node:
+            #        priority_agent = agent['AgentID']
 
             if priority_agent is None and len(candidates) > 1:
                 newlist = []
@@ -1249,7 +1247,7 @@ class SmartAgent(AgentInterface):
                                         mode = 2  # move backwaard and let the other
 
                                     if node2 is None:
-                                        node2 = map.get_nearest_randam_free_node(self.position)
+                                        node2 = map.get_nearest_random_free_node(self.position)
 
                                     if node2 is not None:
                                         if nearestFreenode is not None and self.is_target_between_two_nodes(
@@ -1330,6 +1328,7 @@ class SmartAgent(AgentInterface):
 
         self.next_waypoint = self.remaining_path[0]
 
+
     def solve_opposite_conflict(self, map, critic_node: tuple) -> tuple:
         """
         return the id of the agent with the priority to move in the next step
@@ -1346,6 +1345,17 @@ class SmartAgent(AgentInterface):
         else:
             self.conflict_agent = self.neighbors[0]['AgentID']
 
+        # choose the agent having a free neighbour node>
+        if priority_agent is None and len(candidates) == 2:
+
+                got_free_node1 = map.get_right_or_left_free_node(candidates[0]["pos"], candidates[1]["pos"], candidates[1]["next_next_node"])
+                got_free_node2 = map.get_right_or_left_free_node(candidates[1]["pos"], candidates[0]["pos"],candidates[0]["next_next_node"])
+
+                if got_free_node1 is None and got_free_node2 is not None:  # give the priority to this agent (it hasn't any free neighboring_node to got to)
+                    priority_agent = candidates[0]['AgentID']
+
+                elif got_free_node2 is None and got_free_node1 is not None:
+                    priority_agent = candidates[1]['AgentID']
 
 
         # choose the agent having the state 'moving_away' True
@@ -1376,27 +1386,6 @@ class SmartAgent(AgentInterface):
                                             self.moving_away = False
                                         #if self.neighbors[0]['AgentID'] == self.id:
                                              #logging.info(f'the agent{agent["AgentID"]} is moving backward,thus the other agent{priority_agent} has the priority')
-
-        # choose the agent having a free neighbour node>
-        if priority_agent is None and len(candidates) == 2:
-
-                got_free_node1 = map.get_right_or_left_free_node(candidates[0]["pos"], candidates[1]["pos"],
-                                                                 candidates[1]["next_next_node"])  #############
-                got_free_node2 = map.get_right_or_left_free_node(candidates[1]["pos"], candidates[0]["pos"],
-                                                                 candidates[0]["next_next_node"])  #############
-
-
-                if got_free_node1 is None and got_free_node2 is not None:  # give the priority to this agent (it hasn't any free neighboring_node to got to)
-                    priority_agent = candidates[0]['AgentID']
-                    # if self.neighbors[0]['AgentID'] == self.id:
-                    # logging.info(f'Node {got_free_node2} is free : {map.is_free(got_free_node2)}')
-                    # logging.info(f'Agent {priority_agent} has the priority')
-
-                elif got_free_node2 is None and got_free_node1 is not None:
-                    priority_agent = candidates[1]['AgentID']
-                    # if self.neighbors[0]['AgentID'] == self.id:
-                    # logging.info(f'Node {got_free_node1} is free : {map.is_free(got_free_node1)}')
-                    # logging.info(f'Agent {priority_agent} has the priority')
 
         # <choose the agent with the largest number of Followers >
         if priority_agent is None and len(candidates) == 2:
@@ -1509,7 +1498,6 @@ class SmartAgent(AgentInterface):
 
         #if self.neighbors[0]['AgentID'] == self.id:
             #logging.info(f'Solution{solution}')
-
 
     def post_negotiation(self, map):
 
@@ -2019,8 +2007,8 @@ class SmartAgent(AgentInterface):
 
 
     def readParameterConfiguration(self):
-        self.waitingThreshold = 6
-        self.nodesThreshold = 6
+        self.waitingThreshold = 5
+        self.nodesThreshold = 5
         self.repetitionThreshold = 3
 
     def next_step(self, map) -> None:
@@ -2141,7 +2129,7 @@ class SmartAgent(AgentInterface):
 
             # if neighbor is None: # no free neighboring node
 
-            node_ = map.get_nearest_randam_free_node(self.position)
+            node_ = map.get_nearest_random_free_node(self.position)
             # print(f'Found random node ***************: {node_}')
             if node_ is not None:
 
