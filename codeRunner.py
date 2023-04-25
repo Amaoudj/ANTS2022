@@ -19,14 +19,16 @@ def custom_sort_Benchmarks(file):
 
 def main():
 
-    benchmarks_ = os.listdir('benchmarks')
     new_Benchmark_list = sorted(os.listdir('benchmarks'), key=custom_sort_Benchmarks)
     new_Benchmark_list = [file for file in new_Benchmark_list if not file.endswith('.txt')]
-    print(" Running experiments on the following maps : ",new_Benchmark_list)
+    print("Running experiments on the following maps : ",new_Benchmark_list)
+    print("Please ensure that the number of robots in the <robot_set> variable in the configuration file match the order of the above maps")
 
     subprocess.run(["python3", target_Algorithm, "--config",config_file],stdout=subprocess.PIPE)
+    print("Simulations completed.")
+    print(" Plotting the comparative results in terms of success rate and sum-of-costs ...")
     subprocess.run(["python3", Plotter], stdout=subprocess.PIPE)
-    print("Simulations completed. Check the results_plot folder for the outcomes of DCMAPF.")
+    print("Done. Check the results_plot folder for the outcomes of DCMAPF.")
 
 if __name__ == "__main__":
     main()

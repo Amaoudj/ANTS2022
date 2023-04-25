@@ -146,7 +146,6 @@ def general_plot(filtered_res, axis):
         plt.legend(legend_list, fontsize=13)
         plt.xlabel('Number of robots', fontsize=13)
         plt.ylabel('Sum-of-costs', fontsize=13)
-
         plt.savefig(title)
         #plt.show()
 
