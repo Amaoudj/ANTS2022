@@ -1,6 +1,7 @@
 """ Main function """
 import os
 import sys
+import re
 #sys.path.append('../swarm4I40sim')
 #sys.path.append('../swarm4I40sim/swarmI4')
 import pandas as pd
@@ -289,9 +290,9 @@ def main(args,id=None,map = None, is_benchmark:bool=True):
                         default=id)
 
 
-
     my_experiment = globals()[args.experiment]()
     map_creation_counter = 0 # counts how many random map have been created
+
     while True:
         my_sim = my_experiment.create_simulator(args)
         map_rep = save_map_pattern(my_sim.map, my_sim.swarm)
@@ -380,6 +381,18 @@ def choose_map_to_run(arg,maps_folder):
     return maps_choices
 
 
+def custom_sort_Benchmarks(file):
+    """
+     custom sorting function to ensure that the sorting is done based on the letters in each string
+    """
+    # Remove file extension and split string by '-'
+    file_without_extensions = re.sub(r'\.txt$', '', file)
+    names = file_without_extensions.split('-')
+    names = [word for word in names if not word.isdigit()] # Keep only the words (non-numeric parts)
+
+    return '-'.join(names)
+
+
 def get_benchmarks_list(benchmarks_path='benchmarks'):
     """
     This function returns a list of all the files in the benchmarks directory
@@ -388,8 +401,10 @@ def get_benchmarks_list(benchmarks_path='benchmarks'):
     """
     benchmark_files  = []
     benchmark_names  = []
+    benchmarks_=os.listdir(benchmarks_path)
+    new_Benchmark_list = sorted(os.listdir(benchmarks_path), key=custom_sort_Benchmarks)
 
-    for benchmark in os.listdir(benchmarks_path):
+    for benchmark in new_Benchmark_list:
         if os.path.isfile(os.path.join(benchmarks_path, benchmark)):
             folder = os.path.join(benchmarks_path, benchmark.replace('.txt',''))
             files = os.listdir(folder)
@@ -398,8 +413,10 @@ def get_benchmarks_list(benchmarks_path='benchmarks'):
     return benchmark_files,benchmark_names
 
 def get_benchmark_data(bench_list):
+
     benchmarks_data = {}
     index = 0
+
     for benchmark_id, map_params in enumerate(zip(arg.robot_set, bench_list)):  # for every benchmark
         for robot_num in map_params[0]:  # for every robot number
             poses_in_maps = []
@@ -433,6 +450,7 @@ if __name__ == "__main__":
     if arg.run_experiments:
             if arg.map == 'BenchmarkMapGenerator':
                 bench_list,benchs_paths = get_benchmarks_list(BENCHMARK_STORAGE_PATH)
+                print(bench_list)
                 benchmarks_data,index = get_benchmark_data(bench_list)
                 processes = []
                 for i in range(0, index // arg.batch_size):
