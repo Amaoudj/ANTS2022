@@ -392,6 +392,11 @@ def custom_sort_Benchmarks(file):
 
     return '-'.join(names)
 
+def get_string_between_slashes(s: str) -> str:
+    split_str = s.split('/')
+    if len(split_str) >= 2:
+        return split_str[1]
+    return ''
 
 def get_benchmarks_list(benchmarks_path='benchmarks'):
     """
@@ -407,10 +412,13 @@ def get_benchmarks_list(benchmarks_path='benchmarks'):
     for benchmark in new_Benchmark_list:
         if os.path.isfile(os.path.join(benchmarks_path, benchmark)):
             folder = os.path.join(benchmarks_path, benchmark.replace('.txt',''))
+            #print(folder)
             files = os.listdir(folder)
             benchmark_files.append([os.path.join(folder,file) for file in files])
             benchmark_names.append(os.path.join(benchmarks_path, benchmark))
+
     return benchmark_files,benchmark_names
+
 
 def get_benchmark_data(bench_list):
 
@@ -418,7 +426,15 @@ def get_benchmark_data(bench_list):
     index = 0
 
     for benchmark_id, map_params in enumerate(zip(arg.robot_set, bench_list)):  # for every benchmark
-        for robot_num in map_params[0]:  # for every robot number
+        #print(map_params[0])
+        robot_set = []
+        mapName = get_string_between_slashes(bench_list[0][0])
+        if mapName == 'empty-48-48' or mapName =='random-64-64-20' or mapName =='warehouse-20-40-10-2-2' :
+            robot_set= [50, 100, 150, 200, 250, 300, 350, 400, 450]
+        elif mapName == 'random-32-32-20' :
+             robot_set = [50, 100, 150, 200]
+
+        for robot_num in robot_set:  # for every robot number in robot_set
             poses_in_maps = []
             for i, m_p in enumerate(map_params[1]):  # for every file in this benchmark folder
                 f = open(m_p, "r")
