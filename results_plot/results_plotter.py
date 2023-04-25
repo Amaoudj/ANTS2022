@@ -8,7 +8,7 @@ import os
 
 
 RESULTS_FOLDER = "results_plot/results_data_solvers"
-
+folder_path = "results_plot/plots/"
 
 FILTERS = ['map_name']
 
@@ -22,8 +22,7 @@ marker_styles = [
 
 SOLVERS = ['CBS', 'EECBS', 'PIBT', 'PIBT+', 'DCMAPF']
 
-ROBOT_SET = [[50, 100, 150, 200, 250, 300, 350, 400, 450], [50, 100, 150, 200], [50, 100, 150, 200, 250, 300, 450],
-             [50, 100, 150, 200, 250, 300, 350, 450]]
+ROBOT_SET = [[50, 100, 150, 200, 250, 300, 350, 400, 450], [50, 100, 150, 200], [50, 100, 150, 200, 250, 300, 450], [50, 100, 150, 200, 250, 300, 350, 450]]
 
 MAPS_TO_PLOT = ['empty-48-48.map', 'random-32-32-20.map', 'random-64-64-20.map','warehouse-20-40-10-2-2.map']
 
@@ -41,6 +40,7 @@ def import_results(folder: str) -> dict:
             solver = os.listdir(dir)[0]
             df = pd.read_csv(os.path.join(dir, solver))
             df['map_name'] = df['map_name'].str.replace('benchmarks/', '').to_frame()
+            df['map_name'] = df['map_name'].str.replace('benchmarks\\\\', '').to_frame()
             df['map_name'] = df['map_name'].str.replace('txt', 'map').to_frame()
             solvers_df[f] = df
             # print(solvers_df)
@@ -72,19 +72,19 @@ def success_rate_plot(filtered_res):
 
             try:
                 s_rates[solver][map] = {}
-
                 n_agents_groups = filtered_res[solver][map].groupby('num_agents')
 
                 for group in n_agents_groups:
                     if group[0] in ROBOT_SET[i]:
                         s_rate = 0
                         if 1 in group[1]['solved'].to_list() or True in group[1]['solved'].to_list():
-                            s_rate = group[1]['solved'].value_counts()[1] / len(group[1]['solved']) * 100
+                            #s_rate = group[1]['solved'].value_counts()[1] / len(group[1]['solved']) * 100
+                            s_rate = group[1]['solved'].mean() * 100
                         s_rates[solver][map][group[0]] = s_rate / 100.0
                     else:
                         pass
             except KeyError:
-                print(f'{map} do not exist in the result file of the folder {solver}')
+                print(f'{map} does not exist in the result file of the folder {solver}')
 
     for map in MAPS_TO_PLOT:
         legend_list = []
@@ -97,15 +97,16 @@ def success_rate_plot(filtered_res):
             except KeyError:
                 print(f'{map} do not exist in the solver : {solver}')
 
-        title = f'success rate in {map[:-4]}.png'
         # plt.title(title)
-
         plt.ylim(bottom=0, top=1.05)
         plt.legend(legend_list, fontsize=13)
         plt.xlabel('Number of robots', fontsize=13)
         plt.ylabel('Success rate', fontsize=13)
-        plt.savefig(title)
-        #plt.show()
+
+        title = f'success rate in {map[:-4]}.png'
+        file_path = folder_path + title
+        plt.savefig(file_path)
+        plt.show()
 
 
 def general_plot(filtered_res, axis):
@@ -146,8 +147,9 @@ def general_plot(filtered_res, axis):
         plt.legend(legend_list, fontsize=13)
         plt.xlabel('Number of robots', fontsize=13)
         plt.ylabel('Sum-of-costs', fontsize=13)
-        plt.savefig(title)
-        #plt.show()
+        file_path = folder_path + title
+        plt.savefig(file_path)
+        plt.show()
 
 def main():
    data = import_results(RESULTS_FOLDER)

@@ -21,14 +21,23 @@ def main():
 
     new_Benchmark_list = sorted(os.listdir('benchmarks'), key=custom_sort_Benchmarks)
     new_Benchmark_list = [file for file in new_Benchmark_list if not file.endswith('.txt')]
-    print("Running experiments on the following maps : ",new_Benchmark_list)
-    print("Please ensure that the number of robots in the <robot_set> variable in the configuration file match the order of the above maps")
+    print("Running experiments on the following maps : ", new_Benchmark_list)
+    with subprocess.Popen(["python3", target_Algorithm, "--config", config_file], stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE, text=True, bufsize=1, universal_newlines=True) as proc:
+        for line in proc.stdout:
+            print(line, end='')
+        for line in proc.stderr:
+            print(line, end='')
 
-    subprocess.run(["python3", target_Algorithm, "--config",config_file],stdout=subprocess.PIPE)
+    returncode = proc.returncode
+
+    print("-----------------------")
     print("Simulations completed.")
-    print(" Plotting the comparative results in terms of success rate and sum-of-costs ...")
+    print("-----------------------")
+    print("Plotting the comparative results in terms of success rate and sum-of-costs ...")
+    print("")
     subprocess.run(["python3", Plotter], stdout=subprocess.PIPE)
-    print("Done. Check the results_plot folder for the outcomes of DCMAPF.")
+    print("Done. Check the plots folder in results_plots for the outcomes of DCMAPF.")
 
 if __name__ == "__main__":
     main()

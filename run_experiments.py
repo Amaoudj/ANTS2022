@@ -450,7 +450,7 @@ if __name__ == "__main__":
     if arg.run_experiments:
             if arg.map == 'BenchmarkMapGenerator':
                 bench_list,benchs_paths = get_benchmarks_list(BENCHMARK_STORAGE_PATH)
-                print(bench_list)
+
                 benchmarks_data,index = get_benchmark_data(bench_list)
                 processes = []
                 for i in range(0, index // arg.batch_size):
