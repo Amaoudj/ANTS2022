@@ -25,8 +25,8 @@ class SmartAgent(AgentInterface):
             self.targetReached= False
 
             # create targets automatically
-            for n in range(0, self.num_targets):
-              target = my_map.get_random_free_node()
+            #for n in range(0, self.num_targets):
+            #  target = my_map.get_random_free_node()
 
 
             # initial path info
@@ -1247,7 +1247,8 @@ class SmartAgent(AgentInterface):
                                         mode = 2  # move backwaard and let the other
 
                                     if node2 is None:
-                                        node2 = map.get_nearest_random_free_node(self.position)
+                                        #node2 = map.get_nearest_random_free_node(self.position)
+                                        node2 = map.get_nearest_free_node(self.position)
 
                                     if node2 is not None:
                                         if nearestFreenode is not None and self.is_target_between_two_nodes(
@@ -2128,8 +2129,8 @@ class SmartAgent(AgentInterface):
             neighbor = map.free_neighboring_node(self.position, self.position)
 
             # if neighbor is None: # no free neighboring node
-
-            node_ = map.get_nearest_random_free_node(self.position)
+            #node_ = map.get_nearest_random_free_node(self.position)
+            node_ = map.get_nearest_free_node(self.position)
             # print(f'Found random node ***************: {node_}')
             if node_ is not None:
 

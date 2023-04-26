@@ -436,6 +436,7 @@ def get_benchmark_data(bench_list):
 
         for robot_num in robot_set:  # for every robot number in robot_set
             poses_in_maps = []
+
             for i, m_p in enumerate(map_params[1]):  # for every file in this benchmark folder
                 f = open(m_p, "r")
                 lines = f.readlines()
