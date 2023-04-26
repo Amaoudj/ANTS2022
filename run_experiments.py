@@ -400,9 +400,7 @@ def get_string_between_slashes(s: str) -> str:
 
 def get_benchmarks_list(benchmarks_path='benchmarks'):
     """
-    This function returns a list of all the files in the benchmarks directory
-
-    :param benchmarks_path: the directory that contains the benchmark files
+    This function returns a list of all the files in the benchmarks directo
     """
     benchmark_files  = []
     benchmark_names  = []
@@ -421,31 +419,29 @@ def get_benchmarks_list(benchmarks_path='benchmarks'):
 
 
 def get_benchmark_data(bench_list):
-
     #print(bench_list)# containe the list of 25 instances
-
     benchmarks_data = {}
     index = 0
 
-    # print(map_params[0])
-
-
     for benchmark_id, map_params in enumerate(zip(arg.robot_set , bench_list)):  # for every benchmark
-        #print(map_params[0])
-        #print(map_params[1][0])
+        #print(map_params[0])    # the number of robots from arg
+        #print(map_params[1][0]) # the map's path
 
         new_robot_set = []
         mapName = get_string_between_slashes(map_params[1][0])
+
         if mapName == 'empty-48-48' or mapName == 'random-64-64-20' or mapName == 'warehouse-20-40-10-2-2':
+            new_robot_set = []
             new_robot_set = [50, 100, 150, 200, 250, 300, 350, 400, 450]
+
         elif mapName == 'random-32-32-20':
-            new_robot_set.clear()
+            new_robot_set= []
             new_robot_set = [50, 100, 150, 200]
 
         for robot_num in new_robot_set:  # for every robot number in robot_set
             poses_in_maps = []
             for i, m_p in enumerate(map_params[1]):  # for every file in this benchmark folder
-                print(robot_num, m_p)
+                print(robot_num, m_p)  # the saved data in benchmarks_data{} Dic
                 f = open(m_p, "r")
                 lines = f.readlines()
                 lines.pop(0)

@@ -314,7 +314,7 @@ class Map(object):
             random_node = None
             num_tries=0
             node_state = ''
-            while node_state != 'obstacle' and num_tries< 50 :
+            while node_state != 'obstacle' and num_tries < 50 :
                 num_tries += 1
                 random_node_id = np.random.choice(range(0, len(self._graph.nodes) - 1))
                 random_node = list(self._graph.nodes)[random_node_id]

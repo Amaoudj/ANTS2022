@@ -207,13 +207,14 @@ class SmartAgent(AgentInterface):
                 agent_id = follower['AgentID']
             steps = 0
 
-            while agent_id is not None and agent_id != self.id and steps < 20:
+            while agent_id is not None and agent_id != self.id and steps < 40:
+                steps += 1
                 follower = self.get_follower_agent(map, agent_id)
                 if follower is None or follower['AgentID'] in (_f['AgentID'] for _f in _followers):
                     break
                 _followers.append(follower)
                 agent_id = follower['AgentID']
-                steps += 1
+
 
             return _followers
 
@@ -277,11 +278,13 @@ class SmartAgent(AgentInterface):
             if predecessor is not None and predecessor['AgentID'] != self.id:
                 _predecessors.append(predecessor)
                 agent_id = predecessor['AgentID']
-            steps = 0
+            reap = 0
 
-            while (steps < 30 and predecessor is not None and predecessor['AgentID'] != self.id and predecessor['AgentID'] != _predecessors[-1]['AgentID']):  #
+            while reap < 30 and predecessor is not None and predecessor['AgentID'] != self.id and predecessor['AgentID'] != _predecessors[-1]['AgentID']:  #
+
+                reap += 1
                 predecessor = self.get_leader_agent(map, agent_id)
-                steps += 1
+
                 if predecessor is not None and predecessor not in _predecessors and predecessor['AgentID'] != \
                         _predecessors[-1]['AgentID']:
                     _predecessors.append(predecessor)
@@ -2013,12 +2016,10 @@ class SmartAgent(AgentInterface):
         self.repetitionThreshold = 3
 
     def next_step(self, map) -> None:
-
-        """ Plan the next step of the agent
-        Deal with undesirable Likelocks and deadlocks
-        :returns: The next node
         """
-
+        Plan the next step of the agent
+        returns: The next node
+        """
         # plan the full path if you didn't do that before
         if len(self.target_list) > 0:
             if self.remaining_path is None:
@@ -2127,6 +2128,7 @@ class SmartAgent(AgentInterface):
             # print(f' AgentID: {self.id}, waitingtime 10, {self.position}, {self.target}')
 
             neighbor = map.free_neighboring_node(self.position, self.position)
+            saved_remaining_path = self.remaining_path
 
             # if neighbor is None: # no free neighboring node
             #node_ = map.get_nearest_random_free_node(self.position)
@@ -2146,8 +2148,7 @@ class SmartAgent(AgentInterface):
                     self.num_replanned_paths += 1
 
                 # remove my next node from the graph (changed: self.position and remove comment from: self.remaining_path.clear())
-                path_i = self._path_finder.astar_replan(map._copy_graph, node_, self.target_list[0],
-                                                        [self.remaining_path[len(self.remaining_path) - 2]])
+                path_i = self._path_finder.astar_replan(map._graph, node_, self.target_list[0],[self.remaining_path[len(self.remaining_path) - 2]])
                 if path_i is None:
                     path_i = self._path_finder.astar_planner(map._graph, node_, self.target_list[0])
                 if path_i is not None and len(path_i) > 0:
@@ -2156,7 +2157,10 @@ class SmartAgent(AgentInterface):
 
                     self.remaining_path.extend(path_i)  #
 
-        # tackle undesirable looping behavior
+                elif path_i is None or path is None:
+                    self.remaining_path.clear()
+                    self.remaining_path.extend(saved_remaining_path)  # keep the previous path
+
         if len(self.repeated_nodes) > self.nodesThreshold and not self.im_done:
             num_repeatitons = []
             for node in self.repeated_nodes:
@@ -2221,6 +2225,7 @@ class SmartAgent(AgentInterface):
                 if self.next_waypoint == self.next_target:
                     if self._current_target_id + 1 < len(self.target_list):
                         self._current_target_id += 1
+
 
     def move(self, map, sim_time, time_lapsed: float = 0):
         #self._current_target_id = 0      #######################
