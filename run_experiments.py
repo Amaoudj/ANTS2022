@@ -422,22 +422,30 @@ def get_benchmarks_list(benchmarks_path='benchmarks'):
 
 def get_benchmark_data(bench_list):
 
+    #print(bench_list)# containe the list of 25 instances
+
     benchmarks_data = {}
     index = 0
 
-    for benchmark_id, map_params in enumerate(zip(arg.robot_set, bench_list)):  # for every benchmark
+    # print(map_params[0])
+
+
+    for benchmark_id, map_params in enumerate(zip(arg.robot_set , bench_list)):  # for every benchmark
         #print(map_params[0])
-        robot_set = []
-        mapName = get_string_between_slashes(bench_list[0][0])
-        if mapName == 'empty-48-48' or mapName =='random-64-64-20' or mapName =='warehouse-20-40-10-2-2' :
-            robot_set= [50, 100, 150, 200, 250, 300, 350, 400, 450]
-        elif mapName == 'random-32-32-20' :
-             robot_set = [50, 100, 150, 200]
+        #print(map_params[1][0])
 
-        for robot_num in robot_set:  # for every robot number in robot_set
+        new_robot_set = []
+        mapName = get_string_between_slashes(map_params[1][0])
+        if mapName == 'empty-48-48' or mapName == 'random-64-64-20' or mapName == 'warehouse-20-40-10-2-2':
+            new_robot_set = [50, 100, 150, 200, 250, 300, 350, 400, 450]
+        elif mapName == 'random-32-32-20':
+            new_robot_set.clear()
+            new_robot_set = [50, 100, 150, 200]
+
+        for robot_num in new_robot_set:  # for every robot number in robot_set
             poses_in_maps = []
-
             for i, m_p in enumerate(map_params[1]):  # for every file in this benchmark folder
+                print(robot_num, m_p)
                 f = open(m_p, "r")
                 lines = f.readlines()
                 lines.pop(0)
@@ -448,12 +456,13 @@ def get_benchmark_data(bench_list):
                     poses = [eval(line[4]), eval(line[5]), eval(line[6]), eval(line[7])]
                     poses_in_map.append(poses)
                 f.close()
-                map['map_file'] = benchs_paths[benchmark_id]
-                map['pose_file'] = m_p
-                map['poses'] = poses_in_map
-                map['robots_num'] = robot_num
+                map['map_file']   = benchs_paths[benchmark_id] # the path of the map.txt
+                map['pose_file']  = m_p                        # the path of the scenarios
+                map['poses']      = poses_in_map               # starts and goals positions
+                map['robots_num'] = robot_num                  # related number of robots
                 benchmarks_data[index] = map
                 index += 1
+                #print(robot_num)
 
     return benchmarks_data,index
 
@@ -465,10 +474,13 @@ if __name__ == "__main__":
     arg.map = arg.map[0]
 
     if arg.run_experiments:
+
             if arg.map == 'BenchmarkMapGenerator':
                 bench_list,benchs_paths = get_benchmarks_list(BENCHMARK_STORAGE_PATH)
 
                 benchmarks_data,index = get_benchmark_data(bench_list)
+
+                #print(benchmarks_data)
                 processes = []
                 for i in range(0, index // arg.batch_size):
                     processes = []
@@ -495,7 +507,6 @@ if __name__ == "__main__":
 
                     for p  in processes:
                         p.join()
-
 
     else:
             main(arg)
