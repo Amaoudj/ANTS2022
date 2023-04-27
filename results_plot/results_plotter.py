@@ -106,7 +106,7 @@ def success_rate_plot(filtered_res):
         title = f'success rate in {map[:-4]}.png'
         file_path =  title
         plt.savefig(file_path)
-        plt.show()
+        #plt.show()
 
 
 def general_plot(filtered_res, axis):
@@ -149,7 +149,7 @@ def general_plot(filtered_res, axis):
         plt.ylabel('Sum-of-costs', fontsize=13)
         file_path =  title
         plt.savefig(file_path)
-        plt.show()
+        #plt.show()
 
 def main():
    data = import_results(RESULTS_FOLDER)
