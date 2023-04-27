@@ -489,13 +489,12 @@ if __name__ == "__main__":
                     for j in range(arg.batch_size):
                         p_id = j + i * arg.batch_size
                         robotNumber = benchmarks_data[p_id]['robots_num']
-
-
+                        Scenario = filename = os.path.basename(benchmarks_data[p_id]['pose_file'])
+                        print(f'Running {robotNumber} robots of the scenario {Scenario} ')
                         p = Process(id=p_id, arg=arg, map=benchmarks_data[p_id], benchmark=True)
                         p.start()
                         processes.append(p)
-                        Scenario=filename = os.path.basename(benchmarks_data[p_id]['pose_file'])
-                        print(f'Running {robotNumber} robots of the scenario {Scenario} ')
+
 
                     for p in processes:
                         p.join()
