@@ -9,7 +9,13 @@ import csv
 #import pyautogui
 import  random
 import  logging
+import signal
+from contextlib import contextmanager
 
+
+
+class TimeoutException(Exception):
+    pass
 
 class Swarm(object):
     """ This a wrapper for the all agents """
@@ -29,6 +35,17 @@ class Swarm(object):
         self.done    = False
         self.success = True
 
+    @contextmanager
+    def time_limit(self, seconds):
+        def signal_handler(signum, frame):
+            raise TimeoutException("Timed out!")
+
+        signal.signal(signal.SIGALRM, signal_handler)
+        signal.alarm(seconds)
+        try:
+            yield
+        finally:
+            signal.alarm(0)
 
     def create_swarm(self,args, agent_generators: List[Tuple[int, Func]], my_map: Map, placement_func: Func) -> None:
         """ Create the swarm according to the generators """
@@ -129,56 +146,52 @@ class Swarm(object):
     
 
     def move_all(self,simulation_time,dt=0) -> None:
-        """
-        Move all agents in the swarm
-        :world: The world
-        :returns: None
-        """
-        #logging.info(f'------------<New iteration started >-----------------------------')
-        num_robots = 0
-        total_num_calls = 0
-
-        for agent in self._agents:
+          """
+          Move all agents in the swarm
+          """
+          #logging.info(f'------------<New iteration started >-----------------------------')
+          num_robots = 0
+          total_num_calls = 0
+          for agent in self._agents:
             if type(agent) is SmartAgent:
                 agent.readParameterConfiguration()
 
-        for agent in self._agents:
+          for agent in self._agents:
             if type(agent) is SmartAgent:
                 agent.next_step(self._my_map)
 
-        # update msg box
-        self.update_msg_box()
+          # update msg box
+          self.update_msg_box()
 
-        for agent in self._agents:
+          for agent in self._agents:
             if type(agent) is SmartAgent:
                 agent.compute_local_data(self._my_map)
 
-        #print(f'Phase 01 : Handling conflicts ')
-        for agent in self._agents:
+          #print(f'Phase 01 : Handling conflicts ')
+          for agent in self._agents:
             if type(agent) is SmartAgent:
                 agent.handle_conflicts(self._my_map)
 
-        #print(f'Phase 02 :Agents_post_coordination() ...')
-        self.agents_post_coordination()
+          #print(f'Phase 02 :Agents_post_coordination() ...')
+          self.agents_post_coordination()
 
-
-        #print(f'Phase 03 : Agents are moving ...')
-        for agent in self._agents:
-          if type(agent) is SmartAgent:
+          #print(f'Phase 03 : Agents are moving ...')
+          for agent in self._agents:
+           if type(agent) is SmartAgent:
             if not agent.im_done:#len(agent.remaining_path) > 0 :
                agent.move(self._my_map,simulation_time, time_lapsed=dt)
 
-          else:
+           else:
               agent.move(self._my_map, simulation_time, time_lapsed=dt)
 
-        # update msg box
-        #self.update_msg_box()
+          # update msg box
+          #self.update_msg_box()
 
-        #clear this list for the next use
-        self._my_map.new_paths_node.clear()
-        self.Time_Step += 1
-        self.done = True
-        for agent in self._agents:
+          #clear this list for the next use
+          self._my_map.new_paths_node.clear()
+          self.Time_Step += 1
+          self.done = True
+          for agent in self._agents:
             if type(agent) is SmartAgent:
                 if not agent.im_done:
                     self.done = False
@@ -186,9 +199,8 @@ class Swarm(object):
             else:
                 self.done = False
                 break
-
-        #logging.info(f'------------< End iteration >-----------------------------')
-        for agent1 in self._agents:
+          #logging.info(f'------------< End iteration >-----------------------------')
+          for agent1 in self._agents:
             for agent2 in self._agents:
                 if agent1.id != agent2.id :
                     if agent1.position == agent2.position :
@@ -196,9 +208,9 @@ class Swarm(object):
                        break
                        #pyautogui.alert(text='Agents failed in finding solutions to a deadlock',title='Simulation failed',button='OK')
                        #logging.info(f'Agents failed in finding solutions to a deadlock')
-
                        #pyautogui.alert(text='Collision between : ' + str(agent1.id)+' from '+ str(agent1.last_node) + ' and ' +str(agent2.id) +' from ' +str(agent2.last_node), title='Conflict in node'+str(agent1.position),
                        #button='OK')
+
 
 
     def set_positions(self, position: int) -> None:

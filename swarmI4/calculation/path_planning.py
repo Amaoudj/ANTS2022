@@ -21,10 +21,9 @@ class PathFinder:
         agent_row,agent_col = agent_pos
         target_row,target_col = target_pos
         try:
-          path = nx.astar_path(graph, (agent_row, agent_col), (target_row, target_col))#,weight='weight'
+          path = nx.astar_path(graph, (agent_row, agent_col), (target_row, target_col)) #,weight='weight'
           return path
         except (nx.NetworkXNoPath, nx.NodeNotFound) as e:
-            #logging.info(f'No path found')
             return None
        else:
            return None
@@ -55,8 +54,7 @@ class PathFinder:
       """
       if agent_pos is not None and target_pos is not None:
        if    agent_pos != target_pos :
-        #G: nx.Graph = nx.Graph()
-        G = graph.copy()#copy.deepcopy(graph)
+        G = graph.copy()
 
         if neighbors_2_remove is not None and len(neighbors_2_remove) > 0 :
           for node_pos in neighbors_2_remove:

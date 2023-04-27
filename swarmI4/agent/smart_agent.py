@@ -205,8 +205,8 @@ class SmartAgent(AgentInterface):
             if follower is not None:
                 _followers.append(follower)
                 agent_id = follower['AgentID']
-            steps = 0
 
+            steps = 0
             while agent_id is not None and agent_id != self.id and steps < 40:
                 steps += 1
                 follower = self.get_follower_agent(map, agent_id)
@@ -385,6 +385,7 @@ class SmartAgent(AgentInterface):
     def get_agent_object(self, agent_id):
          return map.neighbors_agents_stat[agent_id]
 
+
     def check_for_conflict(self, map):
             # if len(self.remaining_path) >= 1:
             my_next_node = self.remaining_path[0]  # self.next_waypoint
@@ -424,10 +425,10 @@ class SmartAgent(AgentInterface):
     def compute_local_data(self, map):
 
             self.my_predecessors.clear()
-            self.leader = self.get_leader_agent(map, self.id)
+            self.leader          = self.get_leader_agent(map, self.id)
+            self.follower        = self.get_follower_agent(map, self.id)
             self.my_predecessors = self.get_predecessors(map)
-            self.follower = self.get_follower_agent(map, self.id)
-            self.followers = self.get_followers(map)
+            self.followers       = self.get_followers(map)
             self.num_pos_requests, self.num_followers = self.num_pos_requests_and_followers(map, self.position)
             self.send_my_data(map)
 
@@ -468,17 +469,11 @@ class SmartAgent(AgentInterface):
                 successor = self.follower  # self.get_follower_agent(map, self.id)
                 if successor is not None and successor["AgentID"] != self.id:
 
-                    if not self.is_agent_involved_in_opposite_conflict(map, successor) and not self.is_agent_involved_in_intersection_conflict(
-                            map, successor):
-                        if (successor["next_node"] == self.position) and (successor["next_next_node"] == my_next_node) and successor["remaining_nodes"] > len(
-                                self.remaining_path):
-                            if (len(self.remaining_path) > 10 and (successor["remaining_nodes"] > len(self.remaining_path) + 1)) or (
-                                    len(self.remaining_path) < 6 and (
-                                    successor["remaining_nodes"] > len(self.remaining_path))):
+                    if not self.is_agent_involved_in_opposite_conflict(map, successor) and not self.is_agent_involved_in_intersection_conflict( map, successor):
+                        if (successor["next_node"] == self.position) and (successor["next_next_node"] == my_next_node) and successor["remaining_nodes"] > len(self.remaining_path):
+                            if (len(self.remaining_path) > 10 and (successor["remaining_nodes"] > len(self.remaining_path) + 1)) or (len(self.remaining_path) < 6 and (successor["remaining_nodes"] > len(self.remaining_path))):
                                 got_free_node = None
-
-                                got_free_node = map.get_right_or_left_free_node(self.position, successor['pos'],
-                                                                                successor['next_next_node'])
+                                got_free_node = map.get_right_or_left_free_node(self.position, successor['pos'],successor['next_next_node'])
 
                                 for msg in map.neighbors_agents_stat:  # map.msg_box.values():
                                     if len(self.remaining_path) > 10 and (msg["next_node"] == got_free_node or msg[
@@ -1254,15 +1249,13 @@ class SmartAgent(AgentInterface):
                                         node2 = map.get_nearest_free_node(self.position)
 
                                     if node2 is not None:
-                                        if nearestFreenode is not None and self.is_target_between_two_nodes(
-                                                Agent_moving_Target, agent_done['pos'], node2):
+                                        if nearestFreenode is not None and self.is_target_between_two_nodes(Agent_moving_Target, agent_done['pos'], node2):
                                             nearestnode_befor_target = False
 
                                     if mode != 0 and not (nearestnode_befor_target and mode == 2):
 
                                         path1 = self._path_finder.astar_planner(map._copy_graph, self.position, node2)
-                                        path2 = self._path_finder.astar_planner(map._copy_graph, node2,
-                                                                                Agent_moving_Target)
+                                        path2 = self._path_finder.astar_planner(map._copy_graph, node2, Agent_moving_Target)
                                         self.next_target = Agent_moving_Target
                                         if path1 is not None and path2 is not None:
                                             self.moving_backward = False

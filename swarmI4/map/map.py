@@ -411,14 +411,12 @@ class Map(object):
                     else:
 
                         if col1 > col:  # search left side
-                            if self.is_free((row, col - 1)) and (row,
-                                                                 col - 1) != prohibited_node:  # self._graph.nodes[(row, col - 1)]["state"] == 'free_space' or self._graph.nodes[(row, col - 1)]["state"] == 'target':
+                            if self.is_free((row, col - 1)) and (row, col - 1) != prohibited_node:  # self._graph.nodes[(row, col - 1)]["state"] == 'free_space' or self._graph.nodes[(row, col - 1)]["state"] == 'target':
                                 _node = (row, col - 1)
                                 move_backward = True
 
                         else:  # search right side
-                            if self.is_free((row, col + 1)) and (row,
-                                                                 col + 1) != prohibited_node:  # self._graph.nodes[(row, col + 1)]["state"] == 'free_space' or self._graph.nodes[(row, col + 1)]["state"] == 'target':
+                            if self.is_free((row, col + 1)) and (row, col + 1) != prohibited_node:  # self._graph.nodes[(row, col + 1)]["state"] == 'free_space' or self._graph.nodes[(row, col + 1)]["state"] == 'target':
                                 _node = (row, col + 1)
                                 move_backward = True
 
@@ -434,13 +432,11 @@ class Map(object):
                     else:
 
                         if row1 > row:  # search Up-side
-                            if self.is_free((row - 1, col)) and (row - 1,
-                                                                 col) != prohibited_node:  # self._graph.nodes[(row- 1, col )]["state"] == 'free_space' or self._graph.nodes[(row- 1, col )]["state"] == 'target':########################
+                            if self.is_free((row - 1, col)) and (row - 1, col) != prohibited_node:  # self._graph.nodes[(row- 1, col )]["state"] == 'free_space' or self._graph.nodes[(row- 1, col )]["state"] == 'target':########################
                                 _node = (row - 1, col)
                                 move_backward = True
                         else:  # search down-side
-                            if self.is_free((row + 1, col)) and (row + 1,
-                                                                 col) != prohibited_node:  # self._graph.nodes[(row + 1, col)]["state"] == 'free_space' or self._graph.nodes[(row + 1, col)]["state"] == 'target':  ########################
+                            if self.is_free((row + 1, col)) and (row + 1,col) != prohibited_node:  # self._graph.nodes[(row + 1, col)]["state"] == 'free_space' or self._graph.nodes[(row + 1, col)]["state"] == 'target':  ########################
                                 _node = (row + 1, col)
                                 move_backward = True
 
@@ -668,7 +664,7 @@ class Map(object):
             i = 0
             num_tries = 0
 
-            while _node is None or self.is_obstacle(_node) and num_tries < 100:
+            while _node is None or self.is_obstacle(_node) and num_tries < 50:
                 num_tries += 1
                 i += 1
                 if row == row1:  # in the same line
@@ -696,7 +692,7 @@ class Map(object):
                             row1 += 1  # go
                         i = 0
 
-            if num_tries == 100:
+            if num_tries == 50:
                 _node = None
 
             return _node
@@ -705,7 +701,7 @@ class Map(object):
        _node     = None
        num_tries = 0
        _node = self.free_neighboring_node(mypos, mypos)
-       while _node is None or self.is_obstacle(_node) and num_tries < 100:
+       while _node is None or self.is_obstacle(_node) and num_tries < 50:
            num_tries +=1
            neighborhood = self.get_neighbors(mypos, diagonal=False)
            mypos =random.choice(neighborhood)

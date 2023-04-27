@@ -8,7 +8,7 @@ Plotter = 'results_plot/results_plotter.py'
 
 def custom_sort_Benchmarks(file):
     """
-     custom sorting function to ensure that the sorting is done based on the letters in each string
+    custom sorting function to ensure that the sorting is done based on the letters in each string
     """
     # Remove file extension and split string by '-'
     file_without_extensions = re.sub(r'\.txt$', '', file)

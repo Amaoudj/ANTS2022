@@ -386,12 +386,13 @@ def custom_sort_Benchmarks(file):
     # Remove file extension and split string by '-'
     file_without_extensions = re.sub(r'\.txt$', '', file)
     names = file_without_extensions.split('-')
+
     names = [word for word in names if not word.isdigit()] # Keep only the words (non-numeric parts)
 
     return '-'.join(names)
 
 def get_string_between_slashes(s: str) -> str:
-    split_str = s.split('/')
+    split_str = os.path.normpath(s).split(os.path.sep)
     if len(split_str) >= 2:
         return split_str[1]
     return ''
@@ -399,6 +400,7 @@ def get_string_between_slashes(s: str) -> str:
 def extract_number(filename):
     number = re.search(r'-(\d+)\.scen', filename)
     return int(number.group(1)) if number else 0
+
 
 def get_benchmarks_list(benchmarks_path='benchmarks'):
     """
@@ -489,12 +491,11 @@ if __name__ == "__main__":
                     for j in range(arg.batch_size):
                         p_id = j + i * arg.batch_size
                         robotNumber = benchmarks_data[p_id]['robots_num']
-                        Scenario = filename = os.path.basename(benchmarks_data[p_id]['pose_file'])
+                        Scenario = os.path.basename(benchmarks_data[p_id]['pose_file'])
                         print(f'Running {robotNumber} robots of the scenario {Scenario} ')
                         p = Process(id=p_id, arg=arg, map=benchmarks_data[p_id], benchmark=True)
                         p.start()
                         processes.append(p)
-
 
                     for p in processes:
                         p.join()
