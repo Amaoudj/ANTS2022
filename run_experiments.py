@@ -301,15 +301,13 @@ def main(args,id=None,map = None, is_benchmark:bool=True):
         mapName = file_path.replace("benchmarks/", "")
         num_agents = len(my_sim.swarm.agents)
 
-        print(f'Running {num_agents} robots in the {mapName} map')
+        #print(f'{mapName}')#{num_agents} robots
         if args.create_map and not args.run_experiments and args.num_random_maps > 0:
             if map_creation_counter < args.num_random_maps:
                 store_map_txt(MAP_STORAGE_PATH, map_rep)
-                #logging.info(f'you created {map_creation_counter} random maps')
                 map_creation_counter+=1
                 continue
             else:
-                #logging.info(f'you created {args.num_random_maps} random maps')
                 break
 
 
@@ -398,6 +396,10 @@ def get_string_between_slashes(s: str) -> str:
         return split_str[1]
     return ''
 
+def extract_number(filename):
+    number = re.search(r'-(\d+)\.scen', filename)
+    return int(number.group(1)) if number else 0
+
 def get_benchmarks_list(benchmarks_path='benchmarks'):
     """
     This function returns a list of all the files in the benchmarks directo
@@ -407,14 +409,16 @@ def get_benchmarks_list(benchmarks_path='benchmarks'):
     benchmarks_=os.listdir(benchmarks_path)
     new_Benchmark_list = sorted(os.listdir(benchmarks_path), key=custom_sort_Benchmarks)
 
-    for benchmark in new_Benchmark_list:
+    for benchmark in new_Benchmark_list:#new_Benchmark_list  #benchmarks_
         if os.path.isfile(os.path.join(benchmarks_path, benchmark)):
             folder = os.path.join(benchmarks_path, benchmark.replace('.txt',''))
-            #print(folder)
-            files = os.listdir(folder)
-            benchmark_files.append([os.path.join(folder,file) for file in files])
+
+            files = os.listdir(folder)  #files are not guaranteed to be in any specific order.
+            sorted_files = sorted(files, key=extract_number)
+            benchmark_files.append([os.path.join(folder,file) for file in sorted_files])
             benchmark_names.append(os.path.join(benchmarks_path, benchmark))
 
+    #print(benchmark_files)
     return benchmark_files,benchmark_names
 
 
@@ -441,7 +445,7 @@ def get_benchmark_data(bench_list):
         for robot_num in new_robot_set:  # for every robot number in robot_set
             poses_in_maps = []
             for i, m_p in enumerate(map_params[1]):  # for every file in this benchmark folder
-                print(robot_num, m_p)  # the saved data in benchmarks_data{} Dic
+                #print(robot_num, m_p)  # the saved data in benchmarks_data{} Dic
                 f = open(m_p, "r")
                 lines = f.readlines()
                 lines.pop(0)
@@ -458,7 +462,7 @@ def get_benchmark_data(bench_list):
                 map['robots_num'] = robot_num                  # related number of robots
                 benchmarks_data[index] = map
                 index += 1
-                #print(robot_num)
+
 
     return benchmarks_data,index
 
@@ -476,16 +480,19 @@ if __name__ == "__main__":
 
                 benchmarks_data,index = get_benchmark_data(bench_list)
 
-                #print(benchmarks_data)
                 processes = []
                 for i in range(0, index // arg.batch_size):
                     processes = []
                     for j in range(arg.batch_size):
                         p_id = j + i * arg.batch_size
+                        robotNumber = benchmarks_data[p_id]['robots_num']
+
+
                         p = Process(id=p_id, arg=arg, map=benchmarks_data[p_id], benchmark=True)
                         p.start()
                         processes.append(p)
-                        #logging.info(f'iteration {p_id} is finished')
+                        Scenario=filename = os.path.basename(benchmarks_data[p_id]['pose_file'])
+                        print(f'Running {robotNumber} robots of the scenario {Scenario} ')
 
                     for p in processes:
                         p.join()

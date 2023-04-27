@@ -22,8 +22,7 @@ def main():
     new_Benchmark_list = sorted(os.listdir('benchmarks'), key=custom_sort_Benchmarks)
     new_Benchmark_list = [file for file in new_Benchmark_list if not file.endswith('.txt')]
     print("Running experiments on the following maps : ", new_Benchmark_list)
-    with subprocess.Popen(["python3", target_Algorithm, "--config", config_file], stdout=subprocess.PIPE,
-                          stderr=subprocess.PIPE, text=True, bufsize=1, universal_newlines=True) as proc:
+    with subprocess.Popen(["python3", target_Algorithm, "--config", config_file], stdout=subprocess.PIPE,stderr=subprocess.PIPE, text=True, bufsize=1, universal_newlines=True) as proc:
         for line in proc.stdout:
             print(line, end='')
         for line in proc.stderr:
