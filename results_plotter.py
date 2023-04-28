@@ -63,8 +63,12 @@ def filter_by_map(results_df: dict):
 
 
 def success_rate_plot(filtered_res):
-    s_rates = {}
 
+    # Create the plots folder if it does not exist
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+
+    s_rates = {}
     for solver in filtered_res:
         s_rates[solver] = {}
 
