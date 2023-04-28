@@ -20,7 +20,7 @@ import numpy as np
 import json
 
 parser = configargparse.get_arg_parser()
-RESULTS_PATH = 'results_plot/results_data_solvers/DCMAPF/results.csv'#../swarm4I40sim/
+RESULTS_PATH = 'results_plot/results_data_solvers/DCMAPF/results.csv'
 MAP_STORAGE_PATH = 'conf_experiments/maps_storage'
 BENCHMARK_STORAGE_PATH = 'benchmarks'
 PLOTS_STORAGE_PATH = 'conf_experiments/plots_storage'

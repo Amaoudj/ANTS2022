@@ -3,7 +3,7 @@ import os
 import re
 config_file = 'configfiles/experiments_configuration.conf'
 target_Algorithm = 'run_experiments.py'
-Plotter = 'results_plot/results_plotter.py'
+Plotter = 'results_plotter.py'
 
 
 def custom_sort_Benchmarks(file):
@@ -18,6 +18,7 @@ def custom_sort_Benchmarks(file):
     return '-'.join(names)
 
 def main():
+
     new_Benchmark_list = sorted(os.listdir('benchmarks'), key=custom_sort_Benchmarks)
     new_Benchmark_list = [file for file in new_Benchmark_list if not file.endswith('.txt')]
     print("Running experiments on the following maps : ", new_Benchmark_list)
@@ -33,10 +34,13 @@ def main():
     print("----------------------------------------------")
     print("           < Simulations completed >")
     print("----------------------------------------------")
+    print("Check the results.csv file in results_plots>>results_data_solvers, for the outcomes of DCMAPF.")
+    print("")
+    print("")
     print("Plotting the comparative results in terms of success rate and sum-of-costs ...")
     print("")
     subprocess.run(["python3", Plotter], stdout=subprocess.PIPE)
-    print("Done. Check the plots folder <swarmI4> for the outcomes of DCMAPF.")
+    print("Done. Check the <plots> folder in <results_plots> for the outcomes of DCMAPF.")
 
 if __name__ == "__main__":
     main()
