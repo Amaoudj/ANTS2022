@@ -9,13 +9,8 @@ import csv
 #import pyautogui
 import  random
 import  logging
-import signal
-from contextlib import contextmanager
 
 
-
-class TimeoutException(Exception):
-    pass
 
 class Swarm(object):
     """ This a wrapper for the all agents """
@@ -35,17 +30,7 @@ class Swarm(object):
         self.done    = False
         self.success = True
 
-    @contextmanager
-    def time_limit(self, seconds):
-        def signal_handler(signum, frame):
-            raise TimeoutException("Timed out!")
 
-        signal.signal(signal.SIGALRM, signal_handler)
-        signal.alarm(seconds)
-        try:
-            yield
-        finally:
-            signal.alarm(0)
 
     def create_swarm(self,args, agent_generators: List[Tuple[int, Func]], my_map: Map, placement_func: Func) -> None:
         """ Create the swarm according to the generators """

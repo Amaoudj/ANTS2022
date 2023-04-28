@@ -103,9 +103,9 @@ def success_rate_plot(filtered_res):
         plt.xlabel('Number of robots', fontsize=13)
         plt.ylabel('Success rate', fontsize=13)
 
-        title = f'success rate in {map[:-4]}.png'
-        file_path =  title
-        plt.savefig(file_path)
+        title = f'Success rate in {map[:-4]}.png'
+        #file_path =  title
+        plt.savefig(title)
         #plt.show()
 
 
@@ -147,8 +147,8 @@ def general_plot(filtered_res, axis):
         plt.legend(legend_list, fontsize=13)
         plt.xlabel('Number of robots', fontsize=13)
         plt.ylabel('Sum-of-costs', fontsize=13)
-        file_path =  title
-        plt.savefig(file_path)
+        #file_path =  title
+        plt.savefig(title)
         #plt.show()
 
 def main():

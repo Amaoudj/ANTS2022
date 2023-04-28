@@ -76,7 +76,7 @@ class Simulator(object):
         self.steps_limit = 602
         sim_action       = None
 
-        while   not self._my_swarm.done and self._my_swarm.success and self._step < self.steps_limit:# and self._lapsed_time < 1200 :
+        while   not self._my_swarm.done and self._my_swarm.success and self._step < self.steps_limit:
             #time.sleep(0.9)
             if args.renderer == "PygameRenderer":
                 sim_action = self._renderer.display_frame(args,self._step,lapsed_time=self._lapsed_time)
