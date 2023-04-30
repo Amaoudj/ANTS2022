@@ -388,7 +388,7 @@ class Map(object):
     def get_Free_WayNode(self, node1, threshold_node, prohibited_node) -> tuple:
          """
             return the nearest node for the node1 while note passing threshold_node
-            :return: random node
+
          """
          _node = None
          move_backward = False
@@ -446,7 +446,6 @@ class Map(object):
     def get_right_or_left_free_node(self, node1, threshold_node,prohibited_node) -> tuple:  # search only in two sides
           """
             return the nearest node for the node1 while note passing threshold_node
-            :return: random node
           """
           _node = None
           if node1 is not None and threshold_node is not None:

@@ -1,6 +1,7 @@
 import subprocess
 import os
 import re
+
 config_file = 'configfiles/experiments_configuration.conf'
 target_Algorithm = 'run_experiments.py'
 Plotter = 'results_plotter.py'
@@ -34,7 +35,7 @@ def main():
     print("----------------------------------------------")
     print("           < Simulations completed >")
     print("----------------------------------------------")
-    print("Check the results.csv file in results_plots>>results_data_solvers, for the outcomes of DCMAPF.")
+    print("Check the results.csv file in results_plots >> results_data_solvers, for the outcomes of DCMAPF.")
     print("")
     print("")
     print("Plotting the comparative results in terms of success rate and sum-of-costs ...")

@@ -6,10 +6,9 @@ from swarmI4.agent.agent_placement import custom_placement
 import pandas as pd
 import os,sys
 import csv
-#import pyautogui
 import  random
 import  logging
-
+import pyautogui
 
 
 class Swarm(object):
@@ -79,6 +78,8 @@ class Swarm(object):
             if type(agent) is SmartAgent:
                 agent.post_negotiation(self._my_map)
 
+        self.update_msg_box()
+
         for i in range(0,6):
           self.update_msg_box()
           for agent in self._agents:
@@ -128,7 +129,6 @@ class Swarm(object):
         return cost
 
 
-    
 
     def move_all(self,simulation_time,dt=0) -> None:
           """
@@ -160,17 +160,19 @@ class Swarm(object):
           #print(f'Phase 02 :Agents_post_coordination() ...')
           self.agents_post_coordination()
 
+          self.update_msg_box()
+
           #print(f'Phase 03 : Agents are moving ...')
           for agent in self._agents:
            if type(agent) is SmartAgent:
-            if not agent.im_done:#len(agent.remaining_path) > 0 :
-               agent.move(self._my_map,simulation_time, time_lapsed=dt)
-
+             if not agent.im_done:#len(agent.remaining_path) > 0 :
+                agent.move(self._my_map,simulation_time, time_lapsed=dt)
+                #
            else:
               agent.move(self._my_map, simulation_time, time_lapsed=dt)
 
           # update msg box
-          #self.update_msg_box()
+          self.update_msg_box()
 
           #clear this list for the next use
           self._my_map.new_paths_node.clear()
@@ -190,12 +192,10 @@ class Swarm(object):
                 if agent1.id != agent2.id :
                     if agent1.position == agent2.position :
                        self.success    =  False
-                       break
-                       #pyautogui.alert(text='Agents failed in finding solutions to a deadlock',title='Simulation failed',button='OK')
-                       #logging.info(f'Agents failed in finding solutions to a deadlock')
-                       #pyautogui.alert(text='Collision between : ' + str(agent1.id)+' from '+ str(agent1.last_node) + ' and ' +str(agent2.id) +' from ' +str(agent2.last_node), title='Conflict in node'+str(agent1.position),
-                       #button='OK')
 
+                       #pyautogui.alert(text='Agents failed in finding solutions to a deadlock',title='Simulation failed',button='OK')
+                       pyautogui.alert(text='Collision between : ' + str(agent1.id)+' from '+ str(agent1.last_node) + ' and ' +str(agent2.id) +' from ' +str(agent2.last_node), title='Conflict in node'+str(agent1.position), button='OK')
+                       break
 
 
     def set_positions(self, position: int) -> None:

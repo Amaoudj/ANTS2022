@@ -91,21 +91,22 @@ class Simulator(object):
 
 
         if self._step >= self.steps_limit:
-            logging.info(f'The number of steps has exceeded the threshold')
+            logging.info(f'The number of time-steps has exceeded the threshold')
 
         if not self._my_swarm.success:
-            #pyautogui.alert(text='Simulation failed', title='Simulation', button='OK')
-            #logging.info(f'Simulation failed ! ')
-            print(f'Simulation failed ! ')
+
+            print(f'Simulation failed ')
 
         else:
           self._step -= 2  # remove the step to the start-node and the repeated step to end-node
-          #pyautogui.alert(text='End Task--Time_Step : '+str(self._step),title='Simulation is done', button='OK')
-          #logging.info(f'Simulation is done ! ')
+          if self._step == self.steps_limit - 2 :
+              print(f'Simulation failed >> robots could not reach their goals within the allowed time steps ')
+
+          else :
+              print('Simulation completed--Time-Steps : ', self._step)
 
         self.sum_cost=self._my_swarm.get_sum_cost()
 
-        print('Simulation completed--Time-Steps : ', self._step)
         if args.renderer == "PygameRenderer":
            self._renderer.display_frame(step=self._step, args=args)
            self._renderer.tear_down()
