@@ -470,8 +470,8 @@ class SmartAgent(AgentInterface):
                 if successor is not None and successor["AgentID"] != self.id:
 
                     if not self.is_agent_involved_in_opposite_conflict(map, successor) and not self.is_agent_involved_in_intersection_conflict(map, successor):
-                        if (successor["next_node"] == self.position) and (successor["next_next_node"] == my_next_node) and successor["remaining_nodes"] > len(self.remaining_path) + 1 :
-                            #if (len(self.remaining_path) > 10 and (successor["remaining_nodes"] > len(self.remaining_path) + 1)) or (len(self.remaining_path) < 6 and (successor["remaining_nodes"] > len(self.remaining_path))):
+                        if (successor["next_node"] == self.position) and (successor["next_next_node"] == my_next_node) and successor["remaining_nodes"] > len(self.remaining_path) :# + 1
+                            if (len(self.remaining_path) > 10 and (successor["remaining_nodes"] > len(self.remaining_path) + 1)) or (len(self.remaining_path) < 6 and (successor["remaining_nodes"] > len(self.remaining_path))):
 
                                 got_free_node = map.get_right_or_left_free_node(self.position, successor['pos'], successor['next_next_node'])
 
@@ -1137,13 +1137,11 @@ class SmartAgent(AgentInterface):
 
                                 ##################################################################################
 
-                                got_to_node2, m_ = map.get_Free_WayNode(agent_done['pos'], agent_moving['pos'],
-                                                                        agent_moving['next_next_node'])
+                                got_to_node2, m_ = map.get_Free_WayNode(agent_done['pos'], agent_moving['pos'], agent_moving['next_next_node'])
 
                                 if got_to_node2 is None:
                                     direction_node = self.get_back_node(agent_done['pos'], agent_moving['pos'])
-                                    nearestFreenode = map.get_nearest_free_node_on_right_left_mode(agent_done['pos'],
-                                                                                                   direction_node, 1)
+                                    nearestFreenode = map.get_nearest_free_node_on_right_left_mode(agent_done['pos'], direction_node, 1)
                                     # logging.info(f'direct_node{direction_node} --> nearestFreenode {nearestFreenode}: is between {self.is_node_between_two_nodes(nearestFreenode,agent_moving["pos"],agent_done["pos"])}')
 
                                     if nearestFreenode is not None and not self.is_target_between_two_nodes(
@@ -1278,6 +1276,7 @@ class SmartAgent(AgentInterface):
                     for agent in self.neighbors:
                         if agent['pos'] != critic_node:
                             solution[agent['AgentID']] = "wait"
+
 
         self.priority_neighbor = priority_agent
 
@@ -1989,9 +1988,9 @@ class SmartAgent(AgentInterface):
 
     def next_step(self, map) -> None:
 
-        """ Plan the next step of the agent
-        Deal with undesirable Likelocks and deadlocks
-        :returns: The next node
+        """
+        Plan the next step of the agent
+        returns: The next node
         """
 
         # plan the full path if you didn't do that before
@@ -1999,7 +1998,7 @@ class SmartAgent(AgentInterface):
             if self.remaining_path is None:
                 self.plan_path_to_all_targets(map)
                 self.im_done = False
-        # tackle deadlock
+
         if self.waiting_steps > self.waitingThreshold and not self.im_done and self.num_TRIES == 0:  # there is deadlock
             # plan another path
             # print(f' AgentID: {self.id}, waitingtime 6, {self.position}, {self.target}')
@@ -2128,7 +2127,7 @@ class SmartAgent(AgentInterface):
 
                     self.remaining_path.extend(path_i)  #
 
-        # tackle undesirable looping behavior
+
         if len(self.repeated_nodes) > self.nodesThreshold and not self.im_done:
             num_repeatitons = []
             for node in self.repeated_nodes:
@@ -2139,8 +2138,7 @@ class SmartAgent(AgentInterface):
             if (len(num_repeatitons) >= self.repetitionThreshold):
                 if self.last_node != self.position:
                     forbi_node = [self.last_node]
-                    path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target,
-                                                            forbi_node)  # _copy_graph
+                    path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target, forbi_node)  # _copy_graph
                     if path_i is not None and len(path_i) > 1:
                         # self.previous_foundPath= path_i
                         self.repeated_nodes.clear()
@@ -2232,12 +2230,9 @@ class SmartAgent(AgentInterface):
             self.waiting_steps = self.waiting_steps + 1  #self.waiting_steps +=1
             # logging.info(self.position)
 
-
         else: # your planned action is move
 
            if (self.next_waypoint is None):
-              # pyautogui.alert(text='Agent' + str(self.id) + ' with action ' + str(self._position) + ' is trying to reach a None node' , title='Moving to None node',
-              #     button='OK')
               self.action="wait"
               self.wait()
               self.waiting_steps = self.waiting_steps + 1

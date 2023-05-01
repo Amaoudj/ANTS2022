@@ -486,8 +486,8 @@ if __name__ == "__main__":
                     processes = []
                     for j in range(arg.batch_size):
                         p_id = j + i * arg.batch_size
-                        robotNumber = benchmarks_data[p_id]['robots_num']
-                        Scenario = os.path.basename(benchmarks_data[p_id]['pose_file'])
+                        robotNumber = benchmarks_data[p_id]['robots_num']               # used only to display data
+                        Scenario = os.path.basename(benchmarks_data[p_id]['pose_file']) # used only to display data
                         print(f'Running {robotNumber} robots of the scenario {Scenario} ')
                         p = Process(id=p_id, arg=arg, map=benchmarks_data[p_id], benchmark=True)
                         p.start()
