@@ -536,17 +536,16 @@ class SmartAgent(AgentInterface):
                 elif got_free_node2 is None and got_free_node1 is not None:
                     priority_agent = candidates[1]['AgentID']
 
-            if priority_agent is None and len(candidates) > 10:
-                newlist = []
-                for agent in candidates:
-                    if agent['next_next_node'] not in [candidate['pos'] for candidate in candidates] and int(agent['remaining_nodes']) > 1:
-                        newlist.append(agent)
-                if len(newlist) > 0:
-                    candidates.clear()
-                    candidates.extend(newlist)
-
-                if len(candidates) == 1:  # if only one candidate left then it will have the priority
-                    priority_agent = candidates[0]['AgentID']
+            #if priority_agent is None and len(candidates) > 10:
+            #    newlist = []
+            #    for agent in candidates:
+            #        if agent['next_next_node'] not in [candidate['pos'] for candidate in candidates] and int(agent['remaining_nodes']) > 1:
+            #            newlist.append(agent)
+            #    if len(newlist) > 0:
+            #        candidates.clear()
+            #        candidates.extend(newlist)
+            #    if len(candidates) == 1:  # if only one candidate left then it will have the priority
+            #        priority_agent = candidates[0]['AgentID']
 
             if priority_agent is None :
               if len(candidates) == 2:
