@@ -194,10 +194,9 @@ class Swarm(object):
                 if agent1.id != agent2.id :
                     if agent1.position == agent2.position :
                        self.success    =  False
-
                        #pyautogui.alert(text='Agents failed in finding solutions to a deadlock',title='Simulation failed',button='OK')
-                       pyautogui.alert(text='Collision between : ' + str(agent1.id)+' from '+ str(agent1.last_node) + ' and ' +str(agent2.id) +' from ' +str(agent2.last_node), title='Conflict in node'+str(agent1.position), button='OK')
-                       break
+                       #pyautogui.alert(text='Collision between : ' + str(agent1.id)+' from '+ str(agent1.last_node) + ' and ' +str(agent2.id) +' from ' +str(agent2.last_node), title='Conflict in node'+str(agent1.position), button='OK')
+                       #break
 
 
     def set_positions(self, position: int) -> None:

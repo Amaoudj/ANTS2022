@@ -1246,7 +1246,7 @@ class SmartAgent(AgentInterface):
                                             # self.moving_away = True
 
                                             path1.pop(0)
-                                            #path2.pop(0)
+                                            path2.pop(0)
 
                                             self.remaining_path = path1 + path2  #
 
