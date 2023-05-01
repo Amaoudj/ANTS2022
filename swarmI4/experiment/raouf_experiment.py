@@ -18,5 +18,5 @@ class RaoufExperiment(BaseExperiment):
 
     def _create_swarm(self, args, my_map: Map):
         #print(f"Create a swarm of multiple robots\n")
-        return Swarm(args, [(args.swarm_size, smart_agent_generator(args, my_map))], globals()[args.agent_placement],my_map)
+        return Swarm(args, [(args.swarm_size, smart_agent_generator(args, my_map))], globals()[args.agent_placement],my_map)   # agent_placement >> custum_placement (see agent_placement in agent folde)
 

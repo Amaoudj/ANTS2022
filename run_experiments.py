@@ -281,7 +281,7 @@ def main(args,id=None,map = None, is_benchmark:bool=True):
 
     if map != None:
 
-        args.pattern_map_file = map
+        args.pattern_map_file = map  # it\s the scenario to run, which is returned by the function get_benchmarks_data
 
 
     parser.add_argument("-pid", "--process_id",
@@ -290,11 +290,12 @@ def main(args,id=None,map = None, is_benchmark:bool=True):
                         default=id)
 
 
-    my_experiment = globals()[args.experiment]()
+    my_experiment = globals()[args.experiment]() #it looks up the value corresponding to the -args.experiment- key in the global symbol table, which includes all global variables and functions. It is expected to be a class or a function.
     map_creation_counter = 0 # counts how many random map have been created
 
     while True:
         my_sim = my_experiment.create_simulator(args)
+
         map_rep = save_map_pattern(my_sim.map, my_sim.swarm)
 
         file_path = str(my_sim.map.pattern_file_path).replace(".txt", "")
@@ -317,6 +318,7 @@ def main(args,id=None,map = None, is_benchmark:bool=True):
         else:
             sim_action = my_sim.start(args)
             map_rep = save_map_pattern(my_sim.map, my_sim.swarm)
+
         if sim_action == 'reset':
             #logging.info(f"Resetting the Simulation ...")
             continue

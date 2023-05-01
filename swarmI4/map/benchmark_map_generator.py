@@ -134,7 +134,7 @@ class BenchmarkMapGenerator(object):
 
         for row in range(0, self._number_of_nodes[0]):
             for col in range(0, self._number_of_nodes[1]):
-                if not pattern_map[row,col]:
+                if not pattern_map[row,col]: # obs positions
                     # logging.info(f"world {row}, {col}")
                     my_map.remove_node((row, col))
                     #######################################################################

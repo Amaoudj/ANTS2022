@@ -36,7 +36,7 @@ class Map(object):
         #self.msg_box= {}
         self.new_paths_node = {}
         self.num_agents = 0
-        self.neighbors_agents_stat= None
+        self.neighbors_agents_stat= None  # this list will be instanciated in the function create_swarm () in Swarm class according to the robots number
 
         # Update agent 0's stats
         #agent_stats[0] = {'next_node': (1, 2), 'moving_backward': False, ...}

@@ -470,7 +470,7 @@ class SmartAgent(AgentInterface):
                 if successor is not None and successor["AgentID"] != self.id:
 
                     if not self.is_agent_involved_in_opposite_conflict(map, successor) and not self.is_agent_involved_in_intersection_conflict(map, successor):
-                        if (successor["next_node"] == self.position) and (successor["next_next_node"] == my_next_node) and successor["remaining_nodes"] > len(self.remaining_path) + 1:#
+                        if (successor["next_node"] == self.position) and (successor["next_next_node"] == my_next_node) and successor["remaining_nodes"] > len(self.remaining_path) :#+ 1
                             #if (len(self.remaining_path) > 10 and (successor["remaining_nodes"] > len(self.remaining_path) + 1)) or (len(self.remaining_path) < 6 and (successor["remaining_nodes"] > len(self.remaining_path))):
 
                                 got_free_node = map.get_right_or_left_free_node(self.position, successor['pos'], successor['next_next_node'])

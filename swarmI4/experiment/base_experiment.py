@@ -17,7 +17,9 @@ class BaseExperiment(ExperimentInterface):
         pass
 
     def _get_map_generator(self, args):
-        """ Get the map generator for the experiment """
+        """
+         Get the map generator for the experiment by looking up the map class specified in the args.map attribute
+        """
         return globals()[args.map].create_from_args(args)
 
     def _create_swarm(self, args, my_map: Map):

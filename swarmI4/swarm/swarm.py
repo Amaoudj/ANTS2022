@@ -30,7 +30,7 @@ class Swarm(object):
         self.success = True
 
 
-
+    # called from RaoufExperiment class
     def create_swarm(self,args, agent_generators: List[Tuple[int, Func]], my_map: Map, placement_func: Func) -> None:
         """ Create the swarm according to the generators """
         self.changed_agents_list.clear()
@@ -42,16 +42,17 @@ class Swarm(object):
         else:
             total_number_of_agents = sum([agent_type[0] for agent_type in agent_generators])
 
-        my_map.neighbors_agents_stat = [None] * total_number_of_agents
+        my_map.neighbors_agents_stat = [None] * total_number_of_agents  # list of the agents stats
         self._my_map = my_map
 
         for number, gen in agent_generators:
             for i in range(total_number_of_agents):
-                position,targets= placement_func(i, total_number_of_agents, my_map)
+                position,targets= placement_func(i, total_number_of_agents, my_map)  #  agent_placement >> custum_placement (see agent_placement in agent folde)
+
                 if args.agent_placement == "random_placement":
                    targets, _ = placement_func(i, total_number_of_agents, my_map)
                 agent = gen(position)
-                if targets is not None and args.agent_placement != "random_placement":
+                if targets is not None and args.agent_placement != "random_placement":  # go to this function
                     agent.target_list.append(targets)
                     my_map.set_as_target(targets)
 
