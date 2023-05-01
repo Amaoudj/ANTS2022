@@ -29,7 +29,6 @@ class Swarm(object):
         self.done    = False
         self.success = True
 
-
     # called from RaoufExperiment class
     def create_swarm(self,args, agent_generators: List[Tuple[int, Func]], my_map: Map, placement_func: Func) -> None:
         """ Create the swarm according to the generators """
@@ -51,6 +50,7 @@ class Swarm(object):
 
                 if args.agent_placement == "random_placement":
                    targets, _ = placement_func(i, total_number_of_agents, my_map)
+
                 agent = gen(position)
                 if targets is not None and args.agent_placement != "random_placement":  # go to this function
                     agent.target_list.append(targets)
