@@ -1086,8 +1086,7 @@ class SmartAgent(AgentInterface):
                             # 1-check the number of free neighboring node of the other agent
                             neighbors = map.get_neighbors(agent_moving['pos'], diagonal=False)
                             for neighbor in neighbors:
-                                if self.is_node_between_two_nodes(neighbor, agent_moving['pos'],
-                                                                  agent_done['pos']) or neighbor == agent_done['pos']:
+                                if self.is_node_between_two_nodes(neighbor, agent_moving['pos'],agent_done['pos']) or neighbor == agent_done['pos']:
                                     neighbors.remove(neighbor)
 
                             number_free_neighbors = map.get_number_of_free_neighbors(neighbors)
@@ -1150,8 +1149,7 @@ class SmartAgent(AgentInterface):
                                     if nearestFreenode is not None and not self.is_target_between_two_nodes(
                                             Agent_moving_Target, agent_done['pos'],
                                             nearestFreenode):  # agent_moving['target'] != agent_done['my_last_node'] and agent_moving['target'] not in map.get_neighbors(agent_done['pos'],diagonal=False):
-                                        got_to_node2, m_ = map.get_Free_WayNode(agent_done['pos'], agent_moving['pos'],
-                                                                                agent_moving['pos'])
+                                        got_to_node2, m_ = map.get_Free_WayNode(agent_done['pos'], agent_moving['pos'], agent_moving['pos'])
 
                                 if got_to_node2 is None:
                                     special_traitement = True
@@ -1166,7 +1164,7 @@ class SmartAgent(AgentInterface):
                                     i = 1
                                     if got_to_node2 is not None and i == 0:  # *******************
                                         self.moving_backward = True
-                                        self.remaining_path[0:0] = [ got_to_node2]  #################,self.positionI addade self.position##############################
+                                        self.remaining_path[0:0] = [ got_to_node2]
                                         # logging.info(f'agent{self.id} done & solved--> move_backward--remaining path: {self.remaining_path}')
 
                                         self.special_path[0:0] = [got_to_node2]  # ,self.position
@@ -1178,11 +1176,9 @@ class SmartAgent(AgentInterface):
                                         node_ = None
 
                                         if agent_done_back_node_is_free:
-                                            node_ = map.get_nearest_free_node_on_right_left_mode(self.position,
-                                                                                                 back_node, 1)
+                                            node_ = map.get_nearest_free_node_on_right_left_mode(self.position, back_node, 1)
                                         else:
-                                            node_ = map.get_nearest_free_node_on_right_left_mode(self.position,
-                                                                                                 agent_moving['pos'], 1)
+                                            node_ = map.get_nearest_free_node_on_right_left_mode(self.position, agent_moving['pos'], 1)
 
                                         # logging.info(f'found_nearest_node: {node_}')
                                         path = self._path_finder.astar_planner(map._graph, agent_done['pos'], node_)
@@ -1197,6 +1193,7 @@ class SmartAgent(AgentInterface):
                                             path.reverse()
                                             self.remaining_path[0:0] = path  #
                                             self.special_path[0:0] = path
+                                            #print(self.remaining_path)
 
                                         else:
                                             solution[agent_done['AgentID']] = "wait"
@@ -1238,8 +1235,7 @@ class SmartAgent(AgentInterface):
                                         node2 = map.get_nearest_free_node(self.position)
 
                                     if node2 is not None:
-                                        if nearestFreenode is not None and self.is_target_between_two_nodes(
-                                                Agent_moving_Target, agent_done['pos'], node2):
+                                        if nearestFreenode is not None and self.is_target_between_two_nodes( Agent_moving_Target, agent_done['pos'], node2):
                                             nearestnode_befor_target = False
 
                                     if mode != 0 and not (nearestnode_befor_target and mode == 2):
@@ -1253,7 +1249,7 @@ class SmartAgent(AgentInterface):
                                             # self.moving_away = True
 
                                             path1.pop(0)
-                                            path2.pop(0)
+                                            #path2.pop(0)
 
                                             self.remaining_path = path1 + path2  #
 
