@@ -442,7 +442,7 @@ def get_benchmark_data(bench_list):
 
         elif mapName == 'random-32-32-20':
             new_robot_set= []
-            new_robot_set = [150, 200]
+            new_robot_set = [200]
 
         for robot_num in new_robot_set:  # for every robot number in robot_set
             poses_in_maps = []
