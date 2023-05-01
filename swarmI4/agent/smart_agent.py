@@ -152,7 +152,7 @@ class SmartAgent(AgentInterface):
 
     def readParameterConfiguration(self):
         self.waitingThreshold = 5
-        self.nodesThreshold   = 5
+        self.nodesThreshold   = 4
         self.repetitionThreshold = 3
 
 
@@ -536,7 +536,7 @@ class SmartAgent(AgentInterface):
                 elif got_free_node2 is None and got_free_node1 is not None:
                     priority_agent = candidates[1]['AgentID']
 
-            if priority_agent is None and len(candidates) > 1:
+            if priority_agent is None and len(candidates) > 10:
                 newlist = []
                 for agent in candidates:
                     if agent['next_next_node'] not in [candidate['pos'] for candidate in candidates] and int(agent['remaining_nodes']) > 1:
@@ -566,7 +566,7 @@ class SmartAgent(AgentInterface):
 
             if priority_agent is None and len(candidates) > 1:  # in case of equality in rule 01 apply rule 02
                 # Find the maximum remaining nodes among all agents
-                min_remaining = min(agent['remaining_nodes'] for agent in candidates)
+                min_remaining = max(agent['remaining_nodes'] for agent in candidates)
                 # Count the number of agents with the maximum remaining nodes
                 count = sum(1 for agent in candidates if agent['remaining_nodes'] == min_remaining)
 
@@ -2155,7 +2155,7 @@ class SmartAgent(AgentInterface):
                         self.remaining_path.extend(path_i)  #
                         self.num_replanned_paths += 1
 
-        if len(self.all_repeated_nodes) > 15 and not self.im_done:
+        if len(self.all_repeated_nodes) > 10 and not self.im_done:
             num_repeatitons = []
             for node in self.all_repeated_nodes:
                 rep = self.all_repeated_nodes.count(node)
