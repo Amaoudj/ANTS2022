@@ -56,6 +56,7 @@ class Swarm(object):
                     my_map.set_as_target(targets)
 
                 agent.id = i
+
                 # set targets as they come in the custom map
                 my_map.add_agent_to_map(agent)
                 agent.send_my_position(my_map)
