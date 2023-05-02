@@ -562,7 +562,6 @@ class SmartAgent(AgentInterface):
                     indx = remaining_node.index(max_remaining)
                     priority_agent = candidates[indx]['AgentID']
 
-
             if priority_agent is None and len(candidates) > 1:  # in case of equality in rule 01 apply rule 02
 
                 highest_requests_num = []
@@ -606,6 +605,7 @@ class SmartAgent(AgentInterface):
                     priority_agent = max([agent['AgentID'] for agent in candidates])
                     # if self.neighbors[0]['AgentID'] == self.id:
                     # logging.info( f'last rule failed--we take the agent with the highest id : (agent{priority_agent})')
+
 
         prohibited_node = None
         threshold_node = None
@@ -1384,8 +1384,6 @@ class SmartAgent(AgentInterface):
                                       if agent['AgentID'] == self.id:
                                           self.moving_away = False
 
-
-
         # choose the agent with highest num_pos_requests>
         if priority_agent is None and len(candidates) == 2:
 
@@ -2077,40 +2075,6 @@ class SmartAgent(AgentInterface):
                         # self.waiting_step = 0
 
 
-        if self.waiting_steps > 80 and not self.im_done and self.num_TRIES == 4:  # try for the last time to solve it.
-            self.num_TRIES = 0
-            self.waiting_step = 4  # to start from the first try
-
-
-            neighbor = map.free_neighboring_node(self.position, self.position)
-
-            # if neighbor is None: # no free neighboring node
-            node_ = map.get_nearest_free_node(self.position)
-            #print(f'Found random node ***************: {node_}')
-            if node_ is not None:
-
-                path = self._path_finder.astar_planner(map._graph, self.position, node_)
-                if path is not None and len(path) > 0:
-                    self.moving_backward = False
-                    self.moving_away = True
-                    if path[0] == self.position and self.position != self.target_list[0]:
-                        path.pop(0)
-                    self.path = path
-                    self.remaining_path.clear()
-                    self.remaining_path.extend(path)  #
-                    self.num_replanned_paths += 1
-
-                # remove my next node from the graph (changed: self.position and remove comment from: self.remaining_path.clear())
-                path_i = self._path_finder.astar_replan(map._copy_graph, node_, self.target_list[0], [self.remaining_path[len(self.remaining_path) - 2]])
-                if path_i is None:
-                    path_i = self._path_finder.astar_planner(map._graph, node_, self.target_list[0])
-                if path_i is not None and len(path_i) > 0:
-                    if path_i[0] == node_ and self.position != self.target_list[0]:  # self.position
-                        path_i.pop(0)
-
-                    self.remaining_path.extend(path_i)  #
-
-
         if len(self.all_visited_nodes) > 15 and not self.im_done:
             num_repeatitons = []
             for node in self.all_visited_nodes:
@@ -2131,6 +2095,7 @@ class SmartAgent(AgentInterface):
                         self.remaining_path.clear()
                         self.remaining_path.extend(path_i)  #
                         self.num_replanned_paths += 1
+
 
 
         if self.remaining_path is None or len(self.remaining_path) == 0:
