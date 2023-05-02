@@ -2000,11 +2000,11 @@ class SmartAgent(AgentInterface):
             neighbor = map.free_neighboring_node(self.position, self.position)
             if neighbor is not None: # only robots on boarder will plan their path
 
-                neighbors_to_remove = self.get_node_to_remove_replan_path(map)
-                #neighbors_to_remove = map.get_all_neighbors(self.position)
-                #for node in neighbors_to_remove:
-                #    if map.is_free(node) :
-                #        neighbors_to_remove.remove(node)
+                #neighbors_to_remove = self.get_node_to_remove_replan_path(map)
+                neighbors_to_remove = map.get_all_neighbors(self.position)
+                for node in neighbors_to_remove:
+                    if map.is_free(node) :
+                        neighbors_to_remove.remove(node)
 
                 if self.target in neighbors_to_remove :
                        neighbors_to_remove.remove(self.target )
@@ -2121,6 +2121,28 @@ class SmartAgent(AgentInterface):
                         path_i.pop(0)
 
                     self.remaining_path.extend(path_i)  #
+
+
+        if len(self.all_repeated_nodes) > 15 and not self.im_done:
+            num_repeatitons = []
+            for node in self.all_repeated_nodes:
+                rep = self.all_repeated_nodes.count(node)
+                if rep > 2:  # a node already visited two times
+                    num_repeatitons.append(rep)
+
+            if (len(num_repeatitons) >= 10):
+                if self.last_node != self.position:
+                    forbi_node = [self.last_node]
+                    path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target, forbi_node)
+
+                    if path_i is not None and len(path_i) > 1:
+                        self.repeated_nodes.clear()
+                        self.all_repeated_nodes.clear()
+                        if path_i[0] == self.position:
+                            path_i.pop(0)
+                        self.remaining_path.clear()
+                        self.remaining_path.extend(path_i)  #
+                        self.num_replanned_paths += 1
 
 
         if self.remaining_path is None or len(self.remaining_path) == 0:
