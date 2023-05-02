@@ -53,7 +53,7 @@ class PathFinder:
         :return:
       """
       if agent_pos is not None and target_pos is not None:
-       if    agent_pos != target_pos :
+       if agent_pos != target_pos :
         G = graph.copy()
 
         if neighbors_2_remove is not None and len(neighbors_2_remove) > 0 :
