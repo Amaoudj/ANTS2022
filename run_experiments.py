@@ -281,7 +281,7 @@ def main(args,id=None,map = None, is_benchmark:bool=True):
 
     if map != None:
 
-        args.pattern_map_file = map  # it\s the scenario to run, which is returned by the function get_benchmarks_data
+        args.pattern_map_file = map  # it iss the scenario to run, which is returned by the function get_benchmarks_data
 
 
     parser.add_argument("-pid", "--process_id",

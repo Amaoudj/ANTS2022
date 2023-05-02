@@ -158,6 +158,7 @@ class Map(object):
 
         return _node
 
+
     def add_agent_to_map(self, agent: AgentInterface):
             assert self._graph.nodes[agent.position]["agent"] is None, \
                 f"Trying to place an agent at a none free location {agent.position}"
@@ -289,6 +290,27 @@ class Map(object):
                         (row, col - 1),
                         (row + 1, col),
                         (row - 1, col)]
+
+
+    def get_all_neighbors(self, node_pos):
+
+        first_level_neighbors = self.get_neighbors(node_pos, diagonal=False)
+        all_neighbors = set(first_level_neighbors)
+
+        for neighbor in first_level_neighbors:
+            second_level_neighbors = self.get_neighbors(neighbor, diagonal=False)
+            all_neighbors.update(second_level_neighbors)
+
+        for neighbor in second_level_neighbors:
+            third_level_neighbors = self.get_neighbors(neighbor, diagonal=False)
+            all_neighbors.update(third_level_neighbors)
+
+
+        # Remove the original node position
+        all_neighbors.discard(node_pos)
+
+        return list(all_neighbors)
+
 
     def get_random_free_node(self) -> tuple:
             """
