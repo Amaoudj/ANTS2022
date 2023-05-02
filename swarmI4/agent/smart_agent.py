@@ -1995,31 +1995,21 @@ class SmartAgent(AgentInterface):
 
         if self.waiting_steps > 4 and not self.im_done and self.num_TRIES == 0:
             self.num_TRIES += 1
-
             neighbor = map.free_neighboring_node(self.position, self.position)
-            if neighbor is not None: # only robots on boarder will plan their path
+            if neighbor is not None:
 
-                #neighbors_to_remove = self.get_node_to_remove_replan_path(map)
-                neighbors_to_remove = map.get_all_neighbors(self.position)
-                for node in neighbors_to_remove:
-                    if map.is_free(node) :
-                        neighbors_to_remove.remove(node)
+                neighbors_to_remove = self.get_node_to_remove_replan_path(map)
+                if len(neighbors_to_remove) < 4:
 
-                if self.target in neighbors_to_remove :
-                       neighbors_to_remove.remove(self.target )
-
-                if len(neighbors_to_remove) > 0:#:< 4
-
-                    path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target, neighbors_to_remove)  # neighbors
+                    path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target,
+                                                            neighbors_to_remove)  # neighbors
 
                     if path_i is not None and len(path_i) > 0:
 
-                        if path_i[0] == self.position and self.position != self.target:
+                        if path_i[0] == self.position:
                             path_i.pop(0)
-
                         self.remaining_path.clear()
                         self.remaining_path.extend(path_i)  #
-                        self.num_replanned_paths += 1
 
         if self.waiting_steps > 5 and not self.im_done and self.num_TRIES == 1:  # there is another deadlock
 
