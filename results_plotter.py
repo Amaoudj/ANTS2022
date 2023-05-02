@@ -81,9 +81,14 @@ def success_rate_plot(filtered_res):
                 for group in n_agents_groups:
                     if group[0] in ROBOT_SET[i]:
                         s_rate = 0
-                        if 1 in group[1]['solved'].to_list() or True in group[1]['solved'].to_list():
-                            #s_rate = group[1]['solved'].value_counts()[1] / len(group[1]['solved']) * 100
-                            s_rate = group[1]['solved'].mean() * 100
+
+                        # Filter out non-numeric values using pd.to_numeric()
+                        solved_numeric = pd.to_numeric(group[1]['solved'], errors='coerce')
+
+                        if 1 in solved_numeric.to_list() or True in solved_numeric.to_list():
+                        #if 1 in group[1]['solved'].to_list() or True in group[1]['solved'].to_list():
+                            s_rate = solved_numeric.mean() * 100
+
                         s_rates[solver][map][group[0]] = s_rate / 100.0
                     else:
                         pass
