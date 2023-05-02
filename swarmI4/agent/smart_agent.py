@@ -1993,9 +1993,8 @@ class SmartAgent(AgentInterface):
                 self.plan_path_to_all_targets(map)
                 self.im_done = False
 
-        if self.waiting_steps > 4 :  # there is deadlock
+        if self.waiting_steps > 4 and not self.im_done and self.num_TRIES == 0:
             self.num_TRIES += 1
-            self.waiting_steps += 1
 
             neighbor = map.free_neighboring_node(self.position, self.position)
             if neighbor is not None: # only robots on boarder will plan their path
@@ -2009,7 +2008,7 @@ class SmartAgent(AgentInterface):
                 if self.target in neighbors_to_remove :
                        neighbors_to_remove.remove(self.target )
 
-                if len(neighbors_to_remove) >0:#:< 4
+                if len(neighbors_to_remove) > 0:#:< 4
 
                     path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target, neighbors_to_remove)  # neighbors
 
@@ -2022,37 +2021,7 @@ class SmartAgent(AgentInterface):
                         self.remaining_path.extend(path_i)  #
                         self.num_replanned_paths += 1
 
-        if self.waiting_steps > 5 :  # there is deadlock
-            self.waiting_steps = 4
-            neighbor = map.free_neighboring_node(self.position, self.position)
-            self.num_TRIES += 1
-            if neighbor is not None:
-                neighbors1 = map.get_neighbors(self.position, diagonal=False)
-                for n in neighbors1:
-                    if n not in map._graph.nodes or not map.within_map_size(n):
-                        neighbors1.remove(n)
-
-                neighbors = []
-                for n in neighbors1:
-                    if n in map._copy_graph.nodes and not map.is_free(n):
-                        neighbors.append(n)
-
-                if len(neighbors) < 4:
-
-                    path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target_list[0],
-                                                            neighbors)  # neighbors
-                    if path_i is not None and len(path_i) > 0:
-
-                        if path_i[0] == self.position and self.position != self.target_list[0]:
-                            path_i.pop(0)
-                        self.remaining_path.clear()
-                        self.remaining_path.extend(path_i)  #
-                        self.num_replanned_paths += 1
-
-
-        """
         if self.waiting_steps > 5 and not self.im_done and self.num_TRIES == 1:  # there is another deadlock
-            # print(f' AgentID: {self.id}, waitingtime 7, {self.position}, {self.target}')
 
             neighbor = map.free_neighboring_node(self.position, self.position)
             self.num_TRIES += 1
@@ -2105,7 +2074,8 @@ class SmartAgent(AgentInterface):
                 # print(f' AgentID: {self.id}, waitingtime6, position {self.position}, target {self.target}, planed new path:{path_i}')
 
         if self.waiting_steps > 7 and not self.im_done and self.num_TRIES == 3:  # there is deadlock
-            self.num_TRIES += 1
+            self.num_TRIES = 0
+            self.waiting_step = 4  # to start from the first try
             if self.remaining_path is not None and len(self.remaining_path) > 1:
                 if self.remaining_path[0] != self.position and self.remaining_path[0] != self.target_list[ 0]:  # self.target
                     path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target_list[0],[self.remaining_path[0]])  # neighbors
@@ -2117,9 +2087,10 @@ class SmartAgent(AgentInterface):
                         self.num_replanned_paths += 1
                         # self.waiting_step = 0
 
-        if self.waiting_steps > 8 and not self.im_done and self.num_TRIES == 4:  # try for the last time to solve it.
+
+        if self.waiting_steps > 80 and not self.im_done and self.num_TRIES == 4:  # try for the last time to solve it.
             self.num_TRIES = 0
-            self.waiting_step = 5  # to start from the first try
+            self.waiting_step = 4  # to start from the first try
 
 
             neighbor = map.free_neighboring_node(self.position, self.position)
@@ -2149,7 +2120,7 @@ class SmartAgent(AgentInterface):
                         path_i.pop(0)
 
                     self.remaining_path.extend(path_i)  #
-        """
+
 
         if len(self.all_visited_nodes) > 15 and not self.im_done:
             num_repeatitons = []
