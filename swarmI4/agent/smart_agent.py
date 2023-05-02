@@ -1993,20 +1993,24 @@ class SmartAgent(AgentInterface):
                 self.plan_path_to_all_targets(map)
                 self.im_done = False
 
+        if self.waiting_steps > 4 and not self.im_done and self.num_TRIES == 0:  # there is deadlock
 
-        if self.waiting_steps > 5 and not self.im_done and self.num_TRIES == 0:  # there is deadlock
-            # plan another path
-            # print(f' AgentID: {self.id}, waitingtime 6, {self.position}, {self.target}')
             self.num_TRIES += 1
             neighbor = map.free_neighboring_node(self.position, self.position)
-            if neighbor is not None:
+            if neighbor is not None: # only robots on boarder will plan their path
 
-                neighbors_to_remove = self.get_node_to_remove_replan_path(map)
+                #neighbors_to_remove = self.get_node_to_remove_replan_path(map)
+                neighbors_to_remove = map.get_all_neighbors(self.position)
+                for node in neighbors_to_remove:
+                    if map.is_free(node) :
+                        neighbors_to_remove.remove(node)
 
-                if len(neighbors_to_remove) < 4:
+                if self.target in neighbors_to_remove :
+                       neighbors_to_remove.remove(self.target )
 
-                    path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target,
-                                                            neighbors_to_remove)  # neighbors
+                if len(neighbors_to_remove) >0:#< 4:
+
+                    path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target, neighbors_to_remove)  # neighbors
 
                     if path_i is not None and len(path_i) > 0:
 
@@ -2018,7 +2022,7 @@ class SmartAgent(AgentInterface):
                         self.num_replanned_paths += 1
                         # print(f' AgentID: {self.id}, waitingtime6, position {self.position}, target {self.target}, planed new path:{path_i}')
 
-        if self.waiting_steps > 6 and not self.im_done and self.num_TRIES == 1:  # there is another deadlock
+        if self.waiting_steps > 5 and not self.im_done and self.num_TRIES == 1:  # there is another deadlock
             # print(f' AgentID: {self.id}, waitingtime 7, {self.position}, {self.target}')
 
             neighbor = map.free_neighboring_node(self.position, self.position)
@@ -2047,7 +2051,7 @@ class SmartAgent(AgentInterface):
                         self.num_replanned_paths += 1
                         # print(f' AgentID: {self.id}, waitingtime7, position {self.position}, target {self.target}, planed new path:{path_i}')
 
-        if self.waiting_steps > 7 and not self.im_done and self.num_TRIES == 2:  # there is another deadlock
+        if self.waiting_steps > 6 and not self.im_done and self.num_TRIES == 2:  # there is another deadlock
             # print(f' AgentID: {self.id}, waitingtime 8, {self.position}, {self.target}')
 
             neighbors = map.get_neighbors(self.position, diagonal=False)
@@ -2072,7 +2076,7 @@ class SmartAgent(AgentInterface):
                 self.num_replanned_paths += 1
                 # print(f' AgentID: {self.id}, waitingtime6, position {self.position}, target {self.target}, planed new path:{path_i}')
 
-        if self.waiting_steps > 8 and not self.im_done and self.num_TRIES == 3:  # there is deadlock
+        if self.waiting_steps > 7 and not self.im_done and self.num_TRIES == 3:  # there is deadlock
             self.num_TRIES += 1
             # self.num_TRIES = 0
             # self.waiting_step = 5
@@ -2089,7 +2093,7 @@ class SmartAgent(AgentInterface):
                         self.num_replanned_paths += 1
                         # self.waiting_step = 0
 
-        if self.waiting_steps > 9 and not self.im_done and self.num_TRIES == 4:  # try for the last time to solve it.
+        if self.waiting_steps > 8 and not self.im_done and self.num_TRIES == 4:  # try for the last time to solve it.
             self.num_TRIES = 0
             self.waiting_step = 5  # to start from the first try
 
