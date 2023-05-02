@@ -2000,16 +2000,16 @@ class SmartAgent(AgentInterface):
             neighbor = map.free_neighboring_node(self.position, self.position)
             if neighbor is not None: # only robots on boarder will plan their path
 
-                #neighbors_to_remove = self.get_node_to_remove_replan_path(map)
-                neighbors_to_remove = map.get_all_neighbors(self.position)
-                for node in neighbors_to_remove:
-                    if map.is_free(node) :
-                        neighbors_to_remove.remove(node)
+                neighbors_to_remove = self.get_node_to_remove_replan_path(map)
+                #neighbors_to_remove = map.get_all_neighbors(self.position)
+                #for node in neighbors_to_remove:
+                #    if map.is_free(node) :
+                #        neighbors_to_remove.remove(node)
 
                 if self.target in neighbors_to_remove :
                        neighbors_to_remove.remove(self.target )
 
-                if len(neighbors_to_remove) >0:#< 4:
+                if len(neighbors_to_remove) < 4:#:>0
 
                     path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target, neighbors_to_remove)  # neighbors
 
