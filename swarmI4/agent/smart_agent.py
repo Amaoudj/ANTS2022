@@ -536,7 +536,7 @@ class SmartAgent(AgentInterface):
                 elif got_free_node2 is None and got_free_node1 is not None:
                     priority_agent = candidates[1]['AgentID']
 
-            if priority_agent is None and len(candidates) > 1:
+            if priority_agent is None and len(candidates) > 100 :
                 newlist = []
                 for agent in candidates:
                     if agent['next_next_node'] not in [candidate['pos'] for candidate in candidates] and int(agent['remaining_nodes']) > 1:
@@ -566,14 +566,15 @@ class SmartAgent(AgentInterface):
 
             if priority_agent is None and len(candidates) > 1:  # in case of equality in rule 01 apply rule 02
                 # Find the maximum remaining nodes among all agents
-                min_remaining = min(agent['remaining_nodes'] for agent in candidates)
+                max_remaining = max(agent['remaining_nodes'] for agent in candidates)
                 # Count the number of agents with the maximum remaining nodes
-                count = sum(1 for agent in candidates if agent['remaining_nodes'] == min_remaining)
+                count = sum(1 for agent in candidates if agent['remaining_nodes'] == max_remaining)
 
                 if count == 1:  # only one agent
                     remaining_node = [agent['remaining_nodes'] for agent in candidates]
-                    indx = remaining_node.index(min_remaining)
+                    indx = remaining_node.index(max_remaining)
                     priority_agent = candidates[indx]['AgentID']
+
 
             if priority_agent is None and len(candidates) > 1:  # in case of equality in rule 01 apply rule 02
 
