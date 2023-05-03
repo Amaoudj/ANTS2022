@@ -1929,7 +1929,15 @@ class SmartAgent(AgentInterface):
         #logging.info(f'move_to_AGV_node--remaining path: {self.remaining_path}')
         self.moving_away = True
 
+
     def get_node_to_remove_replan_path(self,map):
+        """
+        Get the neighboring nodes of the robot's current position and remove any node that is not within the map or not part of the graph
+        Check the relative position of my_nextnode compared to the current position of the robot.
+        Depending on its relative positions (same row or same column), remove specific neighbors from the list that are not in the direction my_nextnode.
+        this will
+        """
+
 
         neighbors = map.get_neighbors(self.position, diagonal=False)
         my_nextnode = None
@@ -1977,7 +1985,6 @@ class SmartAgent(AgentInterface):
         return  neighbors
 
 
-
     def next_step(self, map) -> None:
 
         """
@@ -1985,15 +1992,17 @@ class SmartAgent(AgentInterface):
         returns: The next node
         """
 
-        # plan the full path if you didn't do that before
+        # Plan the full path if you didn't do that before (i.e., time Step=0)
         if len(self.target_list) > 0:
             if self.remaining_path is None:
                 self.plan_path_to_all_targets(map)
                 self.im_done = False
 
+        # Agents having free neighboring nodes replan the path while considering some neighbors returned by the function --get_node_to_remove_replan_path-- as obstacles
         if self.waiting_steps > 4 and not self.im_done and self.num_TRIES == 0:
             self.num_TRIES += 1
             neighbor = map.free_neighboring_node(self.position, self.position)
+
             if neighbor is not None:
 
                 neighbors_to_remove = self.get_node_to_remove_replan_path(map)
@@ -2009,6 +2018,7 @@ class SmartAgent(AgentInterface):
                         self.remaining_path.clear()
                         self.remaining_path.extend(path_i)  #
 
+        # Try again, only agents having free neighboring nodes, to replan the path while consider the occupied neighbors as obstacles
         if self.waiting_steps > 5 and not self.im_done and self.num_TRIES == 1:  # there is another deadlock
 
             neighbor = map.free_neighboring_node(self.position, self.position)
@@ -2034,11 +2044,10 @@ class SmartAgent(AgentInterface):
                         self.remaining_path.clear()
                         self.remaining_path.extend(path_i)  #
                         self.num_replanned_paths += 1
-                        # print(f' AgentID: {self.id}, waitingtime7, position {self.position}, target {self.target}, planed new path:{path_i}')
 
+
+        # Try again, all agents, to replan the path while considering the occupied neighbors as obstacles
         if self.waiting_steps > 6 and not self.im_done and self.num_TRIES == 2:  # there is another deadlock
-            # print(f' AgentID: {self.id}, waitingtime 8, {self.position}, {self.target}')
-
             neighbors = map.get_neighbors(self.position, diagonal=False)
             neighbor = map.free_neighboring_node(self.position, self.position)
             self.num_TRIES += 1
@@ -2058,14 +2067,15 @@ class SmartAgent(AgentInterface):
                 self.remaining_path.clear()
                 self.remaining_path.extend(path_i)  #
                 self.num_replanned_paths += 1
-                # print(f' AgentID: {self.id}, waitingtime6, position {self.position}, target {self.target}, planed new path:{path_i}')
 
+
+        # Try again to replan the path while considering only the next node as an obstacle
         if self.waiting_steps > 7 and not self.im_done and self.num_TRIES == 3:  #
             self.num_TRIES = 0
             self.waiting_step = 4  # to start from the first try
             if self.remaining_path is not None and len(self.remaining_path) > 1:
                 if self.remaining_path[0] != self.position and self.remaining_path[0] != self.target_list[ 0]:
-                    path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target_list[0],[self.remaining_path[0]])  # replan and remove the next node
+                    path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target_list[0],[self.remaining_path[0]])  #
                     if path_i is not None and len(path_i) > 0:
                         if path_i[0] == self.position:
                             path_i.pop(0)
@@ -2074,7 +2084,7 @@ class SmartAgent(AgentInterface):
                         self.num_replanned_paths += 1
                         # self.waiting_step = 0
 
-
+        # This is a long-term precaution, where a robot should replan its path when visiting 10 nodes two times regardless the order of visiting these nodes.
         if len(self.all_visited_nodes) > 15 and not self.im_done:
             num_repeatitons = []
             for node in self.all_visited_nodes:
@@ -2097,7 +2107,7 @@ class SmartAgent(AgentInterface):
                         self.num_replanned_paths += 1
 
 
-
+        #Update some variables
         if self.remaining_path is None or len(self.remaining_path) == 0:
             self.im_done = True
             self.target_list = [self.position]
