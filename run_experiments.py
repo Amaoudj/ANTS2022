@@ -18,6 +18,7 @@ import PySimpleGUI as sg
 from swarmI4.experiment  import *
 import numpy as np
 import json
+import csv
 
 parser = configargparse.get_arg_parser()
 RESULTS_PATH = 'results_plot/results_data_solvers/DCMAPF/results.csv'
@@ -478,6 +479,19 @@ if __name__ == "__main__":
     arg.run_experiments = arg.run_experiments[0]
     arg.batch_size = arg.batch_size[0]
     arg.map = arg.map[0]
+
+
+
+    # The path of the results.csv file
+    csv_file = 'results_plot/results_data_solvers/DCMAPF/results.csv'
+
+    # The header line
+    header = ['map_name', 'map_size', 'obstacles_number', 'num_agents', 'solver', 'solved', 'soc', 'makespan', 'simulation_time']
+
+    # Open the CSV file in write mode, write the header line, and close the file
+    with open(csv_file, 'w', newline='') as csvfile:
+        csv_writer = csv.writer(csvfile)
+        csv_writer.writerow(header)
 
     if arg.run_experiments:
 

@@ -602,6 +602,7 @@ class SmartAgent(AgentInterface):
                     # logging.info( f'last rule failed--we take the agent with the highest id : (agent{priority_agent})')
 
 
+
         prohibited_node = None
         threshold_node = None
         # update variables:
@@ -644,12 +645,11 @@ class SmartAgent(AgentInterface):
                             condidate_ = self.neighbors.copy()
                             condidate_.remove(agent)  # remove my self from the neighbors
                             if agent_having_priority in condidate_:
-                                condidate_.remove(
-                                    agent_having_priority)  # remove the agent having the priority from the list
+                                condidate_.remove(agent_having_priority)  #remove the agent having the priority from the list
+
                             moveAGVnode, agent_to_give_way = self.get_best_AGV_node(map, condidate_, critic_node)
                             # the action of the agent located in this node
-                            free_node_to_give_way, _ = map.get_WayNode_include_moveBackward(agent_to_give_way['pos'],
-                                                                                            critic_node)
+                            free_node_to_give_way, _ = map.get_WayNode_include_moveBackward(agent_to_give_way['pos'], critic_node)
 
                 if solved:
                     for agent in self.neighbors:
@@ -664,8 +664,8 @@ class SmartAgent(AgentInterface):
 
                         else:
                             solution[agent['AgentID']] = "wait"
-                else:
 
+                else:
                     for agent in self.neighbors:
 
                         if agent['AgentID'] == agent_done:
@@ -673,8 +673,7 @@ class SmartAgent(AgentInterface):
                             if agent_done == self.id:
                                 self.im_done = False
                                 self.is_last_node = False
-                                self.remaining_path[0:0] = [moveAGVnode]  # , self.critic_node
-
+                                self.remaining_path[0:0] = [moveAGVnode]
                                 self.moving_away = True
 
                         elif agent['AgentID'] == agent_to_give_way['AgentID']:
@@ -685,7 +684,8 @@ class SmartAgent(AgentInterface):
                             solution[agent['AgentID']] = "wait"
 
 
-            else:
+            else:  # Agent on the critic node should move
+
                 for n in self.neighbors:
                     if n['pos'] == critic_node:
                         solution[n['AgentID']] = "move"
@@ -694,6 +694,7 @@ class SmartAgent(AgentInterface):
                     else:
                         solution[n['AgentID']] = "wait"
 
+
         if len(self.neighbors) == 4:  # 4 AGVs in an intersection
             moveAGVnode = None
 
@@ -701,8 +702,7 @@ class SmartAgent(AgentInterface):
                 solution[agent_having_priority['AgentID']] = "move"
 
                 for n in self.neighbors:
-                    if n['pos'] == agent_having_priority[
-                        'next_next_node']:  # and n['AgentID']!= agent_having_priority['AgentID']
+                    if n['pos'] == agent_having_priority['next_next_node']:  # and n['AgentID']!= agent_having_priority['AgentID']
 
                         # get a free node without moving back
                         got_free_node1 = map.get_right_or_left_free_node(n['pos'], critic_node, critic_node)
@@ -715,8 +715,7 @@ class SmartAgent(AgentInterface):
                             condidate_ = self.neighbors.copy()
                             condidate_.remove(n)  # remove my self from the neighbors
                             if agent_having_priority in condidate_:
-                                condidate_.remove(
-                                    agent_having_priority)  # remove the agent having the priority from the list
+                                condidate_.remove( agent_having_priority)  # remove the agent having the priority from the list
                             moveAGVnode, agent_ = self.get_best_AGV_node(map, condidate_, critic_node)
 
                             #############################################################################################################
@@ -774,8 +773,7 @@ class SmartAgent(AgentInterface):
                                 condidate_ = self.neighbors.copy()
                                 condidate_.remove(agent)  # remove my self from the neighbors
                                 if agent_having_priority in condidate_:
-                                    condidate_.remove(
-                                        agent_having_priority)  # remove the agent having the priority from the list
+                                    condidate_.remove(agent_having_priority)  # remove the agent having the priority from the list
 
                                 moveAGVnode, agent_to_give_way = self.get_best_AGV_node(map, condidate_, critic_node)
                                 # the action of the agent located in this node
