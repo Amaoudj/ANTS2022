@@ -151,8 +151,7 @@ class SmartAgent(AgentInterface):
 
 
     def readParameterConfiguration(self):
-        self.waitingThreshold = 5
-
+        pass
 
 
     def is_agent_involved_in_opposite_conflict(self, map, agent):
@@ -186,16 +185,12 @@ class SmartAgent(AgentInterface):
             """
             # concerned_Agent=None
             follower = None
-            # if agent_id is not None:
-            # for agent in map.neighbors_agents_stat:#map.msg_box.values():
-            #   if agent['AgentID'] == agent_id:
-            #        concerned_Agent = agent
-            #        break
+
             concerned_Agent = map.neighbors_agents_stat[agent_id]
 
             for agent in map.neighbors_agents_stat:  # map.msg_box.values():
                 if agent is not None and concerned_Agent is not None and agent['AgentID'] != agent_id:
-                    if (concerned_Agent['pos'] == agent['next_node']) and (concerned_Agent['next_node'] != agent['pos']):
+                    if (concerned_Agent['pos'] == agent['next_node']) and (concerned_Agent['next_node'] != agent['pos']): # if it is not an opposite coflict
                         follower = agent
                         break
 
@@ -211,7 +206,7 @@ class SmartAgent(AgentInterface):
                 agent_id = follower['AgentID']
             steps = 0
 
-            while agent_id is not None and agent_id != self.id and steps < 20:
+            while agent_id is not None and agent_id != self.id and steps < 40:
                 follower = self.get_follower_agent(map, agent_id)
                 if follower is None or follower['AgentID'] in (_f['AgentID'] for _f in _followers):
                     break
@@ -460,6 +455,7 @@ class SmartAgent(AgentInterface):
                     self.got_opposite_conflict = True
                     self.solve_opposite_conflict(map, critic_node)
                     # print("passed solve_opposite_conflict ....")
+
             else:  # check if there is successor agent has the longest path: if yes, move away and let him pass
                 self.my_pos_will_be_free = True
                 self.action = "move"
@@ -470,13 +466,11 @@ class SmartAgent(AgentInterface):
 
                     if not self.is_agent_involved_in_opposite_conflict(map, successor) and not self.is_agent_involved_in_intersection_conflict(map, successor):
                         if (successor["next_node"] == self.position) and (successor["next_next_node"] == my_next_node) and successor["remaining_nodes"] > len(self.remaining_path) + 1 :
-                            #if (len(self.remaining_path) > 10 and (successor["remaining_nodes"] > len(self.remaining_path) + 1)) or (len(self.remaining_path) < 6 and (successor["remaining_nodes"] > len(self.remaining_path))):
 
                                 got_free_node = map.get_right_or_left_free_node(self.position, successor['pos'], successor['next_next_node'])
 
-                                for msg in map.neighbors_agents_stat:  # map.msg_box.values():
-                                    if len(self.remaining_path) > 10 and (msg["next_node"] == got_free_node or msg[
-                                        "next_next_node"] == got_free_node):  # check if this node is the node of another agent
+                                for msg in map.neighbors_agents_stat:
+                                    if  (msg["next_node"] == got_free_node or msg["next_next_node"] == got_free_node) and len(self.remaining_path) > 10:  # check if this node is the node of another agent
                                         got_free_node = None
                                         break
 
@@ -536,20 +530,21 @@ class SmartAgent(AgentInterface):
                     priority_agent = candidates[1]['AgentID']
 
             if priority_agent is None :
-              if len(candidates) == 2:
+              if len(candidates) > 2:
+                new_candidates = []
+                for agent in candidates:
+                    if agent['moving_backward'] or agent['moving_away']:
+                        new_candidates.append(agent)
+                if len(new_candidates) == 1:  # if only one candidate left then it will have the priority
+                    priority_agent = new_candidates[0]['AgentID']
+
+              elif len(candidates) == 2:
                 for agent in candidates:
                     if agent['moving_backward'] or agent['moving_away']:
                         for n in candidates:
                             if n != agent:
                                 if agent['conflict_agent'] == n['AgentID']:
-                                    priority_agent = n['AgentID']  #  robot Agent is moving out of the robot n, so  robot n is given priority to avoid livelock
-              elif  len(candidates) >  2: # give priority to the robot moving out of the way
-                new_candidates= []
-                for agent in candidates:
-                  if agent['moving_backward'] or agent['moving_away']:
-                    new_candidates.append(agent)
-                if len(new_candidates) == 1:  # if only one candidate left then it will have the priority
-                   priority_agent = new_candidates[0]['AgentID']
+                                    priority_agent = n['AgentID']
 
             if priority_agent is None and len(candidates) > 1:  # in case of equality in rule 01 apply rule 02
                 # Find the maximum remaining nodes among all agents
