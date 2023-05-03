@@ -2098,7 +2098,7 @@ class SmartAgent(AgentInterface):
                     path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target, forbi_node)
 
                     if path_i is not None and len(path_i) > 1:
-                        self.repeated_nodes.clear()
+
                         self.all_visited_nodes.clear()
                         if path_i[0] == self.position:
                             path_i.pop(0)
