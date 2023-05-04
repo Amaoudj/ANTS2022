@@ -291,23 +291,28 @@ class Map(object):
                         (row + 1, col),
                         (row - 1, col)]
 
-
-    def get_all_neighbors(self, node_pos):
+    def get_all_occupied_neighbors(self, node_pos, level):
 
         first_level_neighbors = self.get_neighbors(node_pos, diagonal=False)
         all_neighbors = set(first_level_neighbors)
 
-        for neighbor in first_level_neighbors:
-            second_level_neighbors = self.get_neighbors(neighbor, diagonal=False)
-            all_neighbors.update(second_level_neighbors)
+        if level == 2:
+            for neighbor in first_level_neighbors:
+                second_level_neighbors = self.get_neighbors(neighbor, diagonal=False)
+                all_neighbors.update(second_level_neighbors)
 
-        for neighbor in second_level_neighbors:
-            third_level_neighbors = self.get_neighbors(neighbor, diagonal=False)
-            all_neighbors.update(third_level_neighbors)
-
+        if level > 2:
+            for neighbor in second_level_neighbors:
+                third_level_neighbors = self.get_neighbors(neighbor, diagonal=False)
+                all_neighbors.update(third_level_neighbors)
 
         # Remove the original node position
         all_neighbors.discard(node_pos)
+
+        # remove the free nodes
+        for node in list(all_neighbors):
+            if self.is_free(node):
+                all_neighbors.discard(node)
 
         return list(all_neighbors)
 

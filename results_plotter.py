@@ -129,22 +129,31 @@ def general_plot(filtered_res, axis):
             x_axis_val, y_axis_val = [], []
             try:
 
-                if -1 in filtered_res[solver][map]['solved'].to_list():
-                    filtered_res[solver][map] = filtered_res[solver][map][filtered_res[solver][map]['solved'] != -1]
+                # Filter out non-numeric values using pd.to_numeric()
+                solved_numeric = pd.to_numeric(filtered_res[solver][map]['solved'], errors='coerce')
 
-                elif 0 in filtered_res[solver][map]['solved'].to_list():
-                    filtered_res[solver][map] = filtered_res[solver][map][filtered_res[solver][map]['solved'] != 0]
+                #if -1 in filtered_res[solver][map]['solved'].to_list():
+                if -1 in solved_numeric.to_list():
+                    filtered_res[solver][map] = filtered_res[solver][map][solved_numeric != -1]
 
-                elif False in filtered_res[solver][map]['solved'].to_list():
-                    filtered_res[solver][map] = filtered_res[solver][map][filtered_res[solver][map]['solved'] != False]
+                #elif 0 in filtered_res[solver][map]['solved'].to_list():
+                elif 0 in solved_numeric.to_list():
+                    filtered_res[solver][map] = filtered_res[solver][map][solved_numeric != 0]
 
-                #print(filtered_res[solver][map]['solved'])
+                #elif False in filtered_res[solver][map]['solved'].to_list():
+                elif False in solved_numeric.to_list():
+                    filtered_res[solver][map] = filtered_res[solver][map][solved_numeric != False]
+
                 #print(f'-----------------------------------------------')
+
                 n_agents_groups = filtered_res[solver][map].groupby('num_agents')
-                for group in n_agents_groups:
+                #solved_numeric = pd.to_numeric(n_agents_groups, errors='coerce')
+
+                for group in n_agents_groups: #solved_numeric.to_list()
                     if group[0] in ROBOT_SET[i]:
                         y_axis_val.append(group[1].mean()[y_axis_name])
                         x_axis_val.append(group[0])
+
                     else:
                         pass
                 legend_list.append(solver)

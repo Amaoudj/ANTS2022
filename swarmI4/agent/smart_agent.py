@@ -2078,9 +2078,12 @@ class SmartAgent(AgentInterface):
                 if rep > 2:
                     num_repeatitons.append(rep)
 
-            if (len(num_repeatitons) >= 10):
+            if (len(num_repeatitons) >= 5):
                 if self.last_node != self.position:
-                    forbi_node = [self.last_node]
+                    neighbors_to_remove = map.get_all_occupied_neighbors(self.position, 1)
+                    neighbors_to_remove.append(self.last_node)
+                    forbi_node = neighbors_to_remove
+                    #forbi_node = [self.last_node]
                     path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target, forbi_node)
 
                     if path_i is not None and len(path_i) > 1:
