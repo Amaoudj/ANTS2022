@@ -131,7 +131,7 @@ def success_rate_plot(filtered_res):
         plt.close(fig)  # Close the figure
 
 
-def general_plot2(filtered_res, axis):
+def general_plot(filtered_res, axis):
     x_axis_name, y_axis_name = axis
 
     for solver in filtered_res:
@@ -191,7 +191,7 @@ def general_plot2(filtered_res, axis):
         plt.close(fig)  # Close the figure
 
 
-def general_plot(filtered_res, axis):
+def general_plot2(filtered_res, axis):
     x_axis_name, y_axis_name = axis
 
     for i, map in enumerate(MAPS_TO_PLOT):
