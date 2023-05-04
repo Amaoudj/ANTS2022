@@ -211,8 +211,9 @@ def general_plot(filtered_res, axis):
 
                 n_agents_groups = filtered_res[solver][map].groupby('num_agents')
                 for group in n_agents_groups:
+                    print(f'Group1 : {group[1]}')
                     if group[0] in ROBOT_SET[i]:
-                        print(group[1])
+
                         y_axis_val.append(group[1].mean()[y_axis_name])
                         x_axis_val.append(group[0])
                     else:
@@ -267,7 +268,7 @@ def main():
 
    data = import_results(RESULTS_FOLDER)
    filtered_res = filter_by_map(data)
-   success_rate_plot(filtered_res)
+   #success_rate_plot(filtered_res)
    general_plot(filtered_res,['num_agents','soc'])
 
 if __name__ == "__main__":
