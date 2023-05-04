@@ -79,7 +79,8 @@ def success_rate_plot(filtered_res):
                 n_agents_groups = filtered_res[solver][map].groupby('num_agents')
 
                 for group in n_agents_groups:
-                    if group[0] in ROBOT_SET[i]:
+                    g0  = pd.to_numeric(group[0], errors='coerce')
+                    if g0 in ROBOT_SET[i]:#group[0]
                         s_rate = 0
 
                         # Filter out non-numeric values using pd.to_numeric()
@@ -89,7 +90,7 @@ def success_rate_plot(filtered_res):
                         #if 1 in group[1]['solved'].to_list() or True in group[1]['solved'].to_list():
                             s_rate = solved_numeric.mean() * 100
 
-                        s_rates[solver][map][group[0]] = s_rate / 100.0
+                        s_rates[solver][map][g0] = s_rate / 100.0  #group[0]
                     else:
                         pass
             except KeyError:
@@ -150,9 +151,12 @@ def general_plot(filtered_res, axis):
                 #solved_numeric = pd.to_numeric(n_agents_groups, errors='coerce')
 
                 for group in n_agents_groups: #solved_numeric.to_list()
-                    if group[0] in ROBOT_SET[i]:
-                        y_axis_val.append(group[1].mean()[y_axis_name])
-                        x_axis_val.append(group[0])
+                    G0=pd.to_numeric(group[0], errors='coerce')
+                    G1=pd.to_numeric(group[1], errors='coerce')
+
+                    if G0 in ROBOT_SET[i]: #group[0]
+                        y_axis_val.append(G1.mean()[y_axis_name])#group[1]
+                        x_axis_val.append(G0)#group[0]
 
                     else:
                         pass
@@ -180,10 +184,13 @@ def remove_empty_lines(input_file):
     df.to_csv(input_file, index=False)
 
 def remove_last_empty_line(input_file):
+    # Read the CSV file into a pandas DataFrame
     df = pd.read_csv(input_file)
-    df.dropna(how='all', inplace=True)  # Remove rows with all missing values
-    with open(input_file, 'w', newline='', encoding='utf-8') as file:
-        df.to_csv(file, index=False, line_terminator='\n')
+    # Remove any rows with all missing values
+    df.dropna(how='all', inplace=True)
+    # Write the cleaned DataFrame back to the original file
+    df.to_csv(input_file, index=False, line_terminator='\n', encoding='utf-8')
+
 
 def main():
 
