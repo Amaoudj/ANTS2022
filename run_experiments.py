@@ -47,9 +47,9 @@ def export_results(args, map, swarm, step, simulation_time, storage_path: str = 
     df = pd.DataFrame(data)
 
     if os.path.isfile(storage_path):
-        df.to_csv(storage_path, mode='a', index=False, header=False, line_terminator='\n')
+        df.to_csv(storage_path, mode='a', index=False, header=False)#, line_terminator='\n'
     else:
-        df.to_csv(storage_path, mode='w', index=False, line_terminator='\n')
+        df.to_csv(storage_path, mode='w', index=False)#, line_terminator='\n'
 
 
 
