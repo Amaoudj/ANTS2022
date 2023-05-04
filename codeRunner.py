@@ -19,7 +19,7 @@ def custom_sort_Benchmarks(file):
     return '-'.join(names)
 
 def main():
-
+    """
     new_Benchmark_list = sorted(os.listdir('benchmarks'), key=custom_sort_Benchmarks)
     new_Benchmark_list = [file for file in new_Benchmark_list if not file.endswith('.txt')]
     print("Running experiments on the following maps : ", new_Benchmark_list)
@@ -40,6 +40,8 @@ def main():
     print("")
     print("Plotting the comparative results in terms of success rate and sum-of-costs ...")
     print("Done. ")
+    """
+
     subprocess.run(["python3", Plotter], stdout=subprocess.PIPE)
     print("Check the <plots> folder in <results_plots> for the outcomes of DCMAPF.")
 

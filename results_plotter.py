@@ -80,8 +80,6 @@ def success_rate_plot(filtered_res):
 
                 for group in n_agents_groups:
                     g0  = pd.to_numeric(group[0], errors='coerce')
-                    print(group[1])
-                    print(group[0])
 
                     if g0 in ROBOT_SET[i]:#group[0]
                         s_rate = 0
@@ -197,6 +195,7 @@ def remove_string_from_csv(input_file):
     # Read the CSV file into a pandas DataFrame
     df = pd.read_csv(input_file)
     target_string = 'CBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBS'
+
     # Replace the target_string with an empty string in the entire DataFrame
     df.replace(target_string, '', inplace=True, regex=True)
 
