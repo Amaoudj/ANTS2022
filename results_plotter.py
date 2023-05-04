@@ -61,9 +61,10 @@ def filter_by_map(results_df: dict):
 
     return filtered_results
 
-def clean_dataframe(df, column_name):
-    df[column_name] = pd.to_numeric(df[column_name], errors='coerce')
-    df = df.dropna(subset=[column_name])
+def clean_dataframe(df, column_names):
+    for column_name in column_names:
+        df[column_name] = pd.to_numeric(df[column_name], errors='coerce')
+    df = df.dropna(subset=column_names)
     return df
 
 
@@ -78,7 +79,7 @@ def success_rate_plot(filtered_res):
     for solver in filtered_res:
         s_rates[solver] = {}
         for map_name in filtered_res[solver]:
-            filtered_res[solver][map_name] = clean_dataframe(filtered_res[solver][map_name], 'solved')
+            filtered_res[solver][map_name] = clean_dataframe(filtered_res[solver][map_name], ['solved', 'num_agents'])
 
         for i, map in enumerate(MAPS_TO_PLOT):
 
@@ -134,8 +135,8 @@ def general_plot(filtered_res, axis):
     x_axis_name, y_axis_name = axis
 
     for solver in filtered_res:
-       for map_name in filtered_res[solver]:
-        filtered_res[solver][map_name] = clean_dataframe(filtered_res[solver][map_name], 'solved')
+        for map_name in filtered_res[solver]:
+            filtered_res[solver][map_name] = clean_dataframe(filtered_res[solver][map_name], ['solved', 'num_agents', 'soc'])
 
     for i, map in enumerate(MAPS_TO_PLOT):
         legend_list = []
