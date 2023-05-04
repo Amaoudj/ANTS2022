@@ -2,7 +2,7 @@ networkx
 numpy
 matplotlib
 configargparse
-pandas
+pandas==1.5.3
 pygame
 pyautogui
 pysimplegui

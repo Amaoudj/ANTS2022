@@ -117,7 +117,6 @@ def success_rate_plot(filtered_res):
             except KeyError:
                 print(f'{map} do not exist in the solver : {solver}')
 
-
         plt.ylim(bottom=0, top=1.05)
         plt.legend(legend_list, fontsize=13)
         plt.xlabel('Number of robots', fontsize=13)
@@ -191,49 +190,6 @@ def general_plot(filtered_res, axis):
         plt.close(fig)  # Close the figure
 
 
-def general_plot2(filtered_res, axis):
-    x_axis_name, y_axis_name = axis
-
-    for i, map in enumerate(MAPS_TO_PLOT):
-        legend_list = []
-        for id, solver in enumerate(filtered_res):
-            x_axis_val, y_axis_val = [], []
-            try:
-
-                if -1 in filtered_res[solver][map]['solved'].to_list():
-                    filtered_res[solver][map] = filtered_res[solver][map][filtered_res[solver][map]['solved'] != -1]
-
-                elif 0 in filtered_res[solver][map]['solved'].to_list():
-                    filtered_res[solver][map] = filtered_res[solver][map][filtered_res[solver][map]['solved'] != 0]
-
-                elif False in filtered_res[solver][map]['solved'].to_list():
-                    filtered_res[solver][map] = filtered_res[solver][map][filtered_res[solver][map]['solved'] != False]
-
-                n_agents_groups = filtered_res[solver][map].groupby('num_agents')
-
-                for group in n_agents_groups:
-                    if group[0] in ROBOT_SET[i]:
-                        G_numeric = pd.to_numeric(group[1].mean()[y_axis_name], errors='coerce')
-                        y_axis_val.append(G_numeric)
-                        x_axis_val.append(group[0])
-                    else:
-                        pass
-                legend_list.append(solver)
-                plt.plot(x_axis_val, y_axis_val, **marker_styles[id])
-            except KeyError:
-                print(f'{map} do not exist in the solver : {solver}')
-        title = f'{y_axis_name.replace("_", " ")} in {map[:-4]}.png'
-
-        # -----------------------
-        plt.legend(legend_list, fontsize=13)
-        plt.xlabel('Number of robots', fontsize=13)
-        plt.ylabel('Sum-of-costs', fontsize=13)
-        file_path = os.path.join(folder_path, title)
-        plt.savefig(file_path)
-        plt.show()
-        fig = plt.gcf()  # Get the current figure
-        plt.close(fig)  # Close the figure
-
 
 def remove_empty_lines(input_file):
     df = pd.read_csv(input_file)
@@ -249,26 +205,12 @@ def remove_last_empty_line(input_file):
     df.to_csv(input_file, index=False, encoding='utf-8')
 
 
-def remove_string_from_csv(input_file):
-    # Read the CSV file into a pandas DataFrame
-    df = pd.read_csv(input_file)
-    target_string = 'CBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBS'
-
-    # Replace the target_string with an empty string in the entire DataFrame
-    df.replace(target_string, '', inplace=True, regex=True)
-
-    # Write the cleaned DataFrame back to the input file
-    df.to_csv(input_file, index=False, encoding='utf-8')
-
-
 def main():
 
    remove_empty_lines( "results_plot/results_data_solvers/DCMAPF/results.csv")
-   #remove_string_from_csv("results_plot/results_data_solvers/DCMAPF/results.csv")
-
    data = import_results(RESULTS_FOLDER)
    filtered_res = filter_by_map(data)
-   #success_rate_plot(filtered_res)
+   success_rate_plot(filtered_res)
    general_plot(filtered_res,['num_agents','soc'])
 
 if __name__ == "__main__":
