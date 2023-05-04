@@ -192,10 +192,24 @@ def remove_last_empty_line(input_file):
     df.to_csv(input_file, index=False, line_terminator='\n', encoding='utf-8')
 
 
+def remove_string_from_csv(input_file, target_string):
+    # Read the CSV file into a pandas DataFrame
+    df = pd.read_csv(input_file)
+
+    # Replace the target_string with an empty string in the entire DataFrame
+    df.replace(target_string, '', inplace=True, regex=True)
+
+    # Write the cleaned DataFrame back to the input file
+    df.to_csv(input_file, index=False, line_terminator='\n', encoding='utf-8')
+
+
 def main():
 
    remove_empty_lines( "results_plot/results_data_solvers/DCMAPF/results.csv")
-   remove_last_empty_line( "results_plot/results_data_solvers/DCMAPF/results.csv")
+   #remove_last_empty_line( "results_plot/results_data_solvers/DCMAPF/results.csv")
+   target_string = 'CBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBS'
+
+   remove_string_from_csv("results_plot/results_data_solvers/DCMAPF/results.csv", target_string)
    data = import_results(RESULTS_FOLDER)
    filtered_res = filter_by_map(data)
    success_rate_plot(filtered_res)
