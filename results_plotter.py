@@ -131,7 +131,7 @@ def success_rate_plot(filtered_res):
         plt.close(fig)  # Close the figure
 
 
-def general_plot(filtered_res, axis):
+def general_plot2(filtered_res, axis):
     x_axis_name, y_axis_name = axis
 
     for solver in filtered_res:
@@ -189,6 +189,49 @@ def general_plot(filtered_res, axis):
         plt.show()
         fig = plt.gcf()  # Get the current figure
         plt.close(fig)  # Close the figure
+
+
+def general_plot(filtered_res, axis):
+    x_axis_name, y_axis_name = axis
+
+    for i, map in enumerate(MAPS_TO_PLOT):
+        legend_list = []
+        for id, solver in enumerate(filtered_res):
+            x_axis_val, y_axis_val = [], []
+            try:
+
+                if -1 in filtered_res[solver][map]['solved'].to_list():
+                    filtered_res[solver][map] = filtered_res[solver][map][filtered_res[solver][map]['solved'] != -1]
+
+                elif 0 in filtered_res[solver][map]['solved'].to_list():
+                    filtered_res[solver][map] = filtered_res[solver][map][filtered_res[solver][map]['solved'] != 0]
+
+                elif False in filtered_res[solver][map]['solved'].to_list():
+                    filtered_res[solver][map] = filtered_res[solver][map][filtered_res[solver][map]['solved'] != False]
+
+                n_agents_groups = filtered_res[solver][map].groupby('num_agents')
+                for group in n_agents_groups:
+                    if group[0] in ROBOT_SET[i]:
+                        y_axis_val.append(group[1].mean()[y_axis_name])
+                        x_axis_val.append(group[0])
+                    else:
+                        pass
+                legend_list.append(solver)
+                plt.plot(x_axis_val, y_axis_val, **marker_styles[id])
+            except KeyError:
+                print(f'{map} do not exist in the solver : {solver}')
+        title = f'{y_axis_name.replace("_", " ")} in {map[:-4]}.png'
+
+        # -----------------------
+        plt.legend(legend_list, fontsize=13)
+        plt.xlabel('Number of robots', fontsize=13)
+        plt.ylabel('Sum-of-costs', fontsize=13)
+        file_path = os.path.join(folder_path, title)
+        plt.savefig(file_path)
+        plt.show()
+        fig = plt.gcf()  # Get the current figure
+        plt.close(fig)  # Close the figure
+
 
 def remove_empty_lines(input_file):
     df = pd.read_csv(input_file)
