@@ -487,10 +487,15 @@ if __name__ == "__main__":
     header = ['map_name', 'map_size', 'obstacles_number', 'num_agents', 'solver', 'solved', 'soc', 'makespan', 'simulation_time']
 
     # Open the CSV file in write mode, write the header line, and close the file
-    with open(csv_file, 'w', newline='') as csvfile:
-        csv_writer = csv.writer(csvfile)
-        csv_writer.writerow(header)
+    #with open(csv_file, 'w', newline='') as csvfile:
+    #    csv_writer = csv.writer(csvfile)
+    #    csv_writer.writerow(header)
 
+    # Create an empty DataFrame with the specified header
+    empty_df = pd.DataFrame(columns=header)
+
+    # Save the empty DataFrame to a CSV file
+    empty_df.to_csv(csv_file, index=False)
 
     if arg.run_experiments:
 

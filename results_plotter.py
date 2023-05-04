@@ -174,10 +174,23 @@ def general_plot(filtered_res, axis):
         fig = plt.gcf()  # Get the current figure
         plt.close(fig)  # Close the figure
 
+def remove_empty_lines(input_file):
+    df = pd.read_csv(input_file)
+    df.dropna(how='all', inplace=True)  # Remove rows with all missing values
+    df.to_csv(input_file, index=False)
+
+def remove_last_empty_line(input_file):
+    df = pd.read_csv(input_file)
+    df.dropna(how='all', inplace=True)  # Remove rows with all missing values
+    with open(input_file, 'w', newline='', encoding='utf-8') as file:
+        df.to_csv(file, index=False, line_terminator='\n')
+
 def main():
+
+   remove_empty_lines( "results_plot/results_data_solvers/DCMAPF/results.csv")
+   remove_last_empty_line( "results_plot/results_data_solvers/DCMAPF/results.csv")
    data = import_results(RESULTS_FOLDER)
    filtered_res = filter_by_map(data)
-
    success_rate_plot(filtered_res)
    general_plot(filtered_res,['num_agents','soc'])
 
