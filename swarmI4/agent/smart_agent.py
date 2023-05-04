@@ -517,16 +517,31 @@ class SmartAgent(AgentInterface):
         if len(candidates) == 1:  # if only one candidate left then it will have the priority
             priority_agent = candidates[0]['AgentID']
 
+
         if priority_agent is None and len(candidates) > 1:
 
-            if priority_agent is None and len(candidates) > 2:
-                new_candidates = []
-                for agent in candidates:
+            if priority_agent is None :
+              if len(candidates) > 1:
+                 new_candidates = []
+                 for agent in candidates:
                     got_free_node = map.get_right_or_left_free_node(agent["pos"], critic_node,None)
                     if got_free_node is not None:
                         new_candidates.append(agent)
-                if len(new_candidates) == 1:  # if only one agent has a free neighboring node, then it will get priority
+                 if len(new_candidates) == 1:  # if only one agent has a free neighboring node, then it will get priority
                     priority_agent = new_candidates[0]['AgentID']
+
+              elif len(candidates) == 222222:   ##################3
+
+                  got_free_node1 = map.get_right_or_left_free_node(candidates[0]["pos"], critic_node, candidates[1]["next_next_node"])
+                  got_free_node2 = map.get_right_or_left_free_node(candidates[1]["pos"], critic_node, candidates[0]["next_next_node"])
+
+                  if got_free_node1 is None and got_free_node2 is not None:
+                      priority_agent = candidates[0]['AgentID']
+
+                  elif got_free_node2 is None and got_free_node1 is not None:
+                      priority_agent = candidates[1]['AgentID']
+
+
 
             if priority_agent is None :
               if len(candidates) > 2:
@@ -959,11 +974,10 @@ class SmartAgent(AgentInterface):
                     if n['AgentID'] != agent_having_priority['AgentID']:
                         if n['pos'] == agent_having_priority['next_next_node']:  # means the other agent located on my node
 
-                            got_free_node = map.get_right_or_left_free_node(n['pos'], critic_node, critic_node)
-                            got_free_node1 = map.get_right_or_left_free_node(agent_having_priority['pos'], critic_node,
-                                                                             critic_node)
+                            got_free_node = map.get_right_or_left_free_node(n['pos'], critic_node, agent_having_priority['next_next_node'])#critic_node
+                            got_free_node1 = map.get_right_or_left_free_node(agent_having_priority['pos'], critic_node, n['next_next_node']) #criticnode
 
-                            if got_free_node is not None and got_free_node != n[ 'pos']:  # and got_free_node != critic_node:
+                            if got_free_node is not None and got_free_node != n[ 'pos']:
                                 solution[agent_having_priority['AgentID']] = "move"
                                 solution[n['AgentID']] = "move_to_node_and_wait"
 
@@ -971,8 +985,7 @@ class SmartAgent(AgentInterface):
                                     self.my_move_away_node = got_free_node
 
                             # change the priority if the other agent has a neighbour free node
-                            elif got_free_node1 is not None and int(n['remaining_nodes']) > 1 and got_free_node1 != \
-                                    agent_having_priority['pos'] and got_free_node1 != critic_node:
+                            elif got_free_node1 is not None and int(n['remaining_nodes']) > 1 and got_free_node1 != agent_having_priority['pos'] and got_free_node1 != critic_node:
                                 solution[agent_having_priority['AgentID']] = "move_to_node_and_wait"
 
                                 if agent_having_priority['AgentID'] == self.id:  # it is me
@@ -1014,14 +1027,11 @@ class SmartAgent(AgentInterface):
 
                 special_traitement = False
                 if self.neighbors[0]['im_done'] or self.neighbors[1]['im_done']:
-
                     for agent_ in self.neighbors:
                         if not agent_['im_done']:
                             agent_moving = agent_
                         elif agent_['im_done']:
                             agent_done = agent_
-
-                    #print(agent_done,agent_moving)
 
                     if self.neighbors[0]['im_done'] or self.neighbors[1]['im_done']:
 
@@ -1294,6 +1304,7 @@ class SmartAgent(AgentInterface):
             self.move_to_node_and_wait(map, self.my_move_away_node)  # move to this node and stay two time-steps there
 
         self.next_waypoint = self.remaining_path[0]
+
 
     def solve_opposite_conflict(self, map, critic_node: tuple) -> tuple:
         """
