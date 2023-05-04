@@ -210,11 +210,11 @@ def general_plot(filtered_res, axis):
                     filtered_res[solver][map] = filtered_res[solver][map][filtered_res[solver][map]['solved'] != False]
 
                 n_agents_groups = filtered_res[solver][map].groupby('num_agents')
-                for group in n_agents_groups:
-                    print(f'Group1 : {group[1]}')
-                    if group[0] in ROBOT_SET[i]:
 
-                        y_axis_val.append(group[1].mean()[y_axis_name])
+                for group in n_agents_groups:
+                    if group[0] in ROBOT_SET[i]:
+                        G_numeric = pd.to_numeric(group[1].mean()[y_axis_name], errors='coerce')
+                        y_axis_val.append(G_numeric)
                         x_axis_val.append(group[0])
                     else:
                         pass
