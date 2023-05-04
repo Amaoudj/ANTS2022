@@ -520,14 +520,14 @@ class SmartAgent(AgentInterface):
 
             if priority_agent is None and len(candidates) == 2:
 
-                got_free_node1 = map.get_right_or_left_free_node(candidates[0]["pos"], candidates[1]["pos"], candidates[1]["next_next_node"])  #############
-                got_free_node2 = map.get_right_or_left_free_node(candidates[1]["pos"], candidates[0]["pos"],candidates[0]["next_next_node"])  #############
+                got_free_node1 = map.get_right_or_left_free_node(candidates[0]["pos"], candidates[1]["pos"], candidates[1]["next_next_node"])
+                got_free_node2 = map.get_right_or_left_free_node(candidates[1]["pos"], candidates[0]["pos"],candidates[0]["next_next_node"])
 
-                if got_free_node1 is None and got_free_node2 is not None:  # give the priority to this agent (it hasn't any free neighboring_node to got to)
-                    priority_agent = candidates[0]['AgentID']
+                if got_free_node1 is None and got_free_node2 is not None:  # give the priority to this agent
+                    priority_agent = candidates[1]['AgentID']
 
                 elif got_free_node2 is None and got_free_node1 is not None:
-                    priority_agent = candidates[1]['AgentID']
+                    priority_agent = candidates[0]['AgentID']
 
             if priority_agent is None :
               if len(candidates) > 2:
@@ -600,7 +600,6 @@ class SmartAgent(AgentInterface):
                     priority_agent = max([agent['AgentID'] for agent in candidates])
                     # if self.neighbors[0]['AgentID'] == self.id:
                     # logging.info( f'last rule failed--we take the agent with the highest id : (agent{priority_agent})')
-
 
 
         prohibited_node = None
@@ -1323,11 +1322,11 @@ class SmartAgent(AgentInterface):
                 got_free_node1 = map.get_right_or_left_free_node(candidates[0]["pos"], candidates[1]["pos"], candidates[1]["next_next_node"])
                 got_free_node2 = map.get_right_or_left_free_node(candidates[1]["pos"], candidates[0]["pos"],candidates[0]["next_next_node"])
 
-                if got_free_node1 is None and got_free_node2 is not None:  # give the priority to this agent
-                    priority_agent = candidates[0]['AgentID']
+                if got_free_node1 is None and got_free_node2 is not None:
+                    priority_agent = candidates[1]['AgentID']
 
                 elif got_free_node2 is None and got_free_node1 is not None:
-                    priority_agent = candidates[1]['AgentID']
+                    priority_agent = candidates[0]['AgentID']
 
         # agent with the largest number of Followers
         if priority_agent is None and len(candidates) == 2:
@@ -1970,7 +1969,6 @@ class SmartAgent(AgentInterface):
 
         return  neighbors
 
-
     def next_step(self, map) -> None:
 
         """
@@ -1983,6 +1981,7 @@ class SmartAgent(AgentInterface):
             if self.remaining_path is None:
                 self.plan_path_to_all_targets(map)
                 self.im_done = False
+
 
         # Agents having free neighboring nodes replan the path while considering some neighbors returned by the function --get_node_to_remove_replan_path-- as obstacles
         if self.waiting_steps > 4 and not self.im_done and self.num_TRIES == 0:
