@@ -61,6 +61,12 @@ def filter_by_map(results_df: dict):
 
     return filtered_results
 
+def clean_dataframe(df, column_name):
+    df[column_name] = pd.to_numeric(df[column_name], errors='coerce')
+    df = df.dropna(subset=[column_name])
+    return df
+
+
 
 def success_rate_plot(filtered_res):
 
@@ -71,6 +77,8 @@ def success_rate_plot(filtered_res):
     s_rates = {}
     for solver in filtered_res:
         s_rates[solver] = {}
+        for map_name in filtered_res[solver]:
+            filtered_res[solver][map_name] = clean_dataframe(filtered_res[solver][map_name], 'solved')
 
         for i, map in enumerate(MAPS_TO_PLOT):
 
@@ -124,6 +132,10 @@ def success_rate_plot(filtered_res):
 
 def general_plot(filtered_res, axis):
     x_axis_name, y_axis_name = axis
+
+    for solver in filtered_res:
+       for map_name in filtered_res[solver]:
+        filtered_res[solver][map_name] = clean_dataframe(filtered_res[solver][map_name], 'solved')
 
     for i, map in enumerate(MAPS_TO_PLOT):
         legend_list = []
@@ -206,11 +218,9 @@ def remove_string_from_csv(input_file):
 def main():
 
    remove_empty_lines( "results_plot/results_data_solvers/DCMAPF/results.csv")
-   #remove_last_empty_line( "results_plot/results_data_solvers/DCMAPF/results.csv")
+   #remove_string_from_csv("results_plot/results_data_solvers/DCMAPF/results.csv")
 
-   remove_string_from_csv("results_plot/results_data_solvers/DCMAPF/results.csv")
    data = import_results(RESULTS_FOLDER)
-
    filtered_res = filter_by_map(data)
    success_rate_plot(filtered_res)
    general_plot(filtered_res,['num_agents','soc'])
