@@ -80,6 +80,9 @@ def success_rate_plot(filtered_res):
 
                 for group in n_agents_groups:
                     g0  = pd.to_numeric(group[0], errors='coerce')
+                    print(group[1])
+                    print(group[0])
+
                     if g0 in ROBOT_SET[i]:#group[0]
                         s_rate = 0
 
@@ -189,7 +192,7 @@ def remove_last_empty_line(input_file):
     # Remove any rows with all missing values
     df.dropna(how='all', inplace=True)
     # Write the cleaned DataFrame back to the original file
-    df.to_csv(input_file, index=False, line_terminator='\n', encoding='utf-8')
+    df.to_csv(input_file, index=False, encoding='utf-8')
 
 
 def remove_string_from_csv(input_file, target_string):
@@ -200,7 +203,7 @@ def remove_string_from_csv(input_file, target_string):
     df.replace(target_string, '', inplace=True, regex=True)
 
     # Write the cleaned DataFrame back to the input file
-    df.to_csv(input_file, index=False, line_terminator='\n', encoding='utf-8')
+    df.to_csv(input_file, index=False, encoding='utf-8')
 
 
 def main():
