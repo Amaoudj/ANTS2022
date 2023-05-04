@@ -155,10 +155,10 @@ def general_plot(filtered_res, axis):
 
                 for group in n_agents_groups: #solved_numeric.to_list()
                     G0=pd.to_numeric(group[0], errors='coerce')
-                    G1=pd.to_numeric(group[1], errors='coerce')
+                    G1=pd.to_numeric(group[1].mean()[y_axis_name], errors='coerce')
 
                     if G0 in ROBOT_SET[i]: #group[0]
-                        y_axis_val.append(G1.mean()[y_axis_name])#group[1]
+                        y_axis_val.append(G1)#
                         x_axis_val.append(G0)#group[0]
 
                     else:
@@ -169,9 +169,7 @@ def general_plot(filtered_res, axis):
                 print(f'{map} do not exist in the solver : {solver}')
         title = f'{y_axis_name.replace("_", " ")} in {map[:-4]}.png'
 
-
         # -----------------------
-
         plt.legend(legend_list, fontsize=13)
         plt.xlabel('Number of robots', fontsize=13)
         plt.ylabel('Sum-of-costs', fontsize=13)
@@ -195,10 +193,10 @@ def remove_last_empty_line(input_file):
     df.to_csv(input_file, index=False, encoding='utf-8')
 
 
-def remove_string_from_csv(input_file, target_string):
+def remove_string_from_csv(input_file):
     # Read the CSV file into a pandas DataFrame
     df = pd.read_csv(input_file)
-
+    target_string = 'CBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBS'
     # Replace the target_string with an empty string in the entire DataFrame
     df.replace(target_string, '', inplace=True, regex=True)
 
@@ -210,11 +208,10 @@ def main():
 
    remove_empty_lines( "results_plot/results_data_solvers/DCMAPF/results.csv")
    #remove_last_empty_line( "results_plot/results_data_solvers/DCMAPF/results.csv")
-   target_string = 'CBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBSCBS'
 
-   remove_string_from_csv("results_plot/results_data_solvers/DCMAPF/results.csv", target_string)
+   remove_string_from_csv("results_plot/results_data_solvers/DCMAPF/results.csv")
    data = import_results(RESULTS_FOLDER)
-   print(data)
+
    filtered_res = filter_by_map(data)
    success_rate_plot(filtered_res)
    general_plot(filtered_res,['num_agents','soc'])

@@ -39,9 +39,9 @@ def main():
     print("")
     print("")
     print("Plotting the comparative results in terms of success rate and sum-of-costs ...")
-    print("")
+    print("Done. ")
     subprocess.run(["python3", Plotter], stdout=subprocess.PIPE)
-    print("Done. Check the <plots> folder in <results_plots> for the outcomes of DCMAPF.")
+    print("Check the <plots> folder in <results_plots> for the outcomes of DCMAPF.")
 
 if __name__ == "__main__":
     main()

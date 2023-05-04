@@ -443,11 +443,11 @@ def get_benchmark_data(bench_list):
 
         if mapName == 'empty-48-48'or mapName == 'random-64-64-20' : #or mapName == 'warehouse-20-40-10-2-2'
             new_robot_set = []
-            new_robot_set = [50,100]#, 150, 200,250,300,350, 400, 450
+            new_robot_set = [50,100,150, 200,250,300,350,400,450]#
 
         elif mapName == 'random-32-32-20':
             new_robot_set= []
-            new_robot_set = [50,100]#,150,200
+            new_robot_set = [50,100,150,200]#
 
         for robot_num in new_robot_set:  # for every robot number in robot_set
             poses_in_maps = []

@@ -524,10 +524,10 @@ class SmartAgent(AgentInterface):
                  new_candidates = []
                  for agent in candidates:
                     got_free_node = map.get_right_or_left_free_node(agent["pos"], critic_node,None)
-                    if got_free_node is not None:  #agent has a free neighboring node
+                    if got_free_node is not None:  # the agent has a free neighboring node
                         new_candidates.append(agent)
 
-                 if len(new_candidates) == 1:  # if only one agent has a free neighboring node, then it will get priority
+                 if len(new_candidates) == 1:  # if only one agent has a free neighboring node, then it will get the priority
                     priority_agent = new_candidates[0]['AgentID']
 
             if priority_agent is None :
