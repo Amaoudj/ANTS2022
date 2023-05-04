@@ -224,7 +224,7 @@ def main():
    data = import_results(RESULTS_FOLDER)
    filtered_res = filter_by_map(data)
    success_rate_plot(filtered_res)
-   #general_plot(filtered_res,['num_agents','soc'])
+   general_plot(filtered_res,['num_agents','soc'])
 
 if __name__ == "__main__":
     main()
