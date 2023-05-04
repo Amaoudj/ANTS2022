@@ -211,6 +211,7 @@ def main():
 
    remove_string_from_csv("results_plot/results_data_solvers/DCMAPF/results.csv", target_string)
    data = import_results(RESULTS_FOLDER)
+   print(data)
    filtered_res = filter_by_map(data)
    success_rate_plot(filtered_res)
    general_plot(filtered_res,['num_agents','soc'])
