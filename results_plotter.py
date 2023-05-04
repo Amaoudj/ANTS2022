@@ -212,6 +212,7 @@ def general_plot(filtered_res, axis):
                 n_agents_groups = filtered_res[solver][map].groupby('num_agents')
                 for group in n_agents_groups:
                     if group[0] in ROBOT_SET[i]:
+                        print(group[1])
                         y_axis_val.append(group[1].mean()[y_axis_name])
                         x_axis_val.append(group[0])
                     else:
