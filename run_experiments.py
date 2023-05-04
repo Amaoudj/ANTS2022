@@ -493,6 +493,7 @@ if __name__ == "__main__":
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(header)
 
+
     if arg.run_experiments:
 
             if arg.map == 'BenchmarkMapGenerator':

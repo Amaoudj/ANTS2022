@@ -343,6 +343,7 @@ class Map(object):
                 node_state = self._graph.nodes[random_node]["state"]
             return random_node
 
+
     def get_WayNode_include_moveBackward(self, node1, threshold_node) -> tuple:
          """
             return the nearest node for the node1 while note passing threshold_node

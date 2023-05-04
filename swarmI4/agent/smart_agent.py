@@ -959,15 +959,13 @@ class SmartAgent(AgentInterface):
             if self.is_free(critic_node, self.neighbors):  # no agent in the critic_node
                 for n in self.neighbors:
                     if n['AgentID'] != agent_having_priority['AgentID']:
-                        if n['pos'] == agent_having_priority[
-                            'next_next_node']:  # means the other agent located on my node
+                        if n['pos'] == agent_having_priority['next_next_node']:  # means the other agent located on my node
 
                             got_free_node = map.get_right_or_left_free_node(n['pos'], critic_node, critic_node)
                             got_free_node1 = map.get_right_or_left_free_node(agent_having_priority['pos'], critic_node,
                                                                              critic_node)
 
-                            if got_free_node is not None and got_free_node != n[
-                                'pos']:  # and got_free_node != critic_node:
+                            if got_free_node is not None and got_free_node != n[ 'pos']:  # and got_free_node != critic_node:
                                 solution[agent_having_priority['AgentID']] = "move"
                                 solution[n['AgentID']] = "move_to_node_and_wait"
 
@@ -1319,19 +1317,19 @@ class SmartAgent(AgentInterface):
         if priority_agent is None and len(candidates) == 1:
             priority_agent = candidates[0]['AgentID']
 
-        # choose the agent having a free neighbour node>
+        #  free neighbour node
         if priority_agent is None and len(candidates) == 2:
 
                 got_free_node1 = map.get_right_or_left_free_node(candidates[0]["pos"], candidates[1]["pos"], candidates[1]["next_next_node"])
                 got_free_node2 = map.get_right_or_left_free_node(candidates[1]["pos"], candidates[0]["pos"],candidates[0]["next_next_node"])
 
-                if got_free_node1 is None and got_free_node2 is not None:  # give the priority to this agent (it hasn't any free neighboring_node to got to)
+                if got_free_node1 is None and got_free_node2 is not None:  # give the priority to this agent
                     priority_agent = candidates[0]['AgentID']
 
                 elif got_free_node2 is None and got_free_node1 is not None:
                     priority_agent = candidates[1]['AgentID']
 
-        # <choose the agent with the largest number of Followers >
+        # agent with the largest number of Followers
         if priority_agent is None and len(candidates) == 2:
 
                     highest_requests_num = []
@@ -1350,7 +1348,6 @@ class SmartAgent(AgentInterface):
 
                     if len(candidates) == 1:  # if only one candidate left then it will have the priority
                         priority_agent = candidates[0]['AgentID']
-
 
         if priority_agent is None and len(candidates) == 2:
            # choose the agent having the state 'moving_away' True
@@ -1393,7 +1390,6 @@ class SmartAgent(AgentInterface):
                 if len(candidates) == 1:  # if only one candidate left then it will have the priority
                     priority_agent = candidates[0]['AgentID']
 
-
         # choose the agent with the highest remaining_nodes>
         if priority_agent is None and len(candidates) == 2:  # in case of equality
 
@@ -1401,7 +1397,7 @@ class SmartAgent(AgentInterface):
                 for i in candidates:
                     remaining_node.append(i['remaining_nodes'])
 
-                indx = remaining_node.index(min(remaining_node))
+                indx = remaining_node.index(max(remaining_node))
                 longest_path = remaining_node[indx]
                 newcandidates = [i for i in candidates if i['remaining_nodes'] == longest_path]
                 candidates.clear()
@@ -1443,7 +1439,6 @@ class SmartAgent(AgentInterface):
 
                 if priority_agent == self.id:
                     self.action = "move"
-        #Got_free_node = self.move_out_of_the_way(map, threshould, prohibited_node)
 
         # if Got_free_node:
         for n in self.neighbors:  # two agents
@@ -1460,13 +1455,11 @@ class SmartAgent(AgentInterface):
 
         self.next_waypoint = self.remaining_path[0]
 
-        #if self.neighbors[0]['AgentID'] == self.id:
-            #logging.info(f'Solution{solution}')
+
 
     def post_negotiation(self, map):
 
         #each agent checks if there are other agents planned the same next node, and then change their action to wait if they do not have a priority
-
         candidates = []
         conf = False
 
