@@ -1209,9 +1209,9 @@ class SmartAgent(AgentInterface):
 
         self.priority_neighbor = priority_agent
 
-        if self.neighbors[0]['AgentID'] == self.id:
-          #print(len(self.neighbors))
-          #print(f'solution is :{solution}')
+        #if self.neighbors[0]['AgentID'] == self.id:
+        #print(len(self.neighbors))
+        #print(f'solution is :{solution}')
 
         for agent in self.neighbors:
             if agent['AgentID'] == self.id:
