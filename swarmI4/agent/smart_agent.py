@@ -2059,7 +2059,6 @@ class SmartAgent(AgentInterface):
                 self.num_TRIES = 0
 
 
-
                 self.face_to(self.next_waypoint)
                 # logging.info(f'{self._position}-->{self.next_waypoint}')
                 self.last_node = self._position
@@ -2080,11 +2079,13 @@ class SmartAgent(AgentInterface):
                 map.graph.nodes[self._position]["agent"]     = agent
                 map._graph.nodes[self._position]["state"]    = 'agent'
 
-                if self.position == self.target:#self.is_last_node: # if this node is the last one in the path, then im_done
-                    self.is_last_node = False
-                    self.im_done   = True
+
+                if self.position == self.target: #:#self.is_last_node if this node is the last one in the path, then im_done
+                    #self.is_last_node = False
+                    self.im_done       = True
                     self.targetReached = True
-                    self.has_delayed = False
+                    self.has_delayed   = False
+                    self.remaining_path.clear()
 
 
                     #map.add_agent_to_list_agents_done(self.position)
@@ -2094,9 +2095,10 @@ class SmartAgent(AgentInterface):
                    self.all_visited_nodes.append(self.next_waypoint)
 
                    self.remaining_path.remove(self.next_waypoint)
-                   if len(self.remaining_path) == 0: #
+                   if len(self.remaining_path) == 0:
                        self.is_last_node = True
-
+                   else:
+                       self.is_last_node = False
         #self.storage_container.append( {'sim_time': round(sim_time, 2), 'steps': self.steps, 'num_targets': len(self.target_list),'num_conflicts': self.num_conflicts})
 
         if not self.started:

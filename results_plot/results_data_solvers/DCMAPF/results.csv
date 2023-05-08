@@ -1,1 +1,2 @@
 map_name,map_size,obstacles_number,num_agents,solver,solved,soc,makespan,simulation_time
+empty-48-48.map,2304,0,450,DCMAPF,True,19813,101,126.6
