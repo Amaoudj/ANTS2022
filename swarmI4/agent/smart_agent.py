@@ -1059,6 +1059,7 @@ class SmartAgent(AgentInterface):
 
 
                             else:  # no free neighboring nodes
+                                nearestFreenode = None
                                 solution[agent_done['AgentID']]   = "move_backward_"
                                 solution[agent_moving['AgentID']] = "move"
                                 Agent_moving_Target = agent_moving['target']
@@ -1145,7 +1146,7 @@ class SmartAgent(AgentInterface):
                                     nearestnode_befor_target = True  # plan direct path
                                     back_node = self.get_back_node(self.position, agent_done['pos'])
 
-                                    # nearestFreenode = map.get_nearest_free_node_on_right_left_mode(agent_done['pos'], back_node, 1)
+                                    nearestFreenode = map.get_nearest_free_node_on_right_left_mode(agent_done['pos'], back_node, 1)
                                     node2 = None
                                     if not agent_done_back_node_is_free:
                                         node2 = map.get_nearest_free_node_on_right_left_mode(self.position, back_node,
@@ -1160,8 +1161,7 @@ class SmartAgent(AgentInterface):
                                         node2 = map.get_nearest_free_node(self.position)
 
                                     if node2 is not None:
-                                        if nearestFreenode is not None and self.is_target_between_two_nodes(
-                                                Agent_moving_Target, agent_done['pos'], node2):
+                                        if nearestFreenode is not None and self.is_target_between_two_nodes(Agent_moving_Target, agent_done['pos'], node2):
                                             nearestnode_befor_target = False
 
                                     if mode != 0 and not (nearestnode_befor_target and mode == 2):
