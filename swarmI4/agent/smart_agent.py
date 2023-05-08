@@ -1007,7 +1007,9 @@ class SmartAgent(AgentInterface):
                     if agent_done is not None:
 
                         go_to_node1= map.get_right_or_left_free_node(agent_done['pos'], agent_moving['pos'], agent_moving['next_next_node'])  #get_right_or_left_free_node get_Free_WayNode
-
+                        print(go_to_node1,agent_moving['next_next_node'])
+                        print(f'agent done in {self.position}--> move to free neighbor node {go_to_node1}')
+                        print(f'agent moving in {agent_moving["pos"]}--> move to  {agent_moving["next_next_node"]}')
                         if go_to_node1 is not None:
                             solution[agent_done['AgentID']]   = "move_right_left_backward"
                             solution[agent_moving['AgentID']] = "move"
