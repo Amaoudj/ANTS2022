@@ -996,7 +996,7 @@ class SmartAgent(AgentInterface):
 
                 agent_done = None
                 agent_moving = None
-                print(self.neighbors)
+
                 if self.neighbors[0]['im_done'] or self.neighbors[1]['im_done']: # if there is an agent done
                     for agent_ in self.neighbors:
                         if agent_['im_done']:
@@ -1193,6 +1193,7 @@ class SmartAgent(AgentInterface):
                                         solution[agent_moving['AgentID']] = "move"
 
                 else:
+                    print(self.neighbors)
                     for n in self.neighbors:
                         if n['pos'] == critic_node:
                             # if map.is_free(n['next_next_node']):  # next-next node is free
