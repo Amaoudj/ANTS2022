@@ -9,7 +9,7 @@ from typing import Tuple, Callable
 from .. agent import *
 
 
-class RaoufExperiment(BaseExperiment):
+class Experiment(BaseExperiment):
     """
     All the basic configuration is inherited from the BaseExperiment.
     All we need to do is just to override the

@@ -189,7 +189,7 @@ def parse_args():
 
     parser.add_argument("-e", "--experiment",
                         help="Experiment to run",
-                        nargs=1, metavar="experiment", choices=["BaseExperiment", "AndersTestExperiment","RaoufExperiment"],
+                        nargs=1, metavar="experiment", choices=["BaseExperiment", "AndersTestExperiment","Experiment"],
                         type=str,
                         default="RaoufExperiment")
 
@@ -441,7 +441,7 @@ def get_benchmark_data(bench_list):
 
         if mapName == 'empty-48-48'or mapName == 'random-64-64-20' : #or mapName == 'warehouse-20-40-10-2-2':
             new_robot_set = []
-            new_robot_set = [250,300,350,400,450]#
+            new_robot_set = [450]#250,300,350,400,
 
         elif mapName == 'random-32-32-20':
             new_robot_set= []

@@ -436,7 +436,7 @@ class Map(object):
                     elif self.is_free(_node2) and _node2 != prohibited_node:  # and not self.is_free(_node1):
                         _node = _node2
 
-                    else:
+                    else: # None free node that is deffirent from pthe rohibited_node
 
                         if col1 > col:  # search left side
                             if self.is_free((row, col - 1)) and (row, col - 1) != prohibited_node:  # self._graph.nodes[(row, col - 1)]["state"] == 'free_space' or self._graph.nodes[(row, col - 1)]["state"] == 'target':

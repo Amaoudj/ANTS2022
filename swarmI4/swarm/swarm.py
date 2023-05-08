@@ -68,7 +68,7 @@ class Swarm(object):
                 agent.send_my_data(self._my_map)
 
     def agents_post_coordination(self):
-        for i in range(0,5):
+        for i in range(0,6):
           self.update_msg_box()
           # post_negotiation
           for agent in self._agents:
