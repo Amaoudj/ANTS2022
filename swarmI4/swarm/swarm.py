@@ -17,7 +17,6 @@ class Swarm(object):
     def __init__(self,args, agent_generators: List[Tuple[int, Func]], placement_func: Func, my_map: Map):
         """ Create the swarm """
         # create an empty storage folder
-        self.data_storage_dir = 'results'
 
         self._agents = []
         self.changed_agents_list = []
@@ -90,38 +89,6 @@ class Swarm(object):
 
         self.update_msg_box()
 
-    def export_num_replanning(self,time_step,num_robots,total_num_calls):
-
-        Solver = "IDCMAPF"
-
-        storage_path = '../swarm4I40sim/conf_experiments/replannig_stat.csv'
-
-        data = { 'solved': Solver,
-                'num_robots': num_robots, #number of robots that replanned their paths
-                'num_calls' : total_num_calls,
-                'solver': Solver,
-                'time_step': time_step}
-
-        data = {k: [v] for k, v in data.items()}
-        df = pd.DataFrame(data)
-
-        if os.path.isfile(storage_path):
-            df.to_csv(storage_path, mode='a', index=False, header=False)
-        else:
-            df.to_csv(storage_path, mode='w', index=False)
-
-
-    def get_num_replanned_paths(self):
-        num_replanned_paths=0
-        num_agents=0
-        for agent in self._agents:
-            if type(agent) is SmartAgent:
-                num_replanned_paths  += agent.num_replanned_paths
-                if agent.num_replanned_paths != 0 :
-                    num_agents+=1
-
-        return num_replanned_paths,num_agents
-
 
     def get_sum_cost(self):
         cost=0
@@ -131,17 +98,10 @@ class Swarm(object):
         return cost
 
 
-
     def move_all(self,simulation_time,dt=0) -> None:
           """
           Move all agents in the swarm
           """
-          #logging.info(f'------------<New iteration started >-----------------------------')
-          num_robots = 0
-          total_num_calls = 0
-          for agent in self._agents:
-            if type(agent) is SmartAgent:
-                agent.readParameterConfiguration()
 
           for agent in self._agents:
             if type(agent) is SmartAgent:

@@ -150,9 +150,6 @@ class SmartAgent(AgentInterface):
             map.neighbors_agents_stat[self.id] = data
 
 
-    def readParameterConfiguration(self):
-        pass
-
 
     def is_agent_involved_in_opposite_conflict(self, map, agent):
 
@@ -461,8 +458,8 @@ class SmartAgent(AgentInterface):
                 self.action = "move"
                 self.got_conflict = False
 
-                successor = self.follower  # self.get_follower_agent(map, self.id)
-                if successor is not None and successor["AgentID"] != self.id:
+                successor = self.follower
+                if successor is not None :
 
                     if not self.is_agent_involved_in_opposite_conflict(map, successor) and not self.is_agent_involved_in_intersection_conflict(map, successor):
                         if (successor["next_node"] == self.position) and (successor["next_next_node"] == my_next_node) and successor["remaining_nodes"] > len(self.remaining_path) + 1 :
@@ -511,96 +508,76 @@ class SmartAgent(AgentInterface):
 
         for agent in candidates:
             if int(agent['remaining_nodes']) == 1:
-                candidates.remove(agent)
+                #candidates.remove(agent)
                 break
 
-        if len(candidates) == 1:  # if only one candidate left then it will have the priority
-            priority_agent = candidates[0]['AgentID']
 
-
-        if priority_agent is None and len(candidates) > 1:
-
-            if priority_agent is None :
-                 new_candidates = []
-                 for agent in candidates:
-                    got_free_node = map.get_right_or_left_free_node(agent["pos"], critic_node,None)
-                    if got_free_node is not None:  # the agent has a free neighboring node
-                        new_candidates.append(agent)
-
-                 if len(new_candidates) == 1:  # if only one agent has a free neighboring node, then it will get the priority
-                    priority_agent = new_candidates[0]['AgentID']
-
-            if priority_agent is None :
-              if len(candidates) > 2:
-                new_candidates = []
+        # a robot moving out of another robot’s way is given priority
+        if priority_agent is None:
+            if len(candidates) == 2:
                 for agent in candidates:
-                    if agent['moving_backward'] or agent['moving_away']:
-                        new_candidates.append(agent)
-                if len(new_candidates) == 1:  # if only one candidate left then it will have the priority
-                    priority_agent = new_candidates[0]['AgentID']
+                     if agent['moving_backward'] or agent['moving_away']:
+                          for n in candidates:
+                               if n != agent:
+                                    if agent['conflict_agent'] == n['AgentID']:
+                                        priority_agent = n['AgentID']
 
-              elif len(candidates) == 2:
-                for agent in candidates:
-                    if agent['moving_backward'] or agent['moving_away']:
-                        for n in candidates:
-                            if n != agent:
-                                if agent['conflict_agent'] == n['AgentID']:
-                                    priority_agent = n['AgentID']
+            elif len(candidates) > 2:
+                    new_candidates = []
+                    for agent in candidates:
+                        if agent['moving_backward'] or agent['moving_away']:
+                            new_candidates.append(agent)
+                    if len(new_candidates) == 1:  # if only one candidate left then it will have the priority
+                        priority_agent = new_candidates[0]['AgentID']
 
-            if priority_agent is None and len(candidates) > 1:  # in case of equality in rule 01 apply rule 02
+        # the robot with the largest numberFollowers is given priority
+        if priority_agent is None:  # in case of equality in rule 01 apply rule 02
+                max_num_Followers = max(agent['successors'] for agent in candidates)
+                # Count the number of agents with the max_num_Follower
+                count = sum(1 for agent in candidates if agent['successors'] == max_num_Followers)
+
+                if count == 1:  # only one agent has max remaining nodes
+                    num_Followers = [agent['successors'] for agent in candidates]
+                    indx = num_Followers.index(max_num_Followers)
+                    priority_agent = candidates[indx]['AgentID']
+
+        #a robot having a free neighboring node is given priority
+        if priority_agent is None:
+              new_candidates = []
+              for agent in candidates:
+                got_free_node = map.get_right_or_left_free_node(agent["pos"], critic_node,None)
+                if got_free_node is not None:
+                    new_candidates.append(agent)
+
+              if len(new_candidates) == 1:  # if only one agent has a free neighboring node, then it will get the priority
+                priority_agent = new_candidates[0]['AgentID']
+
+        #the robot having the largest numberRequestsMyNode is given priority
+        if priority_agent is None:
+                max_num_pos_requests = max(agent['num_pos_requests'] for agent in candidates)
+                # Count the number of agents with the maximum num_pos_requests
+                count = sum(1 for agent in candidates if agent['num_pos_requests'] == max_num_pos_requests)
+                if count == 1:  # only one agent has max num_pos_requests
+                    num_requests = [agent['num_pos_requests'] for agent in candidates]
+                    indx = num_requests.index(max_num_pos_requests)
+                    priority_agent = candidates[indx]['AgentID']
+
+
+        #the robot having the largest remaining_nodes is given priority
+        if priority_agent is None :
                 # Find the maximum remaining nodes among all agents
                 max_remaining = max(agent['remaining_nodes'] for agent in candidates)
                 # Count the number of agents with the maximum remaining nodes
                 count = sum(1 for agent in candidates if agent['remaining_nodes'] == max_remaining)
 
-                if count == 1:  # only one agent
+                if count == 1:  # only one agent has max remaining nodes
                     remaining_node = [agent['remaining_nodes'] for agent in candidates]
                     indx = remaining_node.index(max_remaining)
                     priority_agent = candidates[indx]['AgentID']
 
-            if priority_agent is None and len(candidates) > 1:  # in case of equality in rule 01 apply rule 02
-
-                highest_requests_num = []
-                done = False
-                for i in candidates:
-                    highest_requests_num.append(i['successors'])
-                    # if i["im_done"]:
-                    # done=True
-                    # break
-                if not done:  # if an agent is done, do not applied this rule
-                    indx = highest_requests_num.index(max(highest_requests_num))
-                    highest_requests = highest_requests_num[indx]
-                    newcandidates = [i for i in candidates if i['successors'] == highest_requests]
-                    candidates.clear()
-                    candidates.extend(newcandidates)
-
-                if len(candidates) == 1:  # if only one candidate left then it will have the priority
-                    priority_agent = candidates[0]['AgentID']
-
-                    # if self.neighbors[0]['AgentID'] == self.id:
-                    #   logging.info(f'priority rule 02: True for agent{priority_agent}')
-
-            if priority_agent is None and len(candidates) > 1:  # in case of equality in rule 01 apply rule 02
-
-                highest_requests_num = []
-                for i in candidates:
-                    highest_requests_num.append(i['num_pos_requests'])
-
-                indx = highest_requests_num.index(max(highest_requests_num))
-                highest_requests = highest_requests_num[indx]
-                newcandidates = [i for i in candidates if i['num_pos_requests'] == highest_requests]
-                candidates.clear()
-                candidates.extend(newcandidates)
-
-                if len(candidates) == 1:  # if only one candidate left then it will have the priority
-                    priority_agent = candidates[0]['AgentID']
-
-
-                # rule 05: in case every other rule failed , choose the agent with the highest id
-                else:
-                    priority_agent = max([agent['AgentID'] for agent in candidates])
-                    # if self.neighbors[0]['AgentID'] == self.id:
-                    # logging.info( f'last rule failed--we take the agent with the highest id : (agent{priority_agent})')
+        #Finally if robots cannot decide priority, the robot with Max ID is given priority
+        if priority_agent is None :
+               priority_agent = max([agent['AgentID'] for agent in candidates])
 
 
         prohibited_node = None
@@ -626,12 +603,10 @@ class SmartAgent(AgentInterface):
             solved = False
             got_to_node = None
 
-            if self.neighbors[0]['im_done'] or self.neighbors[1]['im_done'] or self.neighbors[2]['im_done'] or \
-                    self.neighbors[3]['im_done'] or self.neighbors[4]['im_done']:
+            if self.neighbors[0]['im_done'] or self.neighbors[1]['im_done'] or self.neighbors[2]['im_done'] or self.neighbors[3]['im_done'] or self.neighbors[4]['im_done']:
 
                 for agent in self.neighbors:
                     if agent['im_done']:  # self.im_done :#and self.action=="wait" : # :
-
                         agent_done = agent['AgentID']
                         solution[agent['AgentID']] = "move"
                         got_to_node = map.free_neighboring_node(agent['pos'], self.neighbors)
@@ -680,6 +655,7 @@ class SmartAgent(AgentInterface):
                             solution[agent_to_give_way['AgentID']] = "move_to_node_and_wait"
                             if agent_to_give_way['AgentID'] == self.id:  # it is me
                                 self.my_move_away_node = free_node_to_give_way
+
                         else:
                             solution[agent['AgentID']] = "wait"
 
@@ -826,9 +802,8 @@ class SmartAgent(AgentInterface):
             is_free = True
             for n in self.neighbors:
                 if n['AgentID'] != agent_having_priority['AgentID']:
-                    if agent_having_priority['next_next_node'] == n['pos'] or not self.is_free(critic_node,
-                                                                                               self.neighbors):  # means that the agent having priority will move to an occupied node
-                        is_free = False  # the next_next_node is not free
+                    if not self.is_free(critic_node, self.neighbors) or agent_having_priority['next_next_node'] == n['pos'] :  #
+                        is_free = False  #
 
                 if n['pos'] == critic_node:
                     is_critic_node_free = False
@@ -841,8 +816,7 @@ class SmartAgent(AgentInterface):
                     if agent_having_priority['AgentID'] != n['AgentID']:
                         solution[n['AgentID']] = "wait"
 
-            elif self.is_free(critic_node,
-                              self.neighbors):  # not Free, so the agent in this node should go to a free node and let the priority to the agent
+            elif self.is_free(critic_node,self.neighbors):  # not Free, so the agent in this node should go to a free node and let the priority to the agent
                 solution[agent_having_priority['AgentID']] = "move"
                 for n in self.neighbors:
                     if agent_having_priority['next_next_node'] == n['pos']:  # the agent accupied this node
@@ -1258,6 +1232,7 @@ class SmartAgent(AgentInterface):
                         if agent['pos'] != critic_node:
                             solution[agent['AgentID']] = "wait"
 
+
         self.priority_neighbor = priority_agent
 
         # if self.neighbors[0]['AgentID'] == self.id:
@@ -1313,39 +1288,17 @@ class SmartAgent(AgentInterface):
         if priority_agent is None and len(candidates) == 1:
             priority_agent = candidates[0]['AgentID']
 
-        #  free neighbour node
-        if priority_agent is None and len(candidates) == 2:
+        # if an agent is moving_backward or moving_away and the coflict_agent is the same, then it should continue and give the priority to the coflict_agent
+        for agent in candidates:
+            if agent['moving_backward'] or agent[ 'moving_away']:  # the other agent will have the priority because it had the last step
+                for n in candidates:
+                    if n != agent:
+                        if agent['conflict_agent'] == n['AgentID']:
+                            priority_agent = n['AgentID']
+                            if agent['AgentID'] == self.id:
+                                self.moving_away = False
 
-                got_free_node1 = map.get_right_or_left_free_node(candidates[0]["pos"], candidates[1]["pos"], candidates[1]["next_next_node"])
-                got_free_node2 = map.get_right_or_left_free_node(candidates[1]["pos"], candidates[0]["pos"],candidates[0]["next_next_node"])
-
-                if got_free_node1 is None and got_free_node2 is not None:
-                    priority_agent = candidates[0]['AgentID']
-
-                elif got_free_node2 is None and got_free_node1 is not None:
-                    priority_agent = candidates[1]['AgentID']
-
-        # agent with the largest number of Followers
-        if priority_agent is None and len(candidates) == 2:
-
-                    highest_requests_num = []
-                    done = False
-                    for i in candidates:
-                        highest_requests_num.append(i['successors'])
-                        # if i["im_done"]:
-                        # done=True
-                        # break
-                    if not done:  # if an agent is done, do not applied this rule
-                        indx = highest_requests_num.index(max(highest_requests_num))
-                        highest_requests = highest_requests_num[indx]
-                        newcandidates = [i for i in candidates if i['successors'] == highest_requests]
-                        candidates.clear()
-                        candidates.extend(newcandidates)
-
-                    if len(candidates) == 1:  # if only one candidate left then it will have the priority
-                        priority_agent = candidates[0]['AgentID']
-
-        if priority_agent is None and len(candidates) == 2:
+        if priority_agent ==10000 :
            # choose the agent having the state 'moving_away' True
            if candidates[0]['moving_away'] and candidates[0]['conflict_agent'] != candidates[1]['AgentID'] and candidates[0]['next_node'] != candidates[0]['my_last_node']:
             # if not candidates[1]['moving_away']:
@@ -1359,54 +1312,64 @@ class SmartAgent(AgentInterface):
               if candidates[1]['AgentID'] == self.id:
                  self.moving_away = False
 
-        # if an agent is moving_backward or moving_away and the coflict_agent is the same, then it should continue and give the priority to the coflict_agent
-        if priority_agent is None :  # both AGVs have a free neighboring_node or both AGVs don't have any free neighboring_node
-            for agent in candidates:
-                 if agent['moving_away'] or agent['moving_backward'] and priority_agent is None:  # the other agent will have the priority because it had the last step
-                       for n in candidates:
-                            if n != agent:
-                                 if agent['conflict_agent'] == n['AgentID']:
-                                      priority_agent = n['AgentID']
-                                      if agent['AgentID'] == self.id:
-                                          self.moving_away = False
+                 # the robot with the largest numberFollowers is given priority
+              if priority_agent is None:  # in case of equality in rule 01 apply rule 02
+                  max_num_Followers = max(agent['successors'] for agent in candidates)
+                  # Count the number of agents with the max_num_Follower
+                  count = sum(1 for agent in candidates if agent['successors'] == max_num_Followers)
 
-        # choose the agent with highest num_pos_requests>
-        if priority_agent is None and len(candidates) == 2:
+                  if count == 1:  # only one agent has max remaining nodes
+                      num_Followers = [agent['successors'] for agent in candidates]
+                      indx = num_Followers.index(max_num_Followers)
+                      priority_agent = candidates[indx]['AgentID']
 
-                highest_requests_num = []
-                for i in candidates:
-                    highest_requests_num.append(i['num_pos_requests'])
+        # the robot with the largest numberFollowers is given priority
+        if priority_agent is None:  # in case of equality in rule 01 apply rule 02
+                  max_num_Followers = max(agent['successors'] for agent in candidates)
+                  # Count the number of agents with the max_num_Follower
+                  count = sum(1 for agent in candidates if agent['successors'] == max_num_Followers)
 
-                indx = highest_requests_num.index(max(highest_requests_num))
-                highest_requests = highest_requests_num[indx]
-                newcandidates = [i for i in candidates if i['num_pos_requests'] == highest_requests]
-                candidates.clear()
-                candidates.extend(newcandidates)
+                  if count == 1:  # only one agent has max remaining nodes
+                      num_Followers = [agent['successors'] for agent in candidates]
+                      indx = num_Followers.index(max_num_Followers)
+                      priority_agent = candidates[indx]['AgentID']
 
-                if len(candidates) == 1:  # if only one candidate left then it will have the priority
+        # robot with free neighbour node
+        if priority_agent is None :
+                got_free_node1 = map.get_right_or_left_free_node(candidates[0]["pos"], candidates[1]["pos"], candidates[1]["next_next_node"])
+                got_free_node2 = map.get_right_or_left_free_node(candidates[1]["pos"], candidates[0]["pos"],candidates[0]["next_next_node"])
+
+                if got_free_node1 is None and got_free_node2 is not None:
                     priority_agent = candidates[0]['AgentID']
 
-        # choose the agent with the highest remaining_nodes>
-        if priority_agent is None and len(candidates) == 2:  # in case of equality
+                elif got_free_node2 is None and got_free_node1 is not None:
+                    priority_agent = candidates[1]['AgentID']
 
-                remaining_node = []
-                for i in candidates:
-                    remaining_node.append(i['remaining_nodes'])
+        # the robot having the largest numberRequestsMyNode is given priority
+        if priority_agent is None:
+             max_num_pos_requests = max(agent['num_pos_requests'] for agent in candidates)
+             # Count the number of agents with the maximum num_pos_requests
+             count = sum(1 for agent in candidates if agent['num_pos_requests'] == max_num_pos_requests)
+             if count == 1:  # only one agent has max num_pos_requests
+                  num_requests = [agent['num_pos_requests'] for agent in candidates]
+                  indx = num_requests.index(max_num_pos_requests)
+                  priority_agent = candidates[indx]['AgentID']
 
-                indx = remaining_node.index(max(remaining_node))
-                longest_path = remaining_node[indx]
-                newcandidates = [i for i in candidates if i['remaining_nodes'] == longest_path]
-                candidates.clear()
-                candidates.extend(newcandidates)
+        # the robot having the largest remaining_nodes is given priority
+        if priority_agent is None:
+             # Find the maximum remaining nodes among all agents
+             max_remaining = max(agent['remaining_nodes'] for agent in candidates)
+             # Count the number of agents with the maximum remaining nodes
+             count = sum(1 for agent in candidates if agent['remaining_nodes'] == max_remaining)
 
-                if len(candidates) == 1:  # if only one candidate left then it has the priority
-                    priority_agent = candidates[0]['AgentID']
+             if count == 1:  # only one agent has max remaining nodes
+                  remaining_node = [agent['remaining_nodes'] for agent in candidates]
+                  indx = remaining_node.index(max_remaining)
+                  priority_agent = candidates[indx]['AgentID']
 
-                # rule 04: in case every other rule failed , choose the agent with the highest id
-                else:
-                    #if self.neighbors[0]['AgentID'] == self.id:
-                        #logging.info(f'rule 04 failed, we take the agent with the highest id')
-                    priority_agent = max([agent['AgentID'] for agent in candidates])
+        # Finally if robots cannot decide priority, the robot with Max ID is given priority
+        if priority_agent is None:
+            priority_agent = max([agent['AgentID'] for agent in candidates])
 
 
         self.priority_neighbor = priority_agent
@@ -1979,10 +1942,10 @@ class SmartAgent(AgentInterface):
                 self.plan_path_to_all_targets(map)
                 self.im_done = False
 
-
+        MIN_WAITING_TIME = 5
         # Agents having free neighboring nodes replan the path while considering some neighbors returned by the function --get_node_to_remove_replan_path-- as obstacles
-        if self.waiting_steps > 4 and not self.im_done and self.num_TRIES == 0:
-            self.num_TRIES += 1
+        if self.waiting_steps == MIN_WAITING_TIME and not self.im_done :
+
             neighbor = map.free_neighboring_node(self.position, self.position)
 
             if neighbor is not None:
@@ -2001,7 +1964,7 @@ class SmartAgent(AgentInterface):
                         self.remaining_path.extend(path_i)  #
 
         # Try again, only agents having free neighboring nodes, to replan the path while consider the occupied neighbors as obstacles
-        if self.waiting_steps > 5 and not self.im_done and self.num_TRIES == 1:  # there is another deadlock
+        if self.waiting_steps == MIN_WAITING_TIME + 1 and not self.im_done :
 
             neighbor = map.free_neighboring_node(self.position, self.position)
             self.num_TRIES += 1
@@ -2029,7 +1992,7 @@ class SmartAgent(AgentInterface):
 
 
         # Try again, all agents, to replan the path while considering the occupied neighbors as obstacles
-        if self.waiting_steps > 6 and not self.im_done and self.num_TRIES == 2:  # there is another deadlock
+        if self.waiting_steps == MIN_WAITING_TIME + 2 and not self.im_done :  # there is another deadlock
             neighbors = map.get_neighbors(self.position, diagonal=False)
             neighbor = map.free_neighboring_node(self.position, self.position)
             self.num_TRIES += 1
@@ -2050,9 +2013,8 @@ class SmartAgent(AgentInterface):
                 self.remaining_path.extend(path_i)  #
                 self.num_replanned_paths += 1
 
-
         # Try again to replan the path while considering only the next node as an obstacle
-        if self.waiting_steps > 7 and not self.im_done and self.num_TRIES == 3:  #
+        if self.waiting_steps == MIN_WAITING_TIME + 3 and not self.im_done :  #
             self.num_TRIES = 0
             self.waiting_step = 4  # to start from the first try
             if self.remaining_path is not None and len(self.remaining_path) > 1:
@@ -2068,13 +2030,10 @@ class SmartAgent(AgentInterface):
 
         # This is a long-term precaution, where a robot should replan its path when visiting 10 nodes two times regardless the order of visiting these nodes.
         if len(self.all_visited_nodes) > 15 and not self.im_done:
-            num_repeatitons = []
-            for node in self.all_visited_nodes:
-                rep = self.all_visited_nodes.count(node)
-                if rep > 2:
-                    num_repeatitons.append(rep)
 
-            if (len(num_repeatitons) >= 5):
+            max_repetitions = max(self.all_visited_nodes.count(node) for node in set(self.all_visited_nodes))
+
+            if (max_repetitions >= 3):
                 if self.last_node != self.position:
                     neighbors_to_remove = map.get_all_occupied_neighbors(self.position, 1)
                     neighbors_to_remove.append(self.last_node)
