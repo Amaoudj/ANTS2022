@@ -73,7 +73,7 @@ class Simulator(object):
 
         self._start_time = time.time()
 
-        self.steps_limit = 602
+        self.steps_limit = 502
         sim_action       = None
 
         while   not self._my_swarm.done and self._my_swarm.success and self._step < self.steps_limit:
