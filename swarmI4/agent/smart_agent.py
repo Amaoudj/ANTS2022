@@ -1016,7 +1016,7 @@ class SmartAgent(AgentInterface):
                             solution[agent_done['AgentID']]   = "move_right_left_backward"
                             solution[agent_moving['AgentID']] = "move"
 
-                            if agent_done['AgentID'] == self.id:
+                            if agent_done['AgentID'] == self.id:--
                                 self.im_done = False
                                 self.is_last_node = False
                                 self.action == "move_right_left_backward"
@@ -2042,14 +2042,12 @@ class SmartAgent(AgentInterface):
         if self.action == "wait":
             self.wait()
             self.waiting_steps = self.waiting_steps + 1  #self.waiting_steps +=1
-            # logging.info(self.position)
 
 
         else: # your planned action is move
 
            if (self.next_waypoint is None):
-              # pyautogui.alert(text='Agent' + str(self.id) + ' with action ' + str(self._position) + ' is trying to reach a None node' , title='Moving to None node',
-              #     button='OK')
+
               self.action="wait"
               self.wait()
               self.waiting_steps = self.waiting_steps + 1
@@ -2058,8 +2056,7 @@ class SmartAgent(AgentInterface):
            else:
                 self.waiting_steps = 0
                 self.num_TRIES = 0
-                #if self.last_node != self.position:
-                #self.steps += 1
+
 
 
                 self.face_to(self.next_waypoint)
@@ -2082,7 +2079,7 @@ class SmartAgent(AgentInterface):
                 map.graph.nodes[self._position]["agent"]     = agent
                 map._graph.nodes[self._position]["state"]    = 'agent'
 
-                if self.is_last_node: # if this node is the last one in the path, then im_done
+                if self.position == self.target:#self.is_last_node: # if this node is the last one in the path, then im_done
                     self.is_last_node = False
                     self.im_done   = True
                     self.targetReached = True
