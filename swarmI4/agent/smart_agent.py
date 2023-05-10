@@ -1219,9 +1219,7 @@ class SmartAgent(AgentInterface):
                         if agent['pos'] != critic_node:
                             solution[agent['AgentID']] = "wait"
 
-
         self.priority_neighbor = priority_agent
-
 
         for agent in self.neighbors:
             if agent['AgentID'] == self.id:
@@ -1375,42 +1373,40 @@ class SmartAgent(AgentInterface):
         candidates = []
         conf = False
 
+        # object of me
         agent1 = map.neighbors_agents_stat[self.id]
 
         # get the agent planned the same next_node with me and negotiate the priority again
         for agent2 in map.neighbors_agents_stat:
-            if agent2['AgentID'] != self.id and agent1["next_node"] != None and agent2["next_node"] != None:
-                 if (agent1["next_node"] == agent2["next_node"]):
+            if agent2['AgentID'] != self.id and agent1["next_node"] != None and agent2["next_node"] != None and (agent1["next_node"] == agent2["next_node"]):
                     self.got_conflict = True  # my action will depend only on the conflict_resolution process
                     conf = True
                     candidates.append(agent2)  # the other agents
 
+        # if there are other agents that has planned the same action as me after solving a conflict add me to the list to start another negotiation process
         if conf:
-           candidates.append(agent1)  # if there are other agents that has planned the same action as me after solving a conflict
+           candidates.append(agent1)
 
-        #candidates_copy = candidates
-        all_agents_move = True
+        # another negotiation process to determine which agent will have priority :
+        priority_agent = None
+        agent_having_priority = None
+
 
         if len(candidates) > 1 :
             for agent in candidates:
-                if agent["planned_action"] == "wait":
+                if agent["planned_action"] == "wait": # if an agent\s action is wait, then remove it from the process as it will stay at its node
                     candidates.remove(agent)
                     break
-
-        #negotiation process to determine which agent will have priority :
-        priority_agent = None
-        agent_having_priority=None
 
         if len(candidates) == 1:
             priority_agent = candidates[0]['AgentID']
 
-        elif len(candidates) > 1 and all_agents_move :
+        elif len(candidates) > 1 :
 
             # if Agent is moving_away or moving _backward, then it will have the priority
             if priority_agent is None:
                 for agent in candidates:
                     if agent['moving_away'] or agent['moving_backward']:
-                        # if not candidates[1]['moving_away']:
                         priority_agent = agent['AgentID']
                         agent_having_priority= agent
                         if agent['AgentID'] == self.id:
@@ -1475,6 +1471,7 @@ class SmartAgent(AgentInterface):
               self.action = "wait"
               self.changed_action = True
         self.send_my_data(map)
+
 
     def post_coordination(self, map) -> tuple:
         """
