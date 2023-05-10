@@ -1252,6 +1252,7 @@ class SmartAgent(AgentInterface):
         if self.action == "move_to_node_and_wait":
             self.move_to_node_and_wait(map, self.my_move_away_node)  # move to this node and stay two time-steps there
 
+
         self.next_waypoint = self.remaining_path[0]
 
 
@@ -1273,8 +1274,7 @@ class SmartAgent(AgentInterface):
 
 
         # if an agent is moving_backward or moving_away and the coflict_agent is the same, then coflict_agent should continue and give the priority to the coflict_agent
-        if priority_agent is None:
-          for agent in candidates:
+        for agent in candidates:
             if agent['moving_backward'] or agent[ 'moving_away']:  # the other agent will have the priority because it had the last step
                 for n in candidates:
                     if n != agent:
@@ -1367,7 +1367,6 @@ class SmartAgent(AgentInterface):
                         self.action = "wait"
                     else:
                         self.action = "move_out_of_the_way"
-                    #self.next_waypoint = self.remaining_path[0]
 
 
         self.next_waypoint = self.remaining_path[0]
@@ -2022,7 +2021,6 @@ class SmartAgent(AgentInterface):
 
 
     def move(self, map, sim_time, time_lapsed: float = 0):
-        #self._current_target_id = 0      #######################
 
         if not self.targetReached :
             self.steps += 1
@@ -2037,17 +2035,8 @@ class SmartAgent(AgentInterface):
                 self.changed_action = True
                 self.send_my_data(map)
                 break
-        #if not self.im_done:
-        #  print(f'waiting-times = {self.waiting_steps}')
-        #  print(map.neighbors_agents_stat[self.id])
 
-
-        # logging.info(f'##############################################')
-        # wait for this step
-        # logging.info(f'Agent {self.id} --->action:{self.action} (changed:{self.changed_action})')
-
-        self.delay_steps -= 1
-
+        self.delay_steps    -= 1
         if self.delay_steps == 0:
             #if self.has_delayed and not self.im_done:
             #   self.steps += 1
