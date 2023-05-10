@@ -1113,7 +1113,6 @@ class SmartAgent(AgentInterface):
                                         got_to_node2, m_ = map.get_Free_WayNode(agent_done['pos'], agent_moving['pos'], agent_moving['pos'])
 
 
-
                                 solution[agent_moving['AgentID']] = "move_away_nearest_node"
                                 solution[agent_done['AgentID']] = "replan_path"
 
@@ -1228,10 +1227,6 @@ class SmartAgent(AgentInterface):
 
         self.priority_neighbor = priority_agent
 
-        #if self.neighbors[0]['AgentID'] == self.id:
-        #  print(self.neighbors)
-        #  print(self.is_free(critic_node, self.neighbors))
-        #  print(f'solution is :{solution}')
 
         for agent in self.neighbors:
             if agent['AgentID'] == self.id:
@@ -1270,8 +1265,7 @@ class SmartAgent(AgentInterface):
         solution = {}
         candidates = self.neighbors.copy()
         self.critic_node = critic_node
-        #if self.neighbors[0]['AgentID'] == self.id:
-            #print(f'-----------< solving an opposite_conflict in nodes :  {critic_node}>--------------------')
+
 
         priority_agent = None
 
@@ -1281,7 +1275,7 @@ class SmartAgent(AgentInterface):
             self.conflict_agent = self.neighbors[0]['AgentID']
 
 
-        # if an agent is moving_backward or moving_away and the coflict_agent is the same, then it should continue and give the priority to the coflict_agent
+        # if an agent is moving_backward or moving_away and the coflict_agent is the same, then coflict_agent should continue and give the priority to the coflict_agent
         if priority_agent is None:
           for agent in candidates:
             if agent['moving_backward'] or agent[ 'moving_away']:  # the other agent will have the priority because it had the last step
@@ -1871,18 +1865,15 @@ class SmartAgent(AgentInterface):
                 self.plan_path_to_all_targets(map)
                 self.im_done = False
 
-        # Agents having free neighboring nodes replan the path while considering some neighbors returned by the function --get_node_to_remove_replan_path-- as obstacles
+        # Agents having free neighboring nodes replan the path while considering the neighbors and their neighbors as obstacles
         if self.waiting_steps == MIN_WAITING_TIME and not self.im_done :
 
             neighbor = map.free_neighboring_node(self.position, self.position)
             if neighbor is not None:
-                # neighbors_to_remove = self.get_node_to_remove_replan_path(map)
+                #neighbors_to_remove = self.get_node_to_remove_replan_path(map)
                 neighbors_to_remove = map.get_all_occupied_neighbors(self.position, 2)
-
                 if self.target in neighbors_to_remove:
                     neighbors_to_remove.remove(self.target)
-
-                    #if neighbors_to_remove != None:  # len(neighbors_to_remove) < 4:
 
                     path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target, neighbors_to_remove)  # neighbors_to_remove_replan
 
@@ -1893,8 +1884,7 @@ class SmartAgent(AgentInterface):
                         self.remaining_path.clear()
                         self.remaining_path.extend(path_i)  #
 
-
-        # Try again, only agents having free neighboring nodes, to replan the path while consider the occupied neighbors as obstacles
+        # Try again, only agents having free neighboring nodes, have to replan the path while consider the occupied neighbors as obstacles
         if self.waiting_steps == MIN_WAITING_TIME + 1 and not self.im_done :
 
             neighbor = map.free_neighboring_node(self.position, self.position)
@@ -2003,19 +1993,11 @@ class SmartAgent(AgentInterface):
 
             max_repetitions = max(self.all_visited_nodes.count(node) for node in set(self.all_visited_nodes))
 
-            if (max_repetitions >= 3): # if one or several nodes visited three times re-plan the path
-                    #if self.last_node != self.position:
-                    #neighbors_to_remove = map.get_all_occupied_neighbors(self.position, 1)
-                    #neighbors_to_remove.append(self.last_node)
-                    #if self.target in neighbors_to_remove:
-                    #    neighbors_to_remove.remove(self.target)
-                    #forbi_node = neighbors_to_remove
-
+            # if one or several nodes visited three times re-plan the path
+            if (max_repetitions >= 3):
                     forbi_node = [self.last_node]
                     path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target, forbi_node)
-
                     if path_i is not None and len(path_i) > 1:
-
                         self.all_visited_nodes.clear()
                         if path_i[0] == self.position:
                             path_i.pop(0)
