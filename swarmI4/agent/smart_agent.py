@@ -491,12 +491,6 @@ class SmartAgent(AgentInterface):
         candidates = self.neighbors.copy()
         priority_agent = None
 
-        #used for confilicts ith two robots
-        if self.neighbors[0]['AgentID'] == self.id:
-            self.conflict_agent = self.neighbors[1]['AgentID']
-        else:
-            self.conflict_agent = self.neighbors[0]['AgentID']
-
         # got priority in the previous time step
         for agent in candidates:
             if (agent["got_priority_last_step"] and int(agent['remaining_nodes']) > 1):  # or agent['moving_away']: #or agent["moving_away"]:
@@ -504,7 +498,6 @@ class SmartAgent(AgentInterface):
                 if priority_agent == self.id:  # it is me
                     self.got_priority_last_step = False  #
                 break
-
 
         # a robot moving out of another robot’s way is given priority
         if priority_agent is None:
