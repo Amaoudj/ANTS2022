@@ -187,7 +187,7 @@ class SmartAgent(AgentInterface):
 
             for agent in map.neighbors_agents_stat:  # map.msg_box.values():
                 if agent is not None and concerned_Agent is not None and agent['AgentID'] != agent_id:
-                    if (concerned_Agent['pos'] == agent['next_node']) and (concerned_Agent['next_node'] != agent['pos']): # if it is not an opposite coflict
+                    if (concerned_Agent['pos'] == agent['next_node']) and (concerned_Agent['next_node'] != agent['pos']): # it is not an opposite conflict
                         follower = agent
                         break
 
@@ -203,7 +203,7 @@ class SmartAgent(AgentInterface):
                 agent_id = follower['AgentID']
             steps = 0
 
-            while agent_id is not None and agent_id != self.id and steps < 40:
+            while agent_id is not None and agent_id != self.id and steps < 50:
                 follower = self.get_follower_agent(map, agent_id)
                 if follower is None or follower['AgentID'] in (_f['AgentID'] for _f in _followers):
                     break
@@ -228,6 +228,7 @@ class SmartAgent(AgentInterface):
                     pos_requests += 1
 
             return pos_requests, num_successors
+
 
     def get_back_node(self, pos, threch):
             x, y = pos
@@ -255,9 +256,7 @@ class SmartAgent(AgentInterface):
 
             for agent in map.neighbors_agents_stat:  # map.msg_box.values():
                 if (agent is not None and concerned_Agent is not None) and (agent['AgentID'] != agent_id):
-                    if (concerned_Agent['next_node'] == agent['pos']) and (
-                            agent['next_node'] != concerned_Agent['pos']) and (
-                            agent['next_next_node'] != concerned_Agent['pos']):
+                    if (concerned_Agent['next_node'] == agent['pos']) and ( agent['next_node'] != concerned_Agent['pos']) and (agent['next_next_node'] != concerned_Agent['pos']):
                         predecessor = agent
                         break
 
@@ -274,7 +273,7 @@ class SmartAgent(AgentInterface):
                 agent_id = predecessor['AgentID']
             steps = 0
 
-            while (steps < 30 and predecessor is not None and predecessor['AgentID'] != self.id and predecessor['AgentID'] != _predecessors[-1]['AgentID']):  #
+            while (steps < 50 and predecessor is not None and predecessor['AgentID'] != self.id and predecessor['AgentID'] != _predecessors[-1]['AgentID']):  #
                 predecessor = self.get_leader_agent(map, agent_id)
                 steps += 1
                 if predecessor is not None and predecessor not in _predecessors and predecessor['AgentID'] != \
@@ -1837,7 +1836,6 @@ class SmartAgent(AgentInterface):
         return  neighbors
 
     def next_step(self, map) -> None:
-
         """
         Plan the next step of the agent
         returns: The next node
@@ -1972,12 +1970,13 @@ class SmartAgent(AgentInterface):
                     self.remaining_path.clear()
                     self.remaining_path.extend(saved_remaining_path)  # keep the previous path
 
+
         # This is a long-term precaution
         if len(self.all_visited_nodes) > 10 and not self.im_done:
 
             max_repetitions = max(self.all_visited_nodes.count(node) for node in set(self.all_visited_nodes))
 
-            # if one or several nodes visited three times re-plan the path
+            # once the number of repetitions of any node reaches 3, then re-plan path
             if (max_repetitions >= 3):
                     forbi_node = [self.last_node]
                     path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target, forbi_node)
@@ -2071,7 +2070,7 @@ class SmartAgent(AgentInterface):
 
                 self._position = self.next_waypoint
 
-                #set_as_free(self._position)
+
                 agent=self
                 #map.add_agent_to_map(agent)
                 map._graph.nodes[self._position]["obstacle"] = False
@@ -2079,7 +2078,7 @@ class SmartAgent(AgentInterface):
                 map._graph.nodes[self._position]["state"]    = 'agent'
 
 
-                if self.position == self.target: #:#self.is_last_node if this node is the last one in the path, then im_done
+                if self.position == self.target: #
                     #self.is_last_node = False
                     self.im_done       = True
                     self.targetReached = True
@@ -2102,7 +2101,7 @@ class SmartAgent(AgentInterface):
         if not self.started:
             self.target = self.next_target
             self.started = True
-        #self.action         = None
+
         self.neighbors      = []
         self.got_conflict   = False
         self.got_opposite_conflict=False
