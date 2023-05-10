@@ -1896,7 +1896,6 @@ class SmartAgent(AgentInterface):
                         self.remaining_path.extend(path_i)  #
                         self.num_replanned_paths += 1
 
-
         # Try again, only agents having free neighboring nodes, to replan the path while consider the occupied neighbors as obstacles
         if self.waiting_steps == MIN_WAITING_TIME + 1 and not self.im_done :
 
@@ -1947,10 +1946,10 @@ class SmartAgent(AgentInterface):
 
         # Try again to replan the path while considering only the next node as an obstacle
         if self.waiting_steps == MIN_WAITING_TIME + 3 and not self.im_done :  #
-            #self.waiting_steps = MIN_WAITING_TIME
+            self.waiting_steps = MIN_WAITING_TIME
             if self.remaining_path is not None and len(self.remaining_path) > 1:
-                if self.remaining_path[0] != self.position and self.remaining_path[0] != self.target_list[ 0]:
-                    path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target_list[0],[self.remaining_path[0]])  #
+                if self.remaining_path[0] != self.position and self.remaining_path[0] != self.target:
+                    path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target,[self.remaining_path[0]])  #
                     if path_i is not None and len(path_i) > 0:
                         if path_i[0] == self.position:
                             path_i.pop(0)
@@ -1993,24 +1992,17 @@ class SmartAgent(AgentInterface):
         # This is a long-term precaution
         if len(self.all_visited_nodes) > 10 and not self.im_done:
 
-            #max_repetitions = max(self.all_visited_nodes.count(node) for node in set(self.all_visited_nodes))
+            max_repetitions = max(self.all_visited_nodes.count(node) for node in set(self.all_visited_nodes))
 
-            num_repeatitons = []
-            for node in self.all_visited_nodes:
-                rep = self.all_visited_nodes.count(node)
-                if rep > 2:  # a node already visited two times
-                    num_repeatitons.append(rep)
-
-            if (len(num_repeatitons) >= 3):
-            #if (max_repetitions >= 3): # if one or several nodes visited three times re-plan the path
+            if (max_repetitions >= 3): # if one or several nodes visited three times re-plan the path
                 if self.last_node != self.position:
-                    neighbors_to_remove = map.get_all_occupied_neighbors(self.position, 1)
-                    neighbors_to_remove.append(self.last_node)
-                    if self.target in neighbors_to_remove:
-                        neighbors_to_remove.remove(self.target)
+                    #neighbors_to_remove = map.get_all_occupied_neighbors(self.position, 1)
+                    #neighbors_to_remove.append(self.last_node)
+                    #if self.target in neighbors_to_remove:
+                    #    neighbors_to_remove.remove(self.target)
+                    #forbi_node = neighbors_to_remove
 
-                    forbi_node = neighbors_to_remove
-                    #forbi_node = [self.last_node]
+                    forbi_node = [self.last_node]
                     path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target, forbi_node)
 
                     if path_i is not None and len(path_i) > 1:
