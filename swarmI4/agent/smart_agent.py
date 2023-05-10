@@ -1999,9 +1999,6 @@ class SmartAgent(AgentInterface):
                 #print(self._position, self.target)
 
                 self._position = self.next_waypoint
-                if not map.within_map_size(self._position):
-                   pyautogui.alert(text='node out of the map',title='Simulation failed',button='OK')
-                   print("################# ode out of the map ##################################################3")
 
                 agent=self
                 map._graph.nodes[self._position]["obstacle"] = False
