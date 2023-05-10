@@ -2003,7 +2003,7 @@ class SmartAgent(AgentInterface):
 
             max_repetitions = max(self.all_visited_nodes.count(node) for node in set(self.all_visited_nodes))
 
-            if (max_repetitions >= 5): # if one or several nodes visited three times re-plan the path
+            if (max_repetitions >= 3): # if one or several nodes visited three times re-plan the path
                     #if self.last_node != self.position:
                     #neighbors_to_remove = map.get_all_occupied_neighbors(self.position, 1)
                     #neighbors_to_remove.append(self.last_node)
