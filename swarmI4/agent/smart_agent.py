@@ -491,10 +491,10 @@ class SmartAgent(AgentInterface):
         candidates = self.neighbors.copy()
         priority_agent = None
 
-        if self.neighbors[0]['AgentID'] == self.id:
-            self.conflict_agent = self.neighbors[1]['AgentID']
-        else:
-            self.conflict_agent = self.neighbors[0]['AgentID']
+
+        #find the conflict_agent >> find first AgentID that is not equal to self.id
+        self.conflict_agent = next(neighbor['AgentID'] for neighbor in self.neighbors if neighbor['AgentID'] != self.id)
+
 
         # got priority in the previous time step
         for agent in candidates:
@@ -1029,8 +1029,6 @@ class SmartAgent(AgentInterface):
                     if agent_done is not None:
 
                         go_to_node1,_= map.get_Free_WayNode(agent_done['pos'], agent_moving['pos'], agent_moving['next_next_node'])  #
-                        #print(f'agent done in {self.position}--> move to free neighbor node {go_to_node1}')
-                        #print(f'agent moving in {agent_moving["pos"]}--> move to  {agent_moving["next_next_node"]}')
 
                         if go_to_node1 is not None:
                             solution[agent_done['AgentID']]   = "move_right_left_backward"
