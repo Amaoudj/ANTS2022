@@ -6,10 +6,8 @@ import  pyautogui
 import numpy as np
 import copy
 from . agent_interface import AgentInterface
-
 from swarmI4.calculation.path_planning import PathFinder
 from swarmI4.map.map import Map
-
 from typing import Callable, Tuple
 
 
@@ -78,7 +76,7 @@ class SmartAgent(AgentInterface):
             self.delay = False
             self.has_new_target = False
             self.has_delayed = False
-            self.delay_steps = 0
+
             self.num_replanned_paths = 0
             self.waitingThreshold = 8
             self.nodesThreshold = 7
@@ -1367,6 +1365,7 @@ class SmartAgent(AgentInterface):
 
         self.next_waypoint = self.remaining_path[0]
 
+
     def post_negotiation(self, map):
 
         #each agent checks if there are other agents planned the same next node, and then change their action to wait if they do not have a priority
@@ -1428,15 +1427,10 @@ class SmartAgent(AgentInterface):
             if priority_agent is None:
                 newlist = []
                 for agent in candidates:
-
-                    if agent['next_next_node'] not in [candidate['pos'] for candidate in candidates] and int(
-                            agent['remaining_nodes']) > 1:
+                    if agent['next_next_node'] not in [candidate['pos'] for candidate in candidates] and int(agent['remaining_nodes']) > 1:
                         newlist.append(agent)
-                if len(newlist) > 0:
-                    candidates.clear()
-                    candidates.extend(newlist)
 
-                if len(candidates) == 1:  # if only one candidate left then it will have the priority
+                if len(newlist) == 1:  # if only one candidate left then it will have the priority
                     priority_agent = candidates[0]['AgentID']
                     agent_having_priority = candidates[0]
 
@@ -1471,7 +1465,6 @@ class SmartAgent(AgentInterface):
               self.action = "wait"
               self.changed_action = True
         self.send_my_data(map)
-
 
     def post_coordination(self, map) -> tuple:
         """
@@ -1569,11 +1562,9 @@ class SmartAgent(AgentInterface):
 
       else:#if got_to_node is None or got_to_node==self.position:
           got_to_node = self.position
-          self.moving_away = False
+          self.moving_away     = False
           self.moving_backward = False
-          #self.remaining_path[0:0] = [got_to_node]
-          self.action="wait"
-          #logging.info(f'-returned None ---> action of agent {self.id} changed to wait')
+          #self.action="wait"
           got_free_node= False
 
       return  got_free_node
@@ -1604,15 +1595,13 @@ class SmartAgent(AgentInterface):
           else:
            self.moving_away = True
            self.remaining_path[0:0] = [got_to_node, self.position]
-           #logging.info(f'--new path: {self.remaining_path}')
+           #print(f'--new path: {self.remaining_path}')
            self.my_move_away_node = got_to_node
-
 
         else:
             got_to_node=self.position
             self.moving_away = False
             self.moving_backward=False
-            #self.remaining_path[0:0] = [got_to_node]
             self.action = "wait"
             got_free_node = False
 
@@ -1725,10 +1714,10 @@ class SmartAgent(AgentInterface):
 
       return node,agent_
 
-    def move_backward(self,map):
+    def move_backward_(self,map):
         #logging.info(f'agent {self.id} will move backward ')
         self.remaining_path.insert(0,self.last_node)
-        map.new_paths_node[self.id] = self.last_node
+        #map.new_paths_node[self.id] = self.last_node
         #logging.info(f'move_backward--remaining path: {self.remaining_path}')
         self.my_move_away_node=self.last_node
         self.moving_away = False
@@ -1739,7 +1728,7 @@ class SmartAgent(AgentInterface):
         if node_ is not None:
           #map.new_paths_node[self.id] = node_
           self.remaining_path[0:0] = [node_, node_,self.position]#
-          #logging.info(f'Agent in {self.position} is moving_and_waiting--remaining path: {self.remaining_path}')
+          #print(f'Agent in {self.position} is moving_and_waiting--remaining path: {self.remaining_path}')
           self.my_move_away_node = node_
           self.moving_away = True
           self.im_done = False
@@ -1750,9 +1739,9 @@ class SmartAgent(AgentInterface):
     def move_to_node(self,map, node_):
 
         if node_ is not None:
-          map.new_paths_node[self.id] = node_
+          #map.new_paths_node[self.id] = node_
           self.remaining_path[0:0] = [node_, self.position]#
-          #logging.info(f'Agent in {self.position} is moving_to_node--remaining path: {self.remaining_path}')
+          #print(f'move_to_node from {self.position} --remaining path: {self.remaining_path}')
           self.my_move_away_node = node_
           self.moving_away = True
           self.im_done = False
@@ -1762,10 +1751,9 @@ class SmartAgent(AgentInterface):
 
     def move_to_node_via_critic_node(self,map,my_move_away_node):
 
-        map.new_paths_node[self.id] = my_move_away_node
-
+        #map.new_paths_node[self.id] = my_move_away_node
         self.remaining_path[0:0] = [self.critic_node, my_move_away_node]
-        #logging.info(f'Agent{self.id}--remaining path: {self.remaining_path}')
+        #print(f'move_to_AGV_node from {self.position}--remaining path: {self.remaining_path}')
         self.my_move_away_node = my_move_away_node
         self.moving_away = True
         self.im_done = False
@@ -1774,67 +1762,12 @@ class SmartAgent(AgentInterface):
         """
         define the path of the agent required to move away
         """
-        #logging.info(f'agent {self.id} will move to critic_node, AGV_node, critic_node: {[self.critic_node, got_to_node, self.critic_node]} ')
-        #add the move away path to the remaining path
 
-        map.new_paths_node[self.id] = got_to_node
+        #map.new_paths_node[self.id] = got_to_node
         self.im_done = False
         self.remaining_path[0:0] = [self.critic_node, got_to_node]#, self.critic_node
-        #logging.info(f'move_to_AGV_node--remaining path: {self.remaining_path}')
+        #print(f'move_to_AGV_node from {self.position}--remaining path: {self.remaining_path}')
         self.moving_away = True
-
-    def get_node_to_remove_replan_path(self,map):
-        """
-        Get the neighboring nodes of the robot's current position and remove any node that is not within the map or not part of the graph
-        Check the relative position of my_nextnode compared to the current position of the robot.
-        Depending on its relative positions (same row or same column), remove specific neighbors from the list that are not in the direction my_nextnode.
-        this will
-        """
-
-        neighbors = map.get_neighbors(self.position, diagonal=False)
-        my_nextnode = None
-
-        for n in neighbors:
-            if n not in map._graph.nodes or not map.within_map_size(n):
-                neighbors.remove(n)
-
-        for node in self.remaining_path:
-            if node != self.position :
-                my_nextnode = node
-                break
-
-        x, y   = self.position
-
-        if my_nextnode != None:
-         x1, y1 = my_nextnode
-         if y == y1: # in the same col
-           if x1 > x:
-               for n in neighbors:
-                   x2,y2=n
-                   if x2   < x:
-                       neighbors.remove(n)
-                       break
-           elif x1<x:
-               for n in neighbors:
-                   x2,y2 = n
-                   if x2 > x:
-                       neighbors.remove(n)
-                       break
-         elif x==x1: # in the same row
-             if y1 > y:
-                 for n in neighbors:
-                     x2, y2 = n
-                     if y2 < y:
-                        neighbors.remove(n)
-                        break
-             elif y1 < y:
-                 for n in neighbors:
-                     x2, y2 = n
-                     if y2 > y:
-                        neighbors.remove(n)
-                        break
-
-        return  neighbors
 
     def next_step(self, map) -> None:
         """
@@ -2012,7 +1945,6 @@ class SmartAgent(AgentInterface):
                     if self._current_target_id + 1 < len(self.target_list):
                         self._current_target_id += 1
 
-
     def move(self, map, sim_time, time_lapsed: float = 0):
 
         if not self.targetReached :
@@ -2029,11 +1961,6 @@ class SmartAgent(AgentInterface):
                 self.send_my_data(map)
                 break
 
-        self.delay_steps    -= 1
-        if self.delay_steps == 0:
-            #if self.has_delayed and not self.im_done:
-            #   self.steps += 1
-            self.has_delayed = False
 
         if len(self.remaining_path) > 0:
             self.next_target   = self.target_list[self._current_target_id]
@@ -2043,7 +1970,6 @@ class SmartAgent(AgentInterface):
         if self.action == "wait":
             self.wait()
             self.waiting_steps = self.waiting_steps + 1  #self.waiting_steps +=1
-
 
         else: # your planned action is move
 
@@ -2069,11 +1995,15 @@ class SmartAgent(AgentInterface):
                 map._graph.nodes[self._position]["agent"]    = None
                 map._graph.nodes[self._position]["state"]    = 'free_space'
 
-                self._position = self.next_waypoint
+                #print(self.remaining_path)
+                #print(self._position, self.target)
 
+                self._position = self.next_waypoint
+                if not map.within_map_size(self._position):
+                   pyautogui.alert(text='node out of the map',title='Simulation failed',button='OK')
+                   print("################# ode out of the map ##################################################3")
 
                 agent=self
-                #map.add_agent_to_map(agent)
                 map._graph.nodes[self._position]["obstacle"] = False
                 map.graph.nodes[self._position]["agent"]     = agent
                 map._graph.nodes[self._position]["state"]    = 'agent'

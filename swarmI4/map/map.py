@@ -57,19 +57,7 @@ class Map(object):
         return self._number_of_nodes[1]
 
 
-    #def get_agents_nearby(agent, map, radius) -> List[dict]:
-    #    """
-    #    Get all agents within a given radius of the current agent.
-    #    """
-    #    nearby_agents = []
-    #    qt = QuadTree(map.width, map.height)
-    #    for a in map.agents_stat:
-    #        if a['AgentID'] != agent.id:
-    #            qt.insert(a['pos'], a)
-    #    agents_in_radius = qt.query_radius(agent.position, radius)
-    #    for a in agents_in_radius:
-    #        nearby_agents.append(a.data)
-    #    return nearby_agents
+
 
     def within_map_size(self, node):
             Toreturn = True
@@ -114,9 +102,8 @@ class Map(object):
 
             ToReturn = False
 
-            if not self.occupied(node):
-                if (self._graph.nodes[node]["state"] == 'free_space' or self._graph.nodes[node]["state"] == 'target' or
-                        self._graph.nodes[node]["state"] == 'path'):
+            if not self.occupied(node) and self.within_map_size(node):
+                if (self._graph.nodes[node]["state"] == 'free_space' or self._graph.nodes[node]["state"] == 'target' or self._graph.nodes[node]["state"] == 'path'):
                     ToReturn = True
 
             return ToReturn
@@ -140,12 +127,12 @@ class Map(object):
         neighborhood = self.get_neighbors(mypos, diagonal=False)
         checked_neighbors = set()
         num_tries = 0
-        while _node is None and len(checked_neighbors) < len(neighborhood)and num_tries < 100:
+        while (_node is None or not self.within_map_size(_node)) and len(checked_neighbors) < len(neighborhood) and num_tries < 100:
             num_tries += 1
             for neighbor in neighborhood:
                 if neighbor not in checked_neighbors:
                     _node = self.free_neighboring_node(neighbor, mypos)
-                    if _node is not None and not self.is_obstacle(_node):
+                    if _node is not None and not self.is_obstacle(_node) and self.within_map_size(_node):
                         return _node
                     checked_neighbors.add(neighbor)
 
@@ -286,14 +273,21 @@ class Map(object):
             if diagonal:  # is the diagonal direction considered ?
                 return self._graph.neighbors(node_pos)
             else:
-                return [(row, col + 1),
+                 nodes =[(row, col + 1),
                         (row, col - 1),
                         (row + 1, col),
                         (row - 1, col)]
 
+                 for node in nodes:
+                   if not self.within_map_size(node):
+                     nodes.remove(node)
+                 return nodes
+
+
     def get_all_occupied_neighbors(self, node_pos, level):
 
         first_level_neighbors = self.get_neighbors(node_pos, diagonal=False)
+
         all_neighbors = set(first_level_neighbors)
 
         if level == 2:
@@ -325,7 +319,7 @@ class Map(object):
             random_node = None
             node_state = ''
             num_tries = 0
-            while node_state != 'free_space' and num_tries< 100 :
+            while node_state != 'free_space' and num_tries < 100 :
                 num_tries += 1
                 random_node_id = np.random.choice(range(0, len(self._graph.nodes) - 1))
                 random_node = list(self._graph.nodes)[random_node_id]
@@ -633,7 +627,7 @@ class Map(object):
             i = 0
             num_tries = 0
 
-            while _node is None or self.is_obstacle(_node) and num_tries < 70:
+            while (_node is None or not self.within_map_size(_node) or self.is_obstacle(_node)) and num_tries < 50:
                 num_tries += 1
                 i += 1
                 if row == row1:  # in the same line
@@ -673,7 +667,7 @@ class Map(object):
                             row1 += 1  # go
                         i = 0
 
-            if num_tries == 70:
+            if num_tries == 50:
                 _node = None
 
             return _node
@@ -691,7 +685,7 @@ class Map(object):
             i = 0
             num_tries = 0
 
-            while _node is None or self.is_obstacle(_node) and num_tries < 50:
+            while (_node is None or not self.within_map_size(_node) or self.is_obstacle(_node)) and num_tries < 50:
                 num_tries += 1
                 i += 1
                 if row == row1:  # in the same line
@@ -723,33 +717,6 @@ class Map(object):
                 _node = None
 
             return _node
-
-    def get_nearest_free_node(self, mypos):
-        """
-          the function keeps track of checked neighbors using a set called checked_neighbors.
-          If no free neighboring node is found in the current neighborhood, it updates the neighborhood set to include the
-          neighbors of the current neighbors. The loop continues until a free node is found or all neighbors have been checked
-        """
-        _node = None
-        neighborhood = self.get_neighbors(mypos, diagonal=False)
-        checked_neighbors = set()
-        num_tries = 0
-        while _node is None and len(checked_neighbors) < len(neighborhood) and num_tries < 100:
-            num_tries += 1
-            for neighbor in neighborhood:
-                if neighbor not in checked_neighbors:
-                    _node = self.free_neighboring_node(neighbor, mypos)
-                    if _node is not None and not self.is_obstacle(_node):
-                        return _node
-                    checked_neighbors.add(neighbor)
-
-            # Update neighborhood to include neighbors of the current neighbors
-            new_neighborhood = set()
-            for neighbor in neighborhood:
-                new_neighborhood.update(self.get_neighbors(neighbor, diagonal=False))
-            neighborhood = new_neighborhood
-
-        return _node
 
 
     def move_agent(self, agent: AgentInterface, new_position: Tuple[int, int]):
