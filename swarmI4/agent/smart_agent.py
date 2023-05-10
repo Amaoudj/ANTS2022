@@ -1190,15 +1190,14 @@ class SmartAgent(AgentInterface):
                                     if mode != 0 and not (nearestnode_befor_target and mode == 2):
 
                                         path1 = self._path_finder.astar_planner(map._copy_graph, self.position, node2)
-                                        path2 = self._path_finder.astar_planner(map._copy_graph, node2,
-                                                                                Agent_moving_Target)
+                                        path2 = self._path_finder.astar_planner(map._copy_graph, node2,Agent_moving_Target)
                                         self.next_target = Agent_moving_Target
                                         if path1 is not None and path2 is not None:
                                             self.moving_backward = False
                                             # self.moving_away = True
 
                                             path1.pop(0)
-                                            #path2.pop(0)
+                                            path2.pop(0)
 
                                             self.remaining_path = path1 + path2  #
 
@@ -1874,7 +1873,7 @@ class SmartAgent(AgentInterface):
 
         return  neighbors
 
-    def next_step2(self, map) -> None:
+    def next_step(self, map) -> None:
 
         """
         Plan the next step of the agent
@@ -1892,27 +1891,31 @@ class SmartAgent(AgentInterface):
         if self.waiting_steps == MIN_WAITING_TIME and not self.im_done :
 
             neighbor = map.free_neighboring_node(self.position, self.position)
-
             if neighbor is not None:
 
-                neighbors_to_remove = self.get_node_to_remove_replan_path(map)
+                # neighbors_to_remove = self.get_node_to_remove_replan_path(map)
+                neighbors_to_remove = map.get_all_occupied_neighbors(self.position, 2)
 
-                if len(neighbors_to_remove) < 4:
+                if self.target in neighbors_to_remove:
+                    neighbors_to_remove.remove(self.target)
 
-                    path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target,neighbors_to_remove)  # neighbors
+                if neighbors_to_remove != None:  # len(neighbors_to_remove) < 4:
+
+                    path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target, neighbors_to_remove)  # neighbors_to_remove_replan
 
                     if path_i is not None and len(path_i) > 0:
 
-                        if path_i[0] == self.position:
+                        if path_i[0] == self.position and self.position != self.target:
                             path_i.pop(0)
                         self.remaining_path.clear()
                         self.remaining_path.extend(path_i)  #
+                        self.num_replanned_paths += 1
 
         # Try again, only agents having free neighboring nodes, to replan the path while consider the occupied neighbors as obstacles
         if self.waiting_steps == MIN_WAITING_TIME + 1 and not self.im_done :
 
             neighbor = map.free_neighboring_node(self.position, self.position)
-            self.num_TRIES += 1
+
             if neighbor is not None:  # only agent who has free neighboring nodes will plan their path
                 neighbors1 = map.get_neighbors(self.position, diagonal=False)
                 for n in neighbors1:
@@ -1935,12 +1938,11 @@ class SmartAgent(AgentInterface):
                         self.remaining_path.extend(path_i)  #
                         self.num_replanned_paths += 1
 
-
         # Try again, all agents, to replan the path while considering the occupied neighbors as obstacles
         if self.waiting_steps == MIN_WAITING_TIME + 2 and not self.im_done :  # there is another deadlock
             neighbors = map.get_neighbors(self.position, diagonal=False)
             neighbor = map.free_neighboring_node(self.position, self.position)
-            self.num_TRIES += 1
+
 
             if neighbor is not None and neighbor in neighbors:
                 neighbors.remove(neighbor)
@@ -1960,8 +1962,7 @@ class SmartAgent(AgentInterface):
 
         # Try again to replan the path while considering only the next node as an obstacle
         if self.waiting_steps == MIN_WAITING_TIME + 3 and not self.im_done :  #
-            self.num_TRIES = 0
-            self.waiting_step = 4  # to start from the first try
+            #self.waiting_steps = MIN_WAITING_TIME
             if self.remaining_path is not None and len(self.remaining_path) > 1:
                 if self.remaining_path[0] != self.position and self.remaining_path[0] != self.target_list[ 0]:
                     path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target_list[0],[self.remaining_path[0]])  #
@@ -1973,12 +1974,43 @@ class SmartAgent(AgentInterface):
                         self.num_replanned_paths += 1
                         # self.waiting_step = 0
 
+        if self.waiting_steps == MIN_WAITING_TIME + 4 and not self.im_done :  # try for the last time to solve it.
+
+            self.waiting_step = MIN_WAITING_TIME  # to start from the first try
+
+            neighbor = map.free_neighboring_node(self.position, self.position)
+
+            # if neighbor is None: # no free neighboring node
+            node_ = map.get_nearest_free_node(self.position)
+
+            if node_ is not None and neighbor is None:  # there is free
+
+                path = self._path_finder.astar_planner(map._graph, self.position, node_)
+                if path is not None and len(path) > 0:
+                    self.moving_backward = False
+                    self.moving_away = True
+                    if path[0] == self.position and self.position != self.target_list[0]:
+                        path.pop(0)
+
+                # remove my next node from the graph
+                path_i = self._path_finder.astar_replan(map._copy_graph, node_, self.target, [self.remaining_path[len(self.remaining_path) - 2]])
+                if path_i is None:
+                    path_i = self._path_finder.astar_planner(map._graph, node_, self.target)
+                if path_i is not None and len(path_i) > 0:
+                    if path_i[0] == node_ and self.position != self.target_list[0]:  # self.position
+                        path_i.pop(0)
+
+                if path is not None and path_i is not None :
+                    self.path = path + path_i
+                    self.remaining_path.clear()
+                    self.remaining_path.extend(path)  #
+
         # This is a long-term precaution
         if len(self.all_visited_nodes) > 10 and not self.im_done:
 
             max_repetitions = max(self.all_visited_nodes.count(node) for node in set(self.all_visited_nodes))
 
-            if (max_repetitions >= 4):
+            if (max_repetitions >= 3): # if one or several nodes visited three times re-plan the path
                 if self.last_node != self.position:
                     neighbors_to_remove = map.get_all_occupied_neighbors(self.position, 1)
                     neighbors_to_remove.append(self.last_node)
@@ -2023,7 +2055,7 @@ class SmartAgent(AgentInterface):
                     if self._current_target_id + 1 < len(self.target_list):
                         self._current_target_id += 1
 
-    def next_step(self, map) -> None:
+    def next_step2(self, map) -> None:
 
         """ Plan the next step of the agent
         Deal with undesirable Likelocks and deadlocks
@@ -2058,7 +2090,6 @@ class SmartAgent(AgentInterface):
 
                         if path_i[0] == self.position and self.position != self.target:
                             path_i.pop(0)
-
                         self.remaining_path.clear()
                         self.remaining_path.extend(path_i)  #
                         self.num_replanned_paths += 1
@@ -2142,9 +2173,9 @@ class SmartAgent(AgentInterface):
             neighbor = map.free_neighboring_node(self.position, self.position)
 
             # if neighbor is None: # no free neighboring node
-            node_ = map.get_nearest_random_free_node(self.position)
-            # print(f'Found random node ***************: {node_}')
-            if node_ is not None:
+            node_ = map.get_nearest_free_node(self.position)
+
+            if node_ is not None and neighbor is None:  # there is free
 
                 path = self._path_finder.astar_planner(map._graph, self.position, node_)
                 if path is not None and len(path) > 0:
@@ -2152,21 +2183,20 @@ class SmartAgent(AgentInterface):
                     self.moving_away = True
                     if path[0] == self.position and self.position != self.target_list[0]:
                         path.pop(0)
-                    self.path = path
-                    self.remaining_path.clear()
-                    self.remaining_path.extend(path)  #
-                    self.num_replanned_paths += 1
 
-                # remove my next node from the graph (changed: self.position and remove comment from: self.remaining_path.clear())
-                path_i = self._path_finder.astar_replan(map._copy_graph, node_, self.target_list[0],
-                                                        [self.remaining_path[len(self.remaining_path) - 2]])
+                # remove my next node from the graph
+                path_i = self._path_finder.astar_replan(map._copy_graph, node_, self.target,[self.remaining_path[len(self.remaining_path) - 2]])
                 if path_i is None:
-                    path_i = self._path_finder.astar_planner(map._graph, node_, self.target_list[0])
+                    path_i = self._path_finder.astar_planner(map._graph, node_, self.target)
                 if path_i is not None and len(path_i) > 0:
                     if path_i[0] == node_ and self.position != self.target_list[0]:  # self.position
                         path_i.pop(0)
 
-                    self.remaining_path.extend(path_i)  #
+                if path is not None and path_i is not None:
+                    self.path = path + path_i
+                    self.remaining_path.clear()
+                    self.remaining_path.extend(path)  #
+
 
 
         if len(self.all_visited_nodes) > 10 and not self.im_done:

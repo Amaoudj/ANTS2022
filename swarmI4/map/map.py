@@ -724,17 +724,32 @@ class Map(object):
 
             return _node
 
-    def get_nearest_random_free_node(self, mypos):
-       _node     = None
-       num_tries = 0
-       _node = self.free_neighboring_node(mypos, mypos)
-       while _node is None or self.is_obstacle(_node) and num_tries < 50:
-           num_tries +=1
-           neighborhood = self.get_neighbors(mypos, diagonal=False)
-           mypos =random.choice(neighborhood)
-           _node = self.free_neighboring_node(mypos, mypos)
+    def get_nearest_free_node(self, mypos):
+        """
+          the function keeps track of checked neighbors using a set called checked_neighbors.
+          If no free neighboring node is found in the current neighborhood, it updates the neighborhood set to include the
+          neighbors of the current neighbors. The loop continues until a free node is found or all neighbors have been checked
+        """
+        _node = None
+        neighborhood = self.get_neighbors(mypos, diagonal=False)
+        checked_neighbors = set()
+        num_tries = 0
+        while _node is None and len(checked_neighbors) < len(neighborhood) and num_tries < 100:
+            num_tries += 1
+            for neighbor in neighborhood:
+                if neighbor not in checked_neighbors:
+                    _node = self.free_neighboring_node(neighbor, mypos)
+                    if _node is not None and not self.is_obstacle(_node):
+                        return _node
+                    checked_neighbors.add(neighbor)
 
-       return _node
+            # Update neighborhood to include neighbors of the current neighbors
+            new_neighborhood = set()
+            for neighbor in neighborhood:
+                new_neighborhood.update(self.get_neighbors(neighbor, diagonal=False))
+            neighborhood = new_neighborhood
+
+        return _node
 
 
     def move_agent(self, agent: AgentInterface, new_position: Tuple[int, int]):
