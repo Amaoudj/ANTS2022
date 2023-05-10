@@ -301,6 +301,7 @@ class SmartAgent(AgentInterface):
                         neighbors.append(msg)
             return neighbors
 
+
     def get_intersection_conflict_neighbors(self, map):
             """
             return: the neighbors list of this agent
