@@ -2064,9 +2064,9 @@ class SmartAgent(AgentInterface):
                 self.changed_action = True
                 self.send_my_data(map)
                 break
-        if not self.im_done:
-          print(f'waiting-times = {self.waiting_steps}')
-          print(map.neighbors_agents_stat[self.id])
+        #if not self.im_done:
+        #  print(f'waiting-times = {self.waiting_steps}')
+        #  print(map.neighbors_agents_stat[self.id])
 
 
         # logging.info(f'##############################################')
