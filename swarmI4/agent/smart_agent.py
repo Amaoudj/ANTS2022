@@ -2169,10 +2169,10 @@ class SmartAgent(AgentInterface):
                     self.remaining_path.extend(path_i)  #
 
 
-        if len(self.all_repeated_nodes) > 10 and not self.im_done:
+        if len(self.all_visited_nodes) > 10 and not self.im_done:
             num_repeatitons = []
-            for node in self.all_repeated_nodes:
-                rep = self.all_repeated_nodes.count(node)
+            for node in self.all_visited_nodes:
+                rep = self.all_visited_nodes.count(node)
                 if rep > 2:  # a node already visited two times
                     num_repeatitons.append(rep)
 
@@ -2184,8 +2184,8 @@ class SmartAgent(AgentInterface):
                     path_i = self._path_finder.astar_replan(map._copy_graph, self.position, self.target, forbi_node)
 
                     if path_i is not None and len(path_i) > 1:
-                        self.repeated_nodes.clear()
-                        self.all_repeated_nodes.clear()
+
+                        self.all_visited_nodes.clear()
                         if path_i[0] == self.position:
                             path_i.pop(0)
                         self.remaining_path.clear()
@@ -2214,6 +2214,7 @@ class SmartAgent(AgentInterface):
                 if self.next_waypoint == self.next_target:
                     if self._current_target_id + 1 < len(self.target_list):
                         self._current_target_id += 1
+
 
     def move(self, map, sim_time, time_lapsed: float = 0):
         #self._current_target_id = 0      #######################
