@@ -491,6 +491,11 @@ class SmartAgent(AgentInterface):
         candidates = self.neighbors.copy()
         priority_agent = None
 
+        if self.neighbors[0]['AgentID'] == self.id:
+            self.conflict_agent = self.neighbors[1]['AgentID']
+        else:
+            self.conflict_agent = self.neighbors[0]['AgentID']
+
         # got priority in the previous time step
         for agent in candidates:
             if (agent["got_priority_last_step"] and int(agent['remaining_nodes']) > 1):  # or agent['moving_away']: #or agent["moving_away"]:
@@ -528,7 +533,7 @@ class SmartAgent(AgentInterface):
                     indx = num_Followers.index(max_num_Followers)
                     priority_agent = candidates[indx]['AgentID']
 
-        #a robot having a free neighboring node is given priority
+        # a robot having a free neighboring node is given priority
         if priority_agent is None:
             if len(candidates) == 2 :
                 got_free_node1 = map.get_right_or_left_free_node(candidates[0]["pos"], candidates[1]["pos"], candidates[1]["next_next_node"])
@@ -541,7 +546,7 @@ class SmartAgent(AgentInterface):
                     priority_agent = candidates[1]['AgentID']
 
             elif len(candidates) > 2:
-              new_candidates
+              new_candidates=[]
               for agent in candidates:
                 got_free_node = map.get_right_or_left_free_node(agent["pos"], critic_node,None)
                 if got_free_node is not None:
@@ -550,7 +555,7 @@ class SmartAgent(AgentInterface):
               if len(new_candidates) == 1:  # if only one agent has a free neighboring node, then it will get the priority
                 priority_agent = new_candidates[0]['AgentID']
 
-        #the robot having the largest numberRequestsMyNode is given priority
+        # the robot having the largest numberRequestsMyNode is given priority
         if priority_agent is None:
                 max_num_pos_requests = max(agent['num_pos_requests'] for agent in candidates)
                 # Count the number of agents with the maximum num_pos_requests
@@ -561,7 +566,7 @@ class SmartAgent(AgentInterface):
                     priority_agent = candidates[indx]['AgentID']
 
 
-        #the robot having the largest remaining_nodes is given priority
+        # the robot having the largest remaining_nodes is given priority
         if priority_agent is None :
                 # Find the maximum remaining nodes among all agents
                 max_remaining = max(agent['remaining_nodes'] for agent in candidates)
@@ -573,7 +578,7 @@ class SmartAgent(AgentInterface):
                     indx = remaining_node.index(max_remaining)
                     priority_agent = candidates[indx]['AgentID']
 
-        #Finally if robots cannot decide priority, the robot with Max ID is given priority
+        # Finally if robots cannot decide priority, the robot with Max ID is given priority
         if priority_agent is None :
                priority_agent = max([agent['AgentID'] for agent in candidates])
 
@@ -949,7 +954,6 @@ class SmartAgent(AgentInterface):
                                 self.moving_away = True  # next step you need to mve
                         else:
                             solution[n['AgentID']] = "wait"
-
 
         elif len(self.neighbors) == 2:  # if there are only 2 robots
 
@@ -1485,26 +1489,21 @@ class SmartAgent(AgentInterface):
         if not self.got_conflict:
 
             if self.my_predecessors is not None and len(self.my_predecessors) > 0:
-                # logging.info(f'*******<post coordination (agent{self.id} with {len(self.my_predecessors)} predecessors {self.my_predecessors})>************')
                 leader = None
                 for i in range(len(self.my_predecessors)):
-                    if self.is_agent_involved_in_opposite_conflict(map, self.my_predecessors[i]) or (
-                    self.is_agent_involved_in_intersection_conflict(map, self.my_predecessors[i])) or (
-                    self.my_predecessors[i]["changed_action"]):
-                        leader = self.my_predecessors[i]  # i will follow the cation of my predecessors
+                    if self.is_agent_involved_in_opposite_conflict(map, self.my_predecessors[i]) or (self.is_agent_involved_in_intersection_conflict(map, self.my_predecessors[i])) or (self.my_predecessors[i]["changed_action"]):
+                        leader = self.my_predecessors[i]  # agents will follow the action of the leader that was involved in a negociation process
                         break
                 if leader is None:
                     leader = self.my_predecessors[-1]
-                # logging.info(f'*******<leader {leader})>************')
-                # leader_planned_action = my_predecessors[-1]["planned_action"]
 
                 leader_planned_action = leader["planned_action"]
-                # logging.info(f'<leader_action= {leader["planned_action"]})>')
+
                 if leader["planned_action"] == "wait":
                     self.action = "wait"
 
                     self.changed_action = True
-                    # logging.info(f'********* Agent{self.id} changed its action to wait in post_coordination (leader action is wait)')
+
 
                 else:  # leader will move
                     threshould = None
@@ -1790,7 +1789,6 @@ class SmartAgent(AgentInterface):
         #logging.info(f'move_to_AGV_node--remaining path: {self.remaining_path}')
         self.moving_away = True
 
-
     def get_node_to_remove_replan_path(self,map):
         """
         Get the neighboring nodes of the robot's current position and remove any node that is not within the map or not part of the graph
@@ -1863,7 +1861,7 @@ class SmartAgent(AgentInterface):
 
             neighbor = map.free_neighboring_node(self.position, self.position)
             if neighbor is not None:
-                #neighbors_to_remove = self.get_node_to_remove_replan_path(map)
+
                 neighbors_to_remove = map.get_all_occupied_neighbors(self.position, 2)
                 if self.target in neighbors_to_remove:
                     neighbors_to_remove.remove(self.target)
