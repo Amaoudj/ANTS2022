@@ -959,9 +959,7 @@ class SmartAgent(AgentInterface):
 
 
         elif len(self.neighbors) == 2:  # if there are only 2 robots
-            print('Intersection conflict ')
-            print(self.neighbors[0])
-            print(self.neighbors[1])
+
 
             if self.is_free(critic_node, self.neighbors):  # no agent in the critic_node
 
@@ -1382,7 +1380,6 @@ class SmartAgent(AgentInterface):
 
 
         self.next_waypoint = self.remaining_path[0]
-
 
     def post_negotiation(self, map):
 
@@ -2037,6 +2034,10 @@ class SmartAgent(AgentInterface):
                 self.changed_action = True
                 self.send_my_data(map)
                 break
+        if not self.im_done:
+          print(f'waiting-times = {self.waiting_steps}')
+          print(map.neighbors_agents_stat[self.id])
+
 
         # logging.info(f'##############################################')
         # wait for this step
