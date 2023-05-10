@@ -489,26 +489,20 @@ class SmartAgent(AgentInterface):
         id_critic = None
         self.critic_node = critic_node
         candidates = self.neighbors.copy()
+        priority_agent = None
 
+        #used for confilicts ith two robots
         if self.neighbors[0]['AgentID'] == self.id:
             self.conflict_agent = self.neighbors[1]['AgentID']
         else:
             self.conflict_agent = self.neighbors[0]['AgentID']
 
-        priority_agent = None
-
-        # rule0>> got priority in the previous time step
+        # got priority in the previous time step
         for agent in candidates:
-            if (agent["got_priority_last_step"] and int(
-                    agent['remaining_nodes']) > 1):  # or agent['moving_away']: #or agent["moving_away"]:
+            if (agent["got_priority_last_step"] and int(agent['remaining_nodes']) > 1):  # or agent['moving_away']: #or agent["moving_away"]:
                 priority_agent = agent['AgentID']
                 if priority_agent == self.id:  # it is me
                     self.got_priority_last_step = False  #
-                break
-
-        for agent in candidates:
-            if int(agent['remaining_nodes']) == 1:
-                #candidates.remove(agent)
                 break
 
 
@@ -1288,19 +1282,6 @@ class SmartAgent(AgentInterface):
         else:
             self.conflict_agent = self.neighbors[0]['AgentID']
 
-        if priority_agent is None and len(candidates) == 1:
-            priority_agent = candidates[0]['AgentID']
-
-        # robot with free neighbour node
-        if priority_agent is None:
-                got_free_node1 = map.get_right_or_left_free_node(candidates[0]["pos"], candidates[1]["pos"],candidates[1]["next_next_node"])
-                got_free_node2 = map.get_right_or_left_free_node(candidates[1]["pos"], candidates[0]["pos"], candidates[0]["next_next_node"])
-
-                if got_free_node1 is None and got_free_node2 is not None:
-                    priority_agent = candidates[0]['AgentID']
-
-                elif got_free_node2 is None and got_free_node1 is not None:
-                    priority_agent = candidates[1]['AgentID']
 
         # if an agent is moving_backward or moving_away and the coflict_agent is the same, then it should continue and give the priority to the coflict_agent
         if priority_agent is None:
@@ -1323,6 +1304,17 @@ class SmartAgent(AgentInterface):
                       num_Followers = [agent['successors'] for agent in candidates]
                       indx = num_Followers.index(max_num_Followers)
                       priority_agent = candidates[indx]['AgentID']
+
+        # robot with free neighbour node
+        if priority_agent is None:
+            got_free_node1 = map.get_right_or_left_free_node(candidates[0]["pos"], candidates[1]["pos"], candidates[1]["next_next_node"])
+            got_free_node2 = map.get_right_or_left_free_node(candidates[1]["pos"], candidates[0]["pos"], candidates[0]["next_next_node"])
+
+            if got_free_node1 is None and got_free_node2 is not None:
+                priority_agent = candidates[0]['AgentID']
+
+            elif got_free_node2 is None and got_free_node1 is not None:
+                priority_agent = candidates[1]['AgentID']
 
         # the robot having the largest numberRequestsMyNode is given priority
         if priority_agent is None:
@@ -1362,7 +1354,6 @@ class SmartAgent(AgentInterface):
         for neighbor in self.neighbors:  # two agents
             if neighbor['AgentID'] == priority_agent:
                 self.critic_node = neighbor['pos']  # this is the critic node and priority_agent should move
-
                 break
 
         prohibited_node = None
@@ -1374,7 +1365,6 @@ class SmartAgent(AgentInterface):
                 solution[neighbor['AgentID']] = "move"
                 prohibited_node = neighbor['next_next_node']
                 threshould = neighbor['pos']
-
                 if priority_agent == self.id:
                     self.action = "move"
 
@@ -1388,7 +1378,7 @@ class SmartAgent(AgentInterface):
                         self.action = "wait"
                     else:
                         self.action = "move_out_of_the_way"
-                    self.next_waypoint = self.remaining_path[0]
+                    #self.next_waypoint = self.remaining_path[0]
 
 
         self.next_waypoint = self.remaining_path[0]

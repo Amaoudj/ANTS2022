@@ -439,9 +439,9 @@ def get_benchmark_data(bench_list):
         mapName = get_string_between_slashes(map_params[1][0])
 
 
-        if mapName == 'empty-48-48'or mapName == 'random-64-64-20' : #or mapName == 'warehouse-20-40-10-2-2':
+        if  mapName == 'random-64-64-20' : #or mapName == 'warehouse-20-40-10-2-2'or mapName == 'empty-48-48'or:
             new_robot_set = []
-            new_robot_set = [450]#250,300,350,400,
+            new_robot_set = [350, 400,450]#250,300,350,400,
 
         elif mapName == 'random-32-32-20':
             new_robot_set= []
