@@ -1569,6 +1569,7 @@ class SmartAgent(AgentInterface):
 
       return  got_free_node
 
+
     def move_out_of_the_way_intersection(self, map, threshold_node, prohibited_node):
         """
           used when there are more than one critic node
@@ -1878,7 +1879,6 @@ class SmartAgent(AgentInterface):
             self.waiting_steps = MIN_WAITING_TIME
             node_ = map.get_nearest_free_node(self.position)
 
-
             if node_ is not None:
                 saved_remaining_path = self.remaining_path.copy()
                 path = self._path_finder.astar_planner(map._graph, self.position, node_)
@@ -1903,7 +1903,6 @@ class SmartAgent(AgentInterface):
                 elif path_i is None or path is None:
                     self.remaining_path.clear()
                     self.remaining_path.extend(saved_remaining_path)  # keep the previous path
-
 
         # This is a long-term precaution
         if len(self.all_visited_nodes) > 10 and not self.im_done:
