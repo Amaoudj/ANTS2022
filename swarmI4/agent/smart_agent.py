@@ -1872,7 +1872,6 @@ class SmartAgent(AgentInterface):
                 else:
                     MIN_WAITING_TIME += 1
 
-
         if self.waiting_steps == MIN_WAITING_TIME + 4 and not self.im_done:
 
             self.waiting_steps = MIN_WAITING_TIME
