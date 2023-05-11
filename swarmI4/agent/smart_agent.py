@@ -1798,7 +1798,7 @@ class SmartAgent(AgentInterface):
 
                         if path_i[0] == self.position and self.position != self.target:
                             path_i.pop(0)
-                        self.remaining_pathpath_i#.clear()
+                        self.remaining_path=path_i#.clear()
                         #self.remaining_path.extend(path_i)  #
                     else :
                          MIN_WAITING_TIME += 1
@@ -1826,8 +1826,8 @@ class SmartAgent(AgentInterface):
 
                         if path_i[0] == self.position and self.position != self.target_list[0]:
                             path_i.pop(0)
-                        self.remaining_path.clear()
-                        self.remaining_path.extend(path_i)  #
+                        self.remaining_path=path_i#.clear()
+                        #self.remaining_path.extend(path_i)  #
                         self.num_replanned_paths += 1
                     else :
                          MIN_WAITING_TIME += 1
@@ -1849,8 +1849,8 @@ class SmartAgent(AgentInterface):
 
                 if path_i[0] == self.position and self.position != self.target_list[0]:
                     path_i.pop(0)
-                self.remaining_path.clear()
-                self.remaining_path.extend(path_i)  #
+                self.remaining_path=path_i#.clear()
+                #self.remaining_path.extend(path_i)  #
             else:
                 MIN_WAITING_TIME += 1
 
@@ -1871,8 +1871,8 @@ class SmartAgent(AgentInterface):
                 if path_i is not None and len(path_i) > 0:
                         if path_i[0] == self.position:
                             path_i.pop(0)
-                        self.remaining_path.clear()
-                        self.remaining_path.extend(path_i)  #
+                        self.remaining_path=path_i#.clear()
+                        #self.remaining_path.extend(path_i)  #
                 else:
                     MIN_WAITING_TIME += 1
 
