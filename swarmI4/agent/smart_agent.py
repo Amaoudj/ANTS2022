@@ -1798,12 +1798,12 @@ class SmartAgent(AgentInterface):
 
                         if path_i[0] == self.position and self.position != self.target:
                             path_i.pop(0)
-                        self.remaining_path=path_i#
+                        self.remaining_path = path_i#
                     else :
                          MIN_WAITING_TIME += 1
 
         # Try again, only agents having free neighboring nodes, have to replan the path while consider the occupied neighbors as obstacles
-        if self.waiting_steps == MIN_WAITING_TIME + 100 and not self.im_done :
+        if self.waiting_steps == MIN_WAITING_TIME + 1 and not self.im_done :
 
             neighbor = map.free_neighboring_node(self.position, self.position)
 
@@ -1831,7 +1831,7 @@ class SmartAgent(AgentInterface):
                          MIN_WAITING_TIME += 1
 
         # Try again, all agents, to replan the path while considering the occupied neighbors as obstacles
-        if self.waiting_steps == MIN_WAITING_TIME + 200 and not self.im_done :  # there is another deadlock
+        if self.waiting_steps == MIN_WAITING_TIME + 2 and not self.im_done :  # there is another deadlock
             neighbors = map.get_neighbors(self.position, diagonal=False)
             neighbor = map.free_neighboring_node(self.position, self.position)
 
@@ -1873,7 +1873,7 @@ class SmartAgent(AgentInterface):
                     MIN_WAITING_TIME += 1
 
 
-        if self.waiting_steps == MIN_WAITING_TIME + 1 and not self.im_done:
+        if self.waiting_steps == MIN_WAITING_TIME + 3 and not self.im_done:
 
             self.waiting_steps = MIN_WAITING_TIME
             node_ = map.get_nearest_free_node(self.position)
