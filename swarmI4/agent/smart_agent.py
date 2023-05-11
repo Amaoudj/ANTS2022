@@ -1798,13 +1798,12 @@ class SmartAgent(AgentInterface):
 
                         if path_i[0] == self.position and self.position != self.target:
                             path_i.pop(0)
-                        self.remaining_path=path_i#.clear()
-                        #self.remaining_path.extend(path_i)  #
+                        self.remaining_path=path_i#
                     else :
                          MIN_WAITING_TIME += 1
 
         # Try again, only agents having free neighboring nodes, have to replan the path while consider the occupied neighbors as obstacles
-        if self.waiting_steps == MIN_WAITING_TIME + 1 and not self.im_done :
+        if self.waiting_steps == MIN_WAITING_TIME + 100 and not self.im_done :
 
             neighbor = map.free_neighboring_node(self.position, self.position)
 
@@ -1826,14 +1825,13 @@ class SmartAgent(AgentInterface):
 
                         if path_i[0] == self.position and self.position != self.target_list[0]:
                             path_i.pop(0)
-                        self.remaining_path=path_i#.clear()
-                        #self.remaining_path.extend(path_i)  #
-                        self.num_replanned_paths += 1
+                        self.remaining_path=path_i
+
                     else :
                          MIN_WAITING_TIME += 1
 
         # Try again, all agents, to replan the path while considering the occupied neighbors as obstacles
-        if self.waiting_steps == MIN_WAITING_TIME + 2 and not self.im_done :  # there is another deadlock
+        if self.waiting_steps == MIN_WAITING_TIME + 200 and not self.im_done :  # there is another deadlock
             neighbors = map.get_neighbors(self.position, diagonal=False)
             neighbor = map.free_neighboring_node(self.position, self.position)
 
@@ -1849,13 +1847,12 @@ class SmartAgent(AgentInterface):
 
                 if path_i[0] == self.position and self.position != self.target_list[0]:
                     path_i.pop(0)
-                self.remaining_path=path_i#.clear()
-                #self.remaining_path.extend(path_i)  #
+                self.remaining_path=path_i
             else:
                 MIN_WAITING_TIME += 1
 
         # Try again to replan the path while considering only the next node as an obstacle
-        if self.waiting_steps == MIN_WAITING_TIME + 3 and not self.im_done :  #
+        if self.waiting_steps == MIN_WAITING_TIME + 300 and not self.im_done :  #
 
             if self.remaining_path is not None and len(self.remaining_path) > 1:
                 if self.remaining_path[0] != self.position and self.remaining_path[0] != self.target:
@@ -1871,13 +1868,12 @@ class SmartAgent(AgentInterface):
                 if path_i is not None and len(path_i) > 0:
                         if path_i[0] == self.position:
                             path_i.pop(0)
-                        self.remaining_path=path_i#.clear()
-                        #self.remaining_path.extend(path_i)  #
+                        self.remaining_path=path_i
                 else:
                     MIN_WAITING_TIME += 1
 
 
-        if self.waiting_steps == MIN_WAITING_TIME + 4and not self.im_done:
+        if self.waiting_steps == MIN_WAITING_TIME + 1 and not self.im_done:
 
             self.waiting_steps = MIN_WAITING_TIME
             node_ = map.get_nearest_free_node(self.position)
@@ -1890,9 +1886,8 @@ class SmartAgent(AgentInterface):
                     self.moving_away = True
                     if path[0] == self.position and self.position != self.target:
                         path.pop(0)
-                    self.path = path
-                    self.remaining_path= path#.clear()
-                    #self.remaining_path.extend(path)  #
+
+                    self.remaining_path = path
 
                 path_i = self._path_finder.astar_replan(map._copy_graph, node_, self.target,[self.remaining_path[len(self.remaining_path) - 2]])
                 if path_i is None:
@@ -1921,8 +1916,7 @@ class SmartAgent(AgentInterface):
                         self.all_visited_nodes.clear()
                         if path_i[0] == self.position:
                             path_i.pop(0)
-                        self.remaining_path=path_i#.clear()
-                        #self.remaining_path.extend(path_i)  #
+                        self.remaining_path=path_i
 
         #Update some variables
         if self.remaining_path is None or len(self.remaining_path) == 0:
