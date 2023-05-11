@@ -11,7 +11,7 @@ git clone https://github.com/Amaoudj/ANTS2022.git
 
 cd ANTS2022
 ```
-Add the maps along with their scenario files to the 'benchmarks' folder. Note that the folder containing the scenarios of a map should have the same name as the map. Also, it is important that the maps are formatted according to the standards provided at https://movingai.com/benchmarks/mapf/index.html.".
+Add the maps along with their scenario files to the 'benchmarks' folder. Note that the folder containing the scenarios of a map should have the same name as the map.
 
 In the configuration file located at 'configfiles/experiments_configuration.conf', adjust the number of processes you can run in parallel "batch_size", according to your computer's specifications, to either 1, 5, or 25.
 
