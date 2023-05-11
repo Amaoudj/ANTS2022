@@ -7,15 +7,28 @@ This simulator is developed as part of the "Swarm Robotics for I4.0" research pr
 From a terminal:
 
 ```sh
-git clone https://github.com/anderslyhne/swarm4I40sim.git
+git clone https://github.com/Amaoudj/ANTS2022.git
 
-cd swarm4I40sim
+cd ANTS2022
 ```
-To run an example from the terminal:
+Add the maps along with their scenario files to the 'benchmarks' folder. Note that the folder containing the scenarios of a map should have the same name as the map. Also, it is important that the maps are formatted according to the standards provided at https://movingai.com/benchmarks/mapf/index.html.".
+
+In the configuration file located at 'configfiles/experiments_configuration.conf', adjust the number of processes you can run in parallel "batch_size", according to your computer's specifications, to either 1, 5, or 25.
+
+To run experiments and plot the results from the terminal:
 
 ```sh
-python -m swarmI40 -c configfiles/example.conf
+python3 codeRunner.py
 ```
+To run only experiments from the terminal
+
+```sh
+python3 run_experiments.py -c configfiles/experiments_configuration.conf
+```
+
+The results can be found in the folder 'results_plot/results_data_solvers/DCMAPF/results.csv'.
+
+The plots can be found in the folder 'results_plot/plots'.
 
 # Using pycharm in docker
 Build the docker image (install docker.io if not already installed `sudo apt install docker.io`):
