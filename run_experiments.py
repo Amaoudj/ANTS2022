@@ -171,7 +171,7 @@ def parse_args():
     parser.add_argument("-batch", "--batch_size",
                         help="number of simulations executed at once",
                         nargs=1, metavar="batch_size", type=int,
-                        default=5)
+                        default=1)
 
     parser.add_argument("-l", "--loglevel",
                         help="Logging level",
@@ -189,9 +189,9 @@ def parse_args():
 
     parser.add_argument("-e", "--experiment",
                         help="Experiment to run",
-                        nargs=1, metavar="experiment", choices=["BaseExperiment", "AndersTestExperiment","Experiment"],
+                        nargs=1, metavar="experiment", choices=["BaseExperiment", "Experiment"],
                         type=str,
-                        default="RaoufExperiment")
+                        default="Experiment")
 
     parser.add_argument("-cmap", "--create_map",
                         help="if the simulation is successful store it's map",

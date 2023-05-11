@@ -1852,7 +1852,7 @@ class SmartAgent(AgentInterface):
                 MIN_WAITING_TIME += 1
 
         # Try again to replan the path while considering only the next node as an obstacle
-        if self.waiting_steps == MIN_WAITING_TIME + 300 and not self.im_done :  #
+        if self.waiting_steps == MIN_WAITING_TIME + 3 and not self.im_done :  #
 
             if self.remaining_path is not None and len(self.remaining_path) > 1:
                 if self.remaining_path[0] != self.position and self.remaining_path[0] != self.target:
@@ -1873,7 +1873,7 @@ class SmartAgent(AgentInterface):
                     MIN_WAITING_TIME += 1
 
 
-        if self.waiting_steps == MIN_WAITING_TIME + 3 and not self.im_done:
+        if self.waiting_steps == MIN_WAITING_TIME + 4 and not self.im_done:
 
             self.waiting_steps = MIN_WAITING_TIME
             node_ = map.get_nearest_free_node(self.position)
