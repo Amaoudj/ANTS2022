@@ -1,7 +1,7 @@
-# Swarm Robotics for I4.0 Simple Simulator
+# Decentralized Multi-Agent Path Finding in Warehouse Environments for Fleets of Mobile Robots with Limited Communication Range
 
-This simulator is developed as part of the "Swarm Robotics for I4.0" research project. The goal is to enable the simulation on embodied agents operating in a discrete world. The world is a graph where nodes are locations and edges denote connectivity between locations.
-
+This simulator has been developed as part of the 'Swarm Robotics for I4.0' research project. The work features a decentralized multi-agent path-finding approach for mobile robots with a limited communication range, known as DCMAPF. In the proposed DCMAPF planner,
+each robot plans its shortest path offline, and then autonomously coordinates with its neighbors to solve potential conflicts as they occur during task execution. 
 # Getting started
 
 From a terminal:
