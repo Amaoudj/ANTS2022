@@ -45,13 +45,13 @@ class Swarm(object):
 
         for number, gen in agent_generators:
             for i in range(total_number_of_agents):
-                position,targets= placement_func(i, total_number_of_agents, my_map)  #  agent_placement >> custum_placement (see agent_placement in agent folde)
+                position,targets= placement_func(i, total_number_of_agents, my_map)  #
 
                 if args.agent_placement == "random_placement":
                    targets, _ = placement_func(i, total_number_of_agents, my_map)
 
                 agent = gen(position)
-                if targets is not None and args.agent_placement != "random_placement":  # go to this function
+                if targets is not None and args.agent_placement != "random_placement":  #
                     agent.target_list.append(targets)
                     my_map.set_as_target(targets)
 
@@ -70,10 +70,9 @@ class Swarm(object):
     def agents_post_coordination(self):
         for i in range(0,6):
           self.update_msg_box()
-          # post_negotiation
           for agent in self._agents:
             if type(agent) is SmartAgent:
-                agent.post_coordination(self._my_map)  # to solve the conflicts if two agents plan the same next_node
+                agent.post_coordination(self._my_map)
           self.update_msg_box()
           for agent in self._agents:
             if type(agent) is SmartAgent:
