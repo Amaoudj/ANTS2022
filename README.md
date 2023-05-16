@@ -29,6 +29,6 @@ The plots can be found in the folder 'results_plot/plots'.
 
 # Credit
 
-The simulation code and the Makefile/docker setup is based on https://github.com/TheWorldOfCode/project-in-swarms by Dan Nykjær Jakobsen <dannj75@gmail.com>. Via email, the author informed me that the code should be distributed under the BSD-3 licence.
+The simulation code is based on https://github.com/TheWorldOfCode/project-in-swarms by Dan Nykjær Jakobsen <dannj75@gmail.com>. Via email, the author informed me that the code should be distributed under the BSD-3 licence.
 
 
