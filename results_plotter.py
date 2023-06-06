@@ -89,23 +89,31 @@ def success_rate_and_soc_plot(filtered_res):
                 valid_groups = {int(k): v for k, v in n_agents_groups if int(k) in ROBOT_SET[i]}
                 #print(f"For {solver} on {map}, valid groups are: {valid_groups.keys()}")
 
+                soc_mean = 0
+                successes = 0
                 for group_key, group_value in valid_groups.items():
-                    if solver == 'DCMAPF': #
 
+                    if solver == 'DCMAPF':  #
                         solved_numeric = group_value['solved']
-                        successes = solved_numeric.value_counts().get(True, 0)      # Compute the number of solved scenarios, where solved is True
-
-                    else :
+                        successes = solved_numeric.value_counts().get(True,0)  # Compute the number of solved scenarios, where solved is True
+                    else:
                         solved_numeric = pd.to_numeric(group_value['solved'], errors='coerce')
-                        successes      = solved_numeric.value_counts().get(1, 0)    # Compute the number of solved scenarios, where solved is 1
+                        successes = solved_numeric.value_counts().get(1,0)  # Compute the number of solved scenarios, where solved is 1
 
-                    success_rate   = successes / len(solved_numeric)
-
-
+                    success_rate = successes / len(solved_numeric)
                     s_rates[solver][map][group_key] = success_rate
-                    soc_numeric = pd.to_numeric(group_value['soc'], errors='coerce')
-                    soc_mean = soc_numeric[solved_numeric == 1].mean()
+
+                    if solver == 'DCMAPF':  #
+                        solved_boolean = group_value['solved']
+                        soc_numeric = pd.to_numeric(group_value['soc'], errors='coerce')
+                        soc_mean = soc_numeric[solved_boolean].mean()
+
+                    else:
+                        soc_numeric = pd.to_numeric(group_value['soc'], errors='coerce')
+                        soc_mean = soc_numeric[solved_numeric == 1].mean()
+
                     soc_rates[solver][map][group_key] = soc_mean
+
 
             except KeyError:
                 print(f'{map} does not exist in the result file of the folder {solver}')
