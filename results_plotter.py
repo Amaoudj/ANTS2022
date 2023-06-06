@@ -8,7 +8,7 @@ import os
 import sys
 
 RESULTS_FOLDER = "results_plot/results_data_solvers"
-folder_path = "results_plot/plots"
+folder_path    = "results_plot/plots"
 
 FILTERS = ['map_name']
 
@@ -20,11 +20,12 @@ marker_styles = [
     dict(color='red', linestyle='dashed', marker='D', markersize=5, mfc='white', linewidth=1.5)
     ]
 
-SOLVERS = ['CBS', 'EECBS', 'PIBT', 'PIBT+', 'DCMAPF']
+SOLVERS = ['CBS', 'EECBS', 'PIBT', 'PIBT+', 'DCMAPF']#
 
 ROBOT_SET = [[50, 100, 150, 200, 250, 300, 350, 400, 450], [50, 100, 150, 200], [50, 100, 150, 200, 250, 300,350,400, 450], [50, 100, 150, 200, 250, 300, 350, 450]]
 
 MAPS_TO_PLOT = ['empty-48-48.map', 'random-32-32-20.map', 'random-64-64-20.map','warehouse-20-40-10-2-2.map']
+
 
 def import_results(folder: str) -> dict:
     """
@@ -49,7 +50,6 @@ def import_results(folder: str) -> dict:
 
     return solvers_df
 
-
 def filter_by_map(results_df: dict):
     filtered_results = {}
     for solver in results_df:
@@ -67,151 +67,105 @@ def clean_dataframe(df, column_names):
     df = df.dropna(subset=column_names)
     return df
 
-
-
-def success_rate_plot(filtered_res):
-
-    # Create the plots folder if it does not exist
+def success_rate_and_soc_plot(filtered_res):
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
 
     s_rates = {}
+    soc_rates = {}
+
     for solver in filtered_res:
         s_rates[solver] = {}
+        soc_rates[solver] = {}
         for map_name in filtered_res[solver]:
-            filtered_res[solver][map_name] = clean_dataframe(filtered_res[solver][map_name], ['solved', 'num_agents'])
+            filtered_res[solver][map_name] = clean_dataframe(filtered_res[solver][map_name], ['solved', 'num_agents', 'soc'])
 
         for i, map in enumerate(MAPS_TO_PLOT):
-
             try:
                 s_rates[solver][map] = {}
+                soc_rates[solver][map] = {}
                 n_agents_groups = filtered_res[solver][map].groupby('num_agents')
 
-                for group in n_agents_groups:
-                    g0  = pd.to_numeric(group[0], errors='coerce')
+                valid_groups = {int(k): v for k, v in n_agents_groups if int(k) in ROBOT_SET[i]}
+                #print(f"For {solver} on {map}, valid groups are: {valid_groups.keys()}")
 
-                    if g0 in ROBOT_SET[i]:#group[0]
-                        s_rate = 0
+                for group_key, group_value in valid_groups.items():
+                    if solver == 'DCMAPF': #
 
-                        # Filter out non-numeric values using pd.to_numeric()
-                        solved_numeric = pd.to_numeric(group[1]['solved'], errors='coerce')
+                        solved_numeric = group_value['solved']
+                        successes = solved_numeric.value_counts().get(True, 0)      # Compute the number of solved scenarios, where solved is True
 
-                        if 1 in solved_numeric.to_list() or True in solved_numeric.to_list():
-                        #if 1 in group[1]['solved'].to_list() or True in group[1]['solved'].to_list():
-                            s_rate = solved_numeric.mean() * 100
+                    else :
+                        solved_numeric = pd.to_numeric(group_value['solved'], errors='coerce')
+                        successes      = solved_numeric.value_counts().get(1, 0)    # Compute the number of solved scenarios, where solved is 1
 
-                        s_rates[solver][map][g0] = s_rate / 100.0  #group[0]
-                    else:
-                        pass
+                    success_rate   = successes / len(solved_numeric)
+
+
+                    s_rates[solver][map][group_key] = success_rate
+                    soc_numeric = pd.to_numeric(group_value['soc'], errors='coerce')
+                    soc_mean = soc_numeric[solved_numeric == 1].mean()
+                    soc_rates[solver][map][group_key] = soc_mean
+
             except KeyError:
                 print(f'{map} does not exist in the result file of the folder {solver}')
 
-    for map in MAPS_TO_PLOT:
+
+    for i, map in enumerate(MAPS_TO_PLOT): #map in MAPS_TO_PLOT:
+        fig, axs = plt.subplots(1, 2, figsize=(15, 4))
+        plt.subplots_adjust(wspace=0.2)  # add space between subplots
+        plt.subplots_adjust(left=0.05)  #,right=1 adjust this line to remove space on the left and right
+
         legend_list = []
+
         for id, solver in enumerate(s_rates):
             try:
                 x_axis = s_rates[solver][map].keys()
                 y_axis = s_rates[solver][map].values()
-                plt.plot(x_axis, y_axis, **marker_styles[id])
+                axs[0].plot(x_axis, y_axis, **marker_styles[id])
                 legend_list.append(solver)
+
+                y_axis_soc = soc_rates[solver][map].values()
+                axs[1].plot(x_axis, y_axis_soc, **marker_styles[id])
+
             except KeyError:
                 print(f'{map} do not exist in the solver : {solver}')
 
-        plt.ylim(bottom=0, top=1.05)
-        plt.legend(legend_list, fontsize=13)
-        plt.xlabel('Number of robots', fontsize=13)
-        plt.ylabel('Success rate', fontsize=13)
+        # set x-axis to match the values defined in ROBOT_SET[i]
+        axs[0].set_xticks(ROBOT_SET[i])
+        axs[1].set_xticks(ROBOT_SET[i])
 
-        title = f'Success rate in {map[:-4]}.png'
-        file_path =  os.path.join(folder_path, title)
-        plt.savefig(file_path)
-        plt.show()
-        fig = plt.gcf()  # Get the current figure
-        plt.close(fig)  # Close the figure
+        axs[0].set_ylim(bottom=0, top=1.05)
+        axs[0].set_ylabel('Success rate', fontsize=13)
 
+        axs[1].set_ylabel('Sum-of-costs', fontsize=13)
 
-def general_plot(filtered_res, axis):
-    x_axis_name, y_axis_name = axis
+        axs[0].set_xlabel('Number of robots', fontsize=13)
+        axs[1].set_xlabel('Number of robots', fontsize=13)
 
-    for solver in filtered_res:
-        for map_name in filtered_res[solver]:
-            filtered_res[solver][map_name] = clean_dataframe(filtered_res[solver][map_name], ['solved', 'num_agents', 'soc'])
+        # set legend for each subplot to contain all algorithms
+        if map == 'random-32-32-20.map':
+            # set legend for each subplot to contain all algorithms and place it at the middle bottom
+            axs[0].legend(legend_list, loc='lower center', bbox_to_anchor=(0.5, 0), fontsize=12)
+        else:
+            axs[0].legend(legend_list, fontsize=12)
 
-    for i, map in enumerate(MAPS_TO_PLOT):
-        legend_list = []
-        for id, solver in enumerate(filtered_res):
-            x_axis_val, y_axis_val = [], []
-            try:
+        axs[1].legend(legend_list, fontsize=12)
 
-                # Filter out non-numeric values using pd.to_numeric()
-                solved_numeric = pd.to_numeric(filtered_res[solver][map]['solved'], errors='coerce')
+        #plt.suptitle(f'{map[:-4]}')
 
-                #if -1 in filtered_res[solver][map]['solved'].to_list():
-                if -1 in solved_numeric.to_list():
-                    filtered_res[solver][map] = filtered_res[solver][map][solved_numeric != -1]
-
-                #elif 0 in filtered_res[solver][map]['solved'].to_list():
-                elif 0 in solved_numeric.to_list():
-                    filtered_res[solver][map] = filtered_res[solver][map][solved_numeric != 0]
-
-                #elif False in filtered_res[solver][map]['solved'].to_list():
-                elif False in solved_numeric.to_list():
-                    filtered_res[solver][map] = filtered_res[solver][map][solved_numeric != False]
-
-                #print(f'-----------------------------------------------')
-
-                n_agents_groups = filtered_res[solver][map].groupby('num_agents')
-                #solved_numeric = pd.to_numeric(n_agents_groups, errors='coerce')
-
-                for group in n_agents_groups: #solved_numeric.to_list()
-                    G0=pd.to_numeric(group[0], errors='coerce')
-                    G1=pd.to_numeric(group[1].mean()[y_axis_name], errors='coerce')
-
-                    if G0 in ROBOT_SET[i]: #group[0]
-                        y_axis_val.append(G1)#
-                        x_axis_val.append(G0)#group[0]
-
-                    else:
-                        pass
-                legend_list.append(solver)
-                plt.plot(x_axis_val, y_axis_val, **marker_styles[id])
-            except KeyError:
-                print(f'{map} do not exist in the solver : {solver}')
-        title = f'{y_axis_name.replace("_", " ")} in {map[:-4]}.png'
-
-        # -----------------------
-        plt.legend(legend_list, fontsize=13)
-        plt.xlabel('Number of robots', fontsize=13)
-        plt.ylabel('Sum-of-costs', fontsize=13)
-        file_path =  os.path.join(folder_path, title)
-        plt.savefig(file_path)
-        plt.show()
-        fig = plt.gcf()  # Get the current figure
-        plt.close(fig)  # Close the figure
-
-
-
-def remove_empty_lines(input_file):
-    df = pd.read_csv(input_file)
-    df.dropna(how='all', inplace=True)  # Remove rows with all missing values
-    df.to_csv(input_file, index=False)
-
-def remove_last_empty_line(input_file):
-    # Read the CSV file into a pandas DataFrame
-    df = pd.read_csv(input_file)
-    # Remove any rows with all missing values
-    df.dropna(how='all', inplace=True)
-    # Write the cleaned DataFrame back to the original file
-    df.to_csv(input_file, index=False, encoding='utf-8')
+        title = f'{map[:-4]}.pdf'
+        file_path = os.path.join(folder_path, title)
+        plt.savefig(file_path, format='pdf')
+        plt.close(fig)
 
 
 def main():
 
-   remove_empty_lines( "results_plot/results_data_solvers/DCMAPF/results.csv")
    data = import_results(RESULTS_FOLDER)
    filtered_res = filter_by_map(data)
-   success_rate_plot(filtered_res)
-   general_plot(filtered_res,['num_agents','soc'])
+   success_rate_and_soc_plot(filtered_res)
+
 
 if __name__ == "__main__":
     main()
